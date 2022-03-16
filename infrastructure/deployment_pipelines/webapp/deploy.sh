@@ -4,7 +4,7 @@ aws cloudformation deploy \
   --template-file ./template.yaml \
   --region $REGION \
   --capabilities CAPABILITY_IAM \
-  --stack-name klubby-webapp-fe-hosting \
+  --stack-name klubby-deployment-webapp-prod \
   --parameter-overrides \
       ProjectName=klubby-webapp \
       Repository=https://github.com/bjudson1/klubby-react-app	\
@@ -12,24 +12,16 @@ aws cloudformation deploy \
       Domain=klubby.me \
       Branch=main
 
-# source awsume lea-staging-kernel
+# source awsume klubby-dev
 
-# aws cloudformation deploy \
-#   --template-file ./template.yaml \
-#   --capabilities CAPABILITY_IAM \
-#   --stack-name lea-frontend-staging \
-#   --parameter-overrides \
-#       Repository=https://github.com/outsidesource/LEA-ConnectAmpSPA \
-#       Domain=test.leaprofessional.cloud \
-#       Branch=develop
-
-# source awsume lea-prod-kernel
-
-# aws cloudformation deploy \
-#   --template-file ./template.yaml \
-#   --capabilities CAPABILITY_IAM \
-#   --stack-name lea-frontend-prod \
-#   --parameter-overrides \
-#       Repository=https://github.com/outsidesource/LEA-ConnectAmpSPA \
-#       Domain=leaprofessional.cloud \
-#       Branch=master
+aws cloudformation deploy \
+  --template-file ./template.yaml \
+  --region $REGION \
+  --capabilities CAPABILITY_IAM \
+  --stack-name klubby-deployment-webapp-dev \
+  --parameter-overrides \
+      ProjectName=klubby-webapp \
+      Repository=https://github.com/bjudson1/klubby-react-app \
+      OauthToken=$OAUTH \
+      Domain=dev.klubby.me \
+      Branch=dev

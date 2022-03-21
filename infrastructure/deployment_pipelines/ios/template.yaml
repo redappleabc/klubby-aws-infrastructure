@@ -47,6 +47,10 @@ Parameters:
   #   Default: personal-webpage-data-storage
   #   AllowedPattern: "[A-Za-z0-9-]+"
 
+  JenkinsServerURL:
+    Type: String
+    Default: http://65.25.51.190:15150
+
 Resources:
   PipelineArtifactsBucket:
     Type: AWS::S3::Bucket
@@ -72,8 +76,37 @@ Resources:
             Value: !Ref Stage
       ServiceRole: !Ref CodeBuildRole
 
+  JenkinsCustomActionType:
+    Type: AWS::CodePipeline::CustomActionType
+    Properties:
+      Category: Build
+      Provider: !Sub klubby-ios-${Stage}
+      Version: "1"
+      ConfigurationProperties:
+        -
+          Description: "Name of project. Needs to match jenkins."
+          Key: true
+          Name: ProjectName
+          Queryable: true
+          Required: true
+          Secret: false
+          Type: String
+      InputArtifactDetails:
+        MaximumCount: 5
+        MinimumCount: 0
+      OutputArtifactDetails:
+        MaximumCount: 5
+        MinimumCount: 0
+      Settings:
+        EntityUrlTemplate: !Join ['', [!Ref JenkinsServerURL, !Sub "/job/klubby-ios-${Stage}/"]]
+        ExecutionUrlTemplate: !Join ['', [!Ref JenkinsServerURL, !Sub "/job/${Stage}/{ExternalExecutionId}/"]]
+      Tags:
+        - Key: Name
+          Value: klubby-ios-dev-jenkins-custom-action
+
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
+    DependsOn: JenkinsCustomActionType
     Properties:
       ArtifactStore:
         Type: S3
@@ -117,21 +150,37 @@ Resources:
       #       StackName: !Ref ApplicationStackName
       #       TemplatePath: !Sub "SourceCode::application.yaml"
       #     RunOrder: 1
-      - Name: Deploy
+      # - Name: Deploy
+      #   Actions:
+      #   - Name: DeployJob
+      #     ActionTypeId:
+      #       Owner: AWS
+      #       Category: Build
+      #       Version: '1'
+      #       Provider: CodeBuild
+      #     Configuration:
+      #       ProjectName: !Ref CodeBuildDeployBackend
+      #     InputArtifacts:
+      #       - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
+      #     OutputArtifacts:
+      #       - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
+      #     RunOrder: 2
+      - Name: iosBuild
         Actions:
-        - Name: DeployJob
+        - Name: jenkins-ios-build
           ActionTypeId:
-            Owner: AWS
+            Owner: Custom
             Category: Build
-            Version: '1'
-            Provider: CodeBuild
+            Version: 1
+            Provider: !Sub klubby-ios-${Stage}
           Configuration:
-            ProjectName: !Ref CodeBuildDeployBackend
+            ProjectName: !Sub klubby-ios-${Stage}
           InputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
           OutputArtifacts:
-            - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
-          RunOrder: 1
+            - Name: 'iosArtifact'
+            # - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact2'
+          RunOrder: 2
           
 
   # 'GithubWebhook' satisfies two requirements:

@@ -1,7 +1,10 @@
 # klubby-aws-infrastructure
 klubby-aws-infrastructure
 
-![FE CICD](documentation/fe-cicd-arch.png)
+<!-- ![FE CICD](documentation/images/fe-cicd-arch.png) -->
+
+<img src="documentation/images/fe-cicd-arch.png" width="600"/>
+
 
 [AWS Blog Post - iOS GitPipeline](https://aws.amazon.com/blogs/devops/building-and-testing-ios-and-ipados-apps-with-aws-devops-and-mobile-services/)
 

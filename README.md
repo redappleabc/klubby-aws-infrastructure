@@ -1,7 +1,13 @@
 # klubby-aws-infrastructure
-klubby-aws-infrastructure
+This repo contains the AWS infrastructure for the Klubby Application.
 
-<!-- ![FE CICD](documentation/images/fe-cicd-arch.png) -->
+## Infrastructure Components
+The following section goes through the major components of the AWS infrastructure.
+
+
+### Deployment Pipelines - Maybe name FE CICD
+
+A high level overview for the architecture of the Front-End CICD can be seen in the following diagram.
 
 <img src="documentation/images/fe-cicd-arch.png" width="600"/>
 

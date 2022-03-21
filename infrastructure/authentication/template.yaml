@@ -1,0 +1,96 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Cognito Stack
+Parameters:
+  ProjectName:
+    Type: String
+    Default: klubby
+    Description: Unique Auth Name for Cognito Resources
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+Resources:
+  # Creates a role that allows Cognito to send SNS messages
+  SNSRole:
+    Type: "AWS::IAM::Role"
+    Properties:
+      AssumeRolePolicyDocument: 
+        Version: "2012-10-17"
+        Statement:
+          - Effect: "Allow"
+            Principal: 
+              Service: 
+                - "cognito-idp.amazonaws.com"
+            Action: 
+              - "sts:AssumeRole"
+      Policies:
+        - PolicyName: "CognitoSNSPolicy"
+          PolicyDocument: 
+            Version: "2012-10-17"
+            Statement: 
+              - Effect: "Allow"
+                Action: "sns:*"
+                Resource: "*"
+  # Creates a user pool in cognito for your app to auth against
+  UserPool:
+    Type: "AWS::Cognito::UserPool"
+    Properties:
+      UserPoolName: !Sub ${ProjectName}-user-pool-${Stage}
+      AutoVerifiedAttributes:
+        - email
+      #   - phone_number
+      # MfaConfiguration: "ON"
+      # SmsConfiguration:
+      #   ExternalId: !Sub ${ProjectName}-external
+      #   SnsCallerArn: !GetAtt SNSRole.Arn
+      Schema:
+        - Name: name
+          AttributeDataType: String
+          Mutable: true
+          Required: true
+        - Name: email
+          AttributeDataType: String
+          Mutable: false
+          Required: true
+        # - Name: phone_number
+        #   AttributeDataType: String
+        #   Mutable: false
+        #   Required: true
+        # - Name: slackId
+        #   AttributeDataType: String
+        #   Mutable: true
+  UserPoolDomain: 
+    Type: AWS::Cognito::UserPoolDomain 
+    Properties:
+      UserPoolId: !Ref UserPool 
+      Domain: klubby
+  UserPoolTokenClient:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+    #TODO understand these
+      AllowedOAuthFlows:
+        # - code
+        - implicit
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - aws.cognito.signin.user.admin
+      CallbackURLs:
+        - https://klubby.me
+      LogoutURLs:
+        - https://klubby.me
+      UserPoolId: !Ref UserPool
+      GenerateSecret: false
+      ExplicitAuthFlows:
+      - USER_PASSWORD_AUTH
+      SupportedIdentityProviders:
+        - COGNITO
+  # UserPoolUser:
+  #    Type: AWS::Cognito::UserPoolUser
+  #    Properties:
+  #      DesiredDeliveryMediums:
+  #        - EMAIL
+  #      Username: bjudson@trek10.com
+  #      UserPoolId: !Ref UserPool

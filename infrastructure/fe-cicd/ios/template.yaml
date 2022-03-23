@@ -33,8 +33,8 @@ Parameters:
 
   GitHubRepo:
     Type: String
-    Default: klubby-react-app
-    AllowedPattern: "[A-Za-z0-9-]+"
+    Default: bjudson1/klubby-react-app
+    # AllowedPattern: "[A-Za-z0-9-]+"
 
   GitHubBranch:
     Type: String
@@ -104,6 +104,12 @@ Resources:
         - Key: Name
           Value: klubby-ios-dev-jenkins-custom-action
 
+  CodeStarConnection:
+    Type: AWS::CodeStarConnections::Connection
+    Properties:
+      ConnectionName: !Sub ios-${Stage}-codestar-connection
+      ProviderType: GitHub
+
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
     DependsOn: JenkinsCustomActionType
@@ -116,22 +122,38 @@ Resources:
       Stages:
       - Name: Source
         Actions:
-        - Name: Source
-          InputArtifacts: []
-          ActionTypeId:
-            Category: Source
-            Owner: ThirdParty
-            Version: '1'
-            Provider: GitHub
-          OutputArtifacts:
-          - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
-          Configuration:
-            Owner: !Ref GitHubOwner
-            Repo: !Ref GitHubRepo
-            Branch: !Ref GitHubBranch
-            PollForSourceChanges: false
-            OAuthToken: !Ref GitHubOAuthToken
-          RunOrder: 1
+          - Name: Source
+            RunOrder: 1
+            InputArtifacts: []
+            ActionTypeId:
+              Category: Source
+              Owner: AWS
+              Provider: CodeStarSourceConnection
+              Version: '1'
+            OutputArtifacts:
+            - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
+            Configuration:
+              ConnectionArn: !Ref CodeStarConnection
+              FullRepositoryId: !Ref GitHubRepo
+              BranchName: !Ref GitHubBranch
+      # - Name: Source
+      #   Actions:
+      #   - Name: Source
+      #     InputArtifacts: []
+      #     ActionTypeId:
+      #       Category: Source
+      #       Owner: ThirdParty
+      #       Version: '1'
+      #       Provider: GitHub
+      #     OutputArtifacts:
+      #     - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
+      #     Configuration:
+      #       Owner: !Ref GitHubOwner
+      #       Repo: !Ref GitHubRepo
+      #       Branch: !Ref GitHubBranch
+      #       PollForSourceChanges: false
+      #       OAuthToken: !Ref GitHubOAuthToken
+      #     RunOrder: 1
       # Build and Deploy, etc., stages would follow. Here is an example
       # - Name: Deploy
       #   Actions:
@@ -186,19 +208,19 @@ Resources:
   # 'GithubWebhook' satisfies two requirements:
   # -- Means that updates are pushed from GitHub, rather than AWS having to poll
   # -- Means we can filter for required changes
-  GithubWebhook:
-    Type: 'AWS::CodePipeline::Webhook'
-    Properties:
-      Authentication: GITHUB_HMAC
-      AuthenticationConfiguration:
-        SecretToken: !Ref GitHubOAuthToken
-      RegisterWithThirdParty: true
-      Filters:
-      - JsonPath: "$.ref"
-        MatchEquals: refs/heads/{Branch}
-      TargetPipeline: !Ref CodePipeline
-      TargetAction: Source
-      TargetPipelineVersion: !GetAtt CodePipeline.Version
+  # GithubWebhook:
+  #   Type: 'AWS::CodePipeline::Webhook'
+  #   Properties:
+  #     Authentication: GITHUB_HMAC
+  #     AuthenticationConfiguration:
+  #       SecretToken: !Ref GitHubOAuthToken
+  #     RegisterWithThirdParty: true
+  #     Filters:
+  #     - JsonPath: "$.ref"
+  #       MatchEquals: refs/heads/{Branch}
+  #     TargetPipeline: !Ref CodePipeline
+  #     TargetAction: Source
+  #     TargetPipelineVersion: !GetAtt CodePipeline.Version
 
   
   

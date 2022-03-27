@@ -1,0 +1,26 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ProjectName:
+    Default: klubby
+    Description: Project name
+    Type: String
+  Stage:
+    Default: dev
+    Description: The deployment stage for this stack. Used to name a variety of different resources.
+    Type: String
+Resources:
+  UserDynamoTable: 
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Sub 'user-table-${Stage}'
+      AttributeDefinitions:
+      - AttributeName: user
+        AttributeType: S
+      # - AttributeName: wallet
+      #   AttributeType: S
+      KeySchema:
+      - AttributeName: user
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 10

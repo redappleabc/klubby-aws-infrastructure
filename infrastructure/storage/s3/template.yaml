@@ -1,0 +1,19 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Parameters:
+  ProjectName:
+    Default: klubby
+    Description: Project name
+    Type: String
+  Stage:
+    Default: dev
+    Description: The deployment stage for this stack. Used to name a variety of different resources.
+    Type: String
+Resources:
+  ArtifactsBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${ProjectName}-${Stage}-artifacts-bucket

@@ -1,0 +1,64 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AppSync Stack
+Parameters:
+  ProjectName:
+    Type: String
+    Default: klubby
+    Description: Unique Auth Name for Cognito Resources
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+  UserPoolId:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: userpool-id-dev
+    Description: user pool id from SSM
+Resources:
+  GraphQLApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: !Sub '${ProjectName}-graphql-${Stage}'
+      AuthenticationType: "AMAZON_COGNITO_USER_POOLS"
+      UserPoolConfig:
+        UserPoolId: !Ref UserPoolId
+        AwsRegion: us-east-1
+        DefaultAction: ALLOW
+        # Ref: defaultAction
+  Schema:
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      # DefinitionS3Location:
+      #   Ref: graphQlSchemaS3DescriptionLocation
+      Definition: |
+        schema {
+            query: Query
+            mutation: Mutation
+        }
+        type Query {
+            # Get a single value of type 'Post' by primary key.
+            singlePost(id: ID!): Post
+        }
+        type Mutation {
+            # Put a single value of type 'Post'.
+            # If an item exists it's updated. If it does not it's created. llklk
+            putPost(id: ID!, title: String!): Post
+        }
+        type Post {
+            id: ID!
+            title: String!
+        }
+  
+  UserDynamoDBTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "UserDynamoDBTable"
+      Description: The Post DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: "arn:aws:iam::590503010210:role/AppSyncTutorialAmazonDynamoDBRole"
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Sub "user-table-${Stage}"
+

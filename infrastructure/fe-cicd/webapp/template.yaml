@@ -44,6 +44,9 @@ Resources:
               - Effect: Allow
                 Action: s3:*
                 Resource: '*'
+              - Effect: Allow
+                Action: sns:*
+                Resource: '*'
 
   AmplifyApp:
     Type: AWS::Amplify::App

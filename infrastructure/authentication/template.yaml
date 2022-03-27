@@ -94,3 +94,14 @@ Resources:
   #        - EMAIL
   #      Username: bjudson@trek10.com
   #      UserPoolId: !Ref UserPool
+
+### SSM PARAMS ###
+  UserPoolId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub userpool-id-${Stage}
+      Type: String
+      Value: !Ref UserPool
+      Description: SSM Parameter for user pool id
+      Tags:
+        Environment: !Ref Stage

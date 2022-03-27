@@ -38,18 +38,16 @@ Resources:
         }
         type Query {
             # Get a single value of type 'Post' by primary key.
-            singlePost(id: ID!): Post
+            getUsers: [User]
+        }
+        type User {
+            name: String!
         }
         type Mutation {
             # Put a single value of type 'Post'.
             # If an item exists it's updated. If it does not it's created. llklk
-            putPost(id: ID!, title: String!): Post
+            addUser(name: String!): User
         }
-        type Post {
-            id: ID!
-            title: String!
-        }
-  
   UserDynamoDBTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:

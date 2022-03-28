@@ -147,7 +147,7 @@ Resources:
     Type: AWS::AppSync::Resolver
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
+      TypeName: Mutation
       FieldName: updateUser
       DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
       RequestMappingTemplate: |

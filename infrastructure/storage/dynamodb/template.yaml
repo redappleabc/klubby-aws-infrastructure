@@ -12,15 +12,24 @@ Resources:
   UserDynamoTable: 
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: !Sub 'user-table-${Stage}'
+      # TableName: !Sub 'user-table-${Stage}'
       AttributeDefinitions:
-      - AttributeName: user
+      - AttributeName: username
         AttributeType: S
-      # - AttributeName: wallet
-      #   AttributeType: S
       KeySchema:
-      - AttributeName: user
+      - AttributeName: username
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
+
+### SSM Params ###
+  UserTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'user-table-name-${Stage}'
+      Type: String
+      Value: !Ref UserDynamoTable
+      Description: SSM Parameter for user table name
+      Tags:
+        Environment: !Ref Stage

@@ -66,6 +66,10 @@ Resources:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
         Image: 'public.ecr.aws/sam/build-python3.6:latest'
+        EnvironmentVariables:
+          - Name: STAGE
+            Type: PLAINTEXT
+            Value: !Ref Stage
       ServiceRole: !Ref CodeBuildRole
 
   CodePipeline:

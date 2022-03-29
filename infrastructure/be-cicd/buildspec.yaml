@@ -1,9 +1,9 @@
 
 version: 0.2
 
-env:
-  variables:
-    STAGE: 'dev'
+# env:
+#   variables:
+#     STAGE: 'dev'
 
 phases:
   build:

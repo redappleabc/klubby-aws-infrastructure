@@ -8,8 +8,8 @@ version: 0.2
 phases:
   build:
     commands:
-      - echo $STAGE
-      - aws cloudformation deploy --stack-name "klubby-storage-${STAGE}" --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override "Stage=${STAGE}"
+      - cd storage/s3
+      - aws cloudformation deploy --stack-name klubby-storage-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
       # - pip install pipenv
       # - cd infrastructure/data-storage
       # - ./deploy.sh

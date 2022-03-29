@@ -1,0 +1,23 @@
+
+version: 0.2
+
+env:
+  variables:
+    STAGE: 'dev'
+
+phases:
+  build:
+    commands:
+      - env
+      # - pip install pipenv
+      # - cd infrastructure/data-storage
+      # - ./deploy.sh
+      # - cd ../authentication
+      # - ./deploy.sh
+      # - cd ../sam-backends/main-api
+      # - ./deploy.sh
+      # - cd ../../sam-backends/total-value-cron
+      # - pipenv install
+      # - pipenv run ./deploy.sh
+      # - cd ../../sam-backends/weekly-stock-scraper
+      # - ./deploy.sh

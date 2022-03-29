@@ -64,7 +64,7 @@ Resources:
     Type: AWS::Cognito::UserPoolDomain 
     Properties:
       UserPoolId: !Ref UserPool 
-      Domain: klubby
+      Domain: !Sub klubby-${Stage}
   UserPoolTokenClient:
     Type: AWS::Cognito::UserPoolClient
     Properties:

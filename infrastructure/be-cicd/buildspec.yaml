@@ -10,15 +10,5 @@ phases:
     commands:
       - cd infrastructure/storage/s3
       - aws cloudformation deploy --stack-name klubby-storage-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
-      # - pip install pipenv
-      # - cd infrastructure/data-storage
-      # - ./deploy.sh
-      # - cd ../authentication
-      # - ./deploy.sh
-      # - cd ../sam-backends/main-api
-      # - ./deploy.sh
-      # - cd ../../sam-backends/total-value-cron
-      # - pipenv install
-      # - pipenv run ./deploy.sh
-      # - cd ../../sam-backends/weekly-stock-scraper
-      # - ./deploy.sh
+      - cd ../dynamodb
+      - aws cloudformation deploy --stack-name klubby-storage-dynamodb-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE

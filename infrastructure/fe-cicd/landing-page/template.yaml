@@ -1,0 +1,99 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  ProjectName:
+    Type: String
+    Description: GitHub Repository URL
+  Repository:
+    Type: String
+    Description: GitHub Repository URL
+  OauthToken:
+    Type: String
+    Description: GitHub Repository URL
+    NoEcho: true
+  # Domain:
+  #   Type: String
+  #   Description: Domain name to host application
+  #   Default: ''
+  Branch:
+    Type: String
+    Description: The name of the branch to deploy off of
+
+Resources:
+  AmplifyRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: amplify.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: Amplify
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: amplify:*
+                Resource: '*'
+              - Effect: Allow
+                Action: ssm:GetParameter
+                Resource: '*'
+              - Effect: Allow
+                Action: s3:*
+                Resource: '*'
+              - Effect: Allow
+                Action: sns:*
+                Resource: '*'
+
+  AmplifyApp:
+    Type: AWS::Amplify::App
+    Properties:
+      IAMServiceRole: !GetAtt AmplifyRole.Arn
+      Name: !Sub ${ProjectName}-frontend-${Branch}
+      Repository: !Ref Repository
+      OauthToken: !Ref OauthToken
+      AccessToken: !Ref OauthToken
+      # CustomRules:
+      #   - Source: </^[^.]+$|.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>
+      #     Status: 200
+      #     Target: /index.html
+
+  AmplifyBranch:
+    Type: AWS::Amplify::Branch
+    Properties:
+      BranchName: !Ref Branch
+      AppId: !GetAtt AmplifyApp.AppId
+      # Stage: !Ref Stage
+
+  # AmplifyDomain:
+  #   Type: AWS::Amplify::Domain
+  #   # Condition: CreateCustomDomain
+  #   Properties:
+  #     DomainName: !Ref Domain
+  #     AppId: !GetAtt AmplifyApp.AppId
+  #     SubDomainSettings:
+  #       - BranchName: !GetAtt AmplifyBranch.BranchName
+  #         Prefix: ''
+  #       - BranchName: !GetAtt AmplifyBranch.BranchName
+  #         Prefix: www
+
+  ###Route 53 Resources###
+  # HostedZone:
+  #   Type: AWS::Route53::HostedZone
+  #   Properties:
+  #     Name: !Sub ${Domain}.
+
+  # HostedZoneSSM:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Type: String
+  #     Name: !Sub /dns/${Domain}/hosted-zone-id
+  #     Value: !Ref HostedZone
+
+
+# Outputs:
+#   NameServers:
+#     Value: !Join [ ',', !GetAtt HostedZone.NameServers ]

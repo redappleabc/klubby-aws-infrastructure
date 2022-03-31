@@ -19,6 +19,9 @@ Parameters:
     Type: String
     Description: The name of the branch to deploy off of
 
+Conditions:
+  IsProd: !Equals [!Ref Branch, main]
+
 Resources:
   AmplifyRole:
     Type: AWS::IAM::Role
@@ -56,6 +59,16 @@ Resources:
       Repository: !Ref Repository
       OauthToken: !Ref OauthToken
       AccessToken: !Ref OauthToken
+      CustomRules:
+        - Source: /dashboard
+          Status: 200
+          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        - Source: /login
+          Status: 200
+          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        - Source: /logout
+          Status: 200
+          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
 
   AmplifyBranch:
     Type: AWS::Amplify::Branch

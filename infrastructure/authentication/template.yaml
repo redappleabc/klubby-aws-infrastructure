@@ -63,8 +63,9 @@ Resources:
       EmailConfiguration:
         ConfigurationSet: !Ref ConfigSet
         EmailSendingAccount: DEVELOPER
-        From: "welcome@klubby.io"
-        # SourceArn: "ARN of the email address"
+        From: "no-reply@klubby.me"
+        #TODO this was manually created
+        SourceArn: "arn:aws:ses:us-east-1:590503010210:identity/klubby.me"
   UserPoolDomain: 
     Type: AWS::Cognito::UserPoolDomain 
     Properties:

@@ -60,6 +60,11 @@ Resources:
         # - Name: slackId
         #   AttributeDataType: String
         #   Mutable: true
+      EmailConfiguration:
+        ConfigurationSet: !Ref ConfigSet
+        EmailSendingAccount: DEVELOPER
+        From: "welcome@klubby.io"
+        SourceArn: "ARN of the email address"
   UserPoolDomain: 
     Type: AWS::Cognito::UserPoolDomain 
     Properties:
@@ -94,6 +99,10 @@ Resources:
   #        - EMAIL
   #      Username: bjudson@trek10.com
   #      UserPoolId: !Ref UserPool
+  ConfigSet:
+    Type: 'AWS::SES::ConfigurationSet'
+    Properties:
+      Name: !Sub ses-configset-${Stage}
 
 ### SSM PARAMS ###
   UserPoolId:

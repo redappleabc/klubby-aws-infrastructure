@@ -64,7 +64,7 @@ Resources:
         ConfigurationSet: !Ref ConfigSet
         EmailSendingAccount: DEVELOPER
         From: "welcome@klubby.io"
-        SourceArn: "ARN of the email address"
+        # SourceArn: "ARN of the email address"
   UserPoolDomain: 
     Type: AWS::Cognito::UserPoolDomain 
     Properties:

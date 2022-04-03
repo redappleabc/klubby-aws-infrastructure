@@ -23,6 +23,20 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
 
+  EmailDynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      # TableName: !Sub 'user-table-${Stage}'
+      AttributeDefinitions:
+      - AttributeName: email
+        AttributeType: S
+      KeySchema:
+      - AttributeName: email
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 10
+
 ### SSM Params ###
   UserTableNameParam:
     Type: AWS::SSM::Parameter

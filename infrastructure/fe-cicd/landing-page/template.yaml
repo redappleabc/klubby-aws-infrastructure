@@ -11,16 +11,13 @@ Parameters:
     Type: String
     Description: GitHub Repository URL
     NoEcho: true
-  Domain:
-    Type: String
-    Description: Domain name to host application
-    Default: ''
+  # Domain:
+  #   Type: String
+  #   Description: Domain name to host application
+  #   Default: ''
   Branch:
     Type: String
     Description: The name of the branch to deploy off of
-
-Conditions:
-  IsProd: !Equals [!Ref Branch, main]
 
 Resources:
   AmplifyRole:
@@ -59,22 +56,10 @@ Resources:
       Repository: !Ref Repository
       OauthToken: !Ref OauthToken
       AccessToken: !Ref OauthToken
-      CustomRules:
-        - Source: /dashboard
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /login
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /login/
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /logout
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /logout/
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+      # CustomRules:
+      #   - Source: </^[^.]+$|.(?!(css|gif|ico|jpg|js|png|txt|svg|woff|ttf|map|json)$)([^.]+$)/>
+      #     Status: 200
+      #     Target: /index.html
 
   AmplifyBranch:
     Type: AWS::Amplify::Branch
@@ -83,17 +68,17 @@ Resources:
       AppId: !GetAtt AmplifyApp.AppId
       # Stage: !Ref Stage
 
-  AmplifyDomain:
-    Type: AWS::Amplify::Domain
-    # Condition: CreateCustomDomain
-    Properties:
-      DomainName: !Ref Domain
-      AppId: !GetAtt AmplifyApp.AppId
-      SubDomainSettings:
-        - BranchName: !GetAtt AmplifyBranch.BranchName
-          Prefix: ''
-        - BranchName: !GetAtt AmplifyBranch.BranchName
-          Prefix: www
+  # AmplifyDomain:
+  #   Type: AWS::Amplify::Domain
+  #   # Condition: CreateCustomDomain
+  #   Properties:
+  #     DomainName: !Ref Domain
+  #     AppId: !GetAtt AmplifyApp.AppId
+  #     SubDomainSettings:
+  #       - BranchName: !GetAtt AmplifyBranch.BranchName
+  #         Prefix: ''
+  #       - BranchName: !GetAtt AmplifyBranch.BranchName
+  #         Prefix: www
 
   ###Route 53 Resources###
   # HostedZone:

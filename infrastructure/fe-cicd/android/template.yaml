@@ -65,7 +65,8 @@ Resources:
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
-        Image: 'public.ecr.aws/lambda/nodejs:latest'
+        # Image: 'public.ecr.aws/lambda/nodejs:latest'
+        Image: aws/codebuild/android-java-8:24.4.1
         EnvironmentVariables:
           - Name: ENVIRONMENT
             Type: PLAINTEXT

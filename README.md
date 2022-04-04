@@ -17,3 +17,5 @@ A high level overview for the architecture of the Front-End CICD can be seen in 
 [Deploying Capacitor iOS App](https://www.joshmorony.com/deploying-capacitor-applications-to-ios-development-distribution/#do-i-need-a-mac-to-deploy-to-ios)
 
 [Pushing CodePipeline Status to Github](https://aws.amazon.com/blogs/devops/aws-codepipeline-build-status-in-a-third-party-git-repository/)
+
+[AWS Blog Post - Android GitPipeline](https://aws.amazon.com/blogs/mobile/build-a-cicd-pipeline-for-your-android-app-with-aws-services/)

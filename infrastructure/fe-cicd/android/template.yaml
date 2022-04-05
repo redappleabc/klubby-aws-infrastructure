@@ -54,14 +54,33 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  CodeBuildDeployBackend:
+  CodeBuildDeployProject1:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
         Type: CODEPIPELINE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: cicd/android/buildspec.yaml
+        BuildSpec: cicd/android/buildspec1.yaml
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Type: LINUX_CONTAINER
+        Image: 'public.ecr.aws/lambda/nodejs:latest'
+        # Image: aws/codebuild/android-java-8:24.4.1
+        EnvironmentVariables:
+          - Name: ENVIRONMENT
+            Type: PLAINTEXT
+            Value: !Ref Stage
+      ServiceRole: !Ref CodeBuildRole
+
+  CodeBuildDeployProject2:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: CODEPIPELINE
+      Source:
+        Type: CODEPIPELINE
+        BuildSpec: cicd/android/buildspec2.yaml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
@@ -120,18 +139,33 @@ Resources:
       #     RunOrder: 1
       - Name: Deploy
         Actions:
-        - Name: DeployJob
+        - Name: DeployJob1
           ActionTypeId:
             Owner: AWS
             Category: Build
             Version: '1'
             Provider: CodeBuild
           Configuration:
-            ProjectName: !Ref CodeBuildDeployBackend
+            ProjectName: !Ref CodeBuildDeployProject1
           InputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
           OutputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
+          RunOrder: 1
+      - Name: Deploy
+        Actions:
+        - Name: DeployJob2
+          ActionTypeId:
+            Owner: AWS
+            Category: Build
+            Version: '1'
+            Provider: CodeBuild
+          Configuration:
+            ProjectName: !Ref CodeBuildDeployProject2
+          InputArtifacts:
+            - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
+          OutputArtifacts:
+            - Name: !Sub '${ProjectName}-${Stage}-android-app'
           RunOrder: 1
           
 

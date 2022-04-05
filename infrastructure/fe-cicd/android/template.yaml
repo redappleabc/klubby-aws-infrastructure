@@ -152,8 +152,8 @@ Resources:
           OutputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
           RunOrder: 1
-      - Name: Deploy
-        Actions:
+      # - Name: Deploy
+      #   Actions:
         - Name: DeployJob2
           ActionTypeId:
             Owner: AWS
@@ -166,7 +166,7 @@ Resources:
             - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
           OutputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-android-app'
-          RunOrder: 1
+          RunOrder: 2
           
 
   # 'GithubWebhook' satisfies two requirements:

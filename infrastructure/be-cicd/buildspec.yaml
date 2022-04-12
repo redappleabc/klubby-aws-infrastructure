@@ -13,7 +13,7 @@ phases:
       - cd ../dynamodb
       - aws cloudformation deploy --stack-name klubby-storage-dynamodb-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
       - cd ../../authentication
-      - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
+      - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
       - cd ../appsync
       - aws cloudformation deploy --stack-name klubby-appsync-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
       - cd ../sam-backends/add-new-user

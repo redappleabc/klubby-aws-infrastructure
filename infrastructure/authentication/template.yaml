@@ -109,8 +109,8 @@ Resources:
   #      UserPoolId: !Ref UserPool
   ConfigSet:
     Type: 'AWS::SES::ConfigurationSet'
-    Properties:
-      Name: !Sub ses-configset-${Stage}
+    # Properties:
+      # Name: !Sub ses-configset-${Stage}
 
 ### SSM PARAMS ###
   UserPoolId:

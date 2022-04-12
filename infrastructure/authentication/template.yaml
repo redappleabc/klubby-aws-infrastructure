@@ -112,6 +112,14 @@ Resources:
     Properties:
       Name: !Sub ses-configset-${Stage}
 
+  InvokeAddNewUserFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref NewUserFunction
+      Action: lambda:InvokeFunction
+      Principal: cognito.amazonaws.com
+      SourceArn: !Ref UserPool
+
 ### SSM PARAMS ###
   UserPoolId:
     Type: AWS::SSM::Parameter

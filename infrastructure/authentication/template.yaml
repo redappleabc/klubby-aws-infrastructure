@@ -10,6 +10,10 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage of build
+  NewUserFunction:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: add-new-user-funtion-dev
+    Description: user table name
 Resources:
   # Creates a role that allows Cognito to send SNS messages
   SNSRole:
@@ -66,6 +70,8 @@ Resources:
         From: "no-reply@klubby.me"
         #TODO this was manually created
         SourceArn: "arn:aws:ses:us-east-1:590503010210:identity/klubby.me"
+      LambdaConfig:
+        PostConfirmation: !Ref NewUserFunction
   UserPoolDomain: 
     Type: AWS::Cognito::UserPoolDomain 
     Properties:

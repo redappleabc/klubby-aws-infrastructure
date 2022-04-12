@@ -40,7 +40,7 @@ Resources:
   UserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      # UserPoolName: !Sub ${ProjectName}-user-pool-${Stage}
+      UserPoolName: !Sub ${ProjectName}-user-pool-${Stage}
       AutoVerifiedAttributes:
         - email
       #   - phone_number
@@ -109,8 +109,8 @@ Resources:
   #      UserPoolId: !Ref UserPool
   ConfigSet:
     Type: 'AWS::SES::ConfigurationSet'
-    # Properties:
-      # Name: !Sub ses-configset-${Stage}
+    Properties:
+      Name: !Sub ses-configset-${Stage}
 
 ### SSM PARAMS ###
   UserPoolId:

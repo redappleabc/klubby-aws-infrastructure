@@ -117,7 +117,7 @@ Resources:
     Properties:
       FunctionName: !Ref NewUserFunction
       Action: lambda:InvokeFunction
-      Principal: cognito.amazonaws.com
+      Principal: cognito-identity.amazonaws.com
       SourceArn: !GetAtt UserPool.Arn
 
 ### SSM PARAMS ###

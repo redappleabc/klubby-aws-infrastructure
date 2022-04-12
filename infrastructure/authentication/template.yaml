@@ -10,10 +10,10 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage of build
-  # NewUserFunction:
-  #   Type: AWS::SSM::Parameter::Value<String>
-  #   Default: add-new-user-funtion-dev
-  #   Description: user table name
+  NewUserFunction:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: add-new-user-funtion-dev
+    Description: user table name
 Resources:
   # Creates a role that allows Cognito to send SNS messages
   SNSRole:

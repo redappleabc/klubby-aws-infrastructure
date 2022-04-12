@@ -40,7 +40,7 @@ Resources:
   UserPool:
     Type: "AWS::Cognito::UserPool"
     Properties:
-      UserPoolName: !Sub ${ProjectName}-user-pool-${Stage}
+      # UserPoolName: !Sub ${ProjectName}-user-pool-${Stage}
       AutoVerifiedAttributes:
         - email
       #   - phone_number

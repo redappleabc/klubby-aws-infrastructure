@@ -9,18 +9,18 @@ aws cloudformation deploy \
       ProjectName=klubby-landingpage \
       Repository=https://github.com/bjudson1/klubby-landing-page	\
       OauthToken=$OAUTH \
+      Domain=klubby.io \
       Branch=main
 
-# source awsume klubby-dev
 
-# aws cloudformation deploy \
-#   --template-file ./template.yaml \
-#   --region $REGION \
-#   --capabilities CAPABILITY_IAM \
-#   --stack-name klubby-deployment-landingpage-dev \
-#   --parameter-overrides \
-#       ProjectName=klubby-webapp \
-#       Repository=https://github.com/bjudson1/klubby-react-app \
-#       OauthToken=$OAUTH \
-#       Domain=dev.klubby.me \
-#       Branch=dev
+aws cloudformation deploy \
+  --template-file ./template.yaml \
+  --region $REGION \
+  --capabilities CAPABILITY_IAM \
+  --stack-name klubby-deployment-landingpage-dev \
+  --parameter-overrides \
+      ProjectName=klubby-landingpage \
+      Repository=https://github.com/bjudson1/klubby-landing-page	\
+      OauthToken=$OAUTH \
+      Domain=dev.klubby.io \
+      Branch=dev

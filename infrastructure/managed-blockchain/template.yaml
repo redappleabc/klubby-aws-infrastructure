@@ -7,9 +7,13 @@ Parameters:
     Default: dev
     Description: Stage of build
 
+Conditions:
+  IsDev: !Equals [!Ref Stage, dev]
+
 Resources:
   Node:
     Type: "AWS::ManagedBlockchain::Node"
+    Condition: IsDev
     Properties:
       NetworkId: n-ethereum-mainnet
       NodeConfiguration:

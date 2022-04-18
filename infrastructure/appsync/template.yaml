@@ -43,7 +43,7 @@ Resources:
         type Query {
             getUsers: [User]
             #TODO make this [String]
-            getUserWallets(username: String!): String
+            getUserWallets(username: String!): User
         }
         type User {
             username: String!

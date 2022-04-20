@@ -41,8 +41,8 @@ Resources:
     Type: "AWS::Cognito::UserPool"
     Properties:
       UserPoolName: !Sub ${ProjectName}-user-pool-${Stage}
-      AutoVerifiedAttributes:
-        - email
+      # AutoVerifiedAttributes:
+        # - email
       #   - phone_number
       # MfaConfiguration: "ON"
       # SmsConfiguration:

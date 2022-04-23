@@ -47,6 +47,9 @@ Parameters:
   #   Default: personal-webpage-data-storage
   #   AllowedPattern: "[A-Za-z0-9-]+"
 
+Conditions:
+  IsDev: !Equals [!Ref Stage, dev]
+
 Resources:
   PipelineArtifactsBucket:
     Type: AWS::S3::Bucket
@@ -56,6 +59,7 @@ Resources:
 
   AndroidBuildRepository:
     Type: AWS::ECR::Repository
+    Condition: IsDev
     Properties:
       RepositoryName: "android-cicd"
 
@@ -70,7 +74,8 @@ Resources:
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
-        Image: !Sub '${AndroidBuildRepository.RepositoryUri}:latest'
+        # Image: !Sub '${AndroidBuildRepository.RepositoryUri}:latest'
+        Image: 590503010210.dkr.ecr.us-east-1.amazonaws.com/android-cicd:latest
         ImagePullCredentialsType: SERVICE_ROLE
         EnvironmentVariables:
           - Name: ENVIRONMENT

@@ -54,38 +54,24 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
-  CodeBuildDeployProject1:
-    Type: AWS::CodeBuild::Project
+  AndroidBuildRepository:
+    Type: AWS::ECR::Repository
     Properties:
-      Artifacts:
-        Type: CODEPIPELINE
-      Source:
-        Type: CODEPIPELINE
-        BuildSpec: cicd/android/buildspec1.yaml
-      Environment:
-        ComputeType: BUILD_GENERAL1_SMALL
-        Type: LINUX_CONTAINER
-        Image: 'public.ecr.aws/lambda/nodejs:latest'
-        # Image: aws/codebuild/android-java-8:24.4.1
-        EnvironmentVariables:
-          - Name: ENVIRONMENT
-            Type: PLAINTEXT
-            Value: !Ref Stage
-      ServiceRole: !Ref CodeBuildRole
+      RepositoryName: "android-cicd"
 
-  CodeBuildDeployProject2:
+  CodeBuildDeployProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
         Type: CODEPIPELINE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: cicd/android/buildspec2.yaml
+        BuildSpec: cicd/android/buildspec.yaml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
-        # Image: 'public.ecr.aws/lambda/nodejs:latest'
-        Image: aws/codebuild/android-java-8:24.4.1
+        Image: !Sub '${AndroidBuildRepository.RepositoryUri}:latest'
+        ImagePullCredentialsType: SERVICE_ROLE
         EnvironmentVariables:
           - Name: ENVIRONMENT
             Type: PLAINTEXT
@@ -119,55 +105,21 @@ Resources:
             PollForSourceChanges: false
             OAuthToken: !Ref GitHubOAuthToken
           RunOrder: 1
-      # Build and Deploy, etc., stages would follow. Here is an example
-      # - Name: Deploy
-      #   Actions:
-      #   - Name: CloudFormationDeploy
-      #     ActionTypeId:
-      #       Category: Deploy
-      #       Owner: AWS
-      #       Provider: CloudFormation
-      #       Version: '1'
-      #     InputArtifacts:
-      #       - Name: SourceCode
-      #     Configuration:
-      #       ActionMode: CREATE_UPDATE
-      #       Capabilities: CAPABILITY_IAM
-      #       RoleArn: !GetAtt CloudformationRole.Arn
-      #       StackName: !Ref ApplicationStackName
-      #       TemplatePath: !Sub "SourceCode::application.yaml"
-      #     RunOrder: 1
       - Name: Deploy
         Actions:
-        - Name: DeployJob1
+        - Name: DeployJob
           ActionTypeId:
             Owner: AWS
             Category: Build
             Version: '1'
             Provider: CodeBuild
           Configuration:
-            ProjectName: !Ref CodeBuildDeployProject1
+            ProjectName: !Ref CodeBuildDeployProject
           InputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
           OutputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
           RunOrder: 1
-      # - Name: Deploy
-      #   Actions:
-        - Name: DeployJob2
-          ActionTypeId:
-            Owner: AWS
-            Category: Build
-            Version: '1'
-            Provider: CodeBuild
-          Configuration:
-            ProjectName: !Ref CodeBuildDeployProject2
-          InputArtifacts:
-            - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
-          OutputArtifacts:
-            - Name: !Sub '${ProjectName}-${Stage}-android-app'
-          RunOrder: 2
-          
 
   # 'GithubWebhook' satisfies two requirements:
   # -- Means that updates are pushed from GitHub, rather than AWS having to poll

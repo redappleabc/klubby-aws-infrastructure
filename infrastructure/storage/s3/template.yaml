@@ -25,3 +25,11 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       BucketName: !Sub ${ProjectName}-android-build-${Stage}-bucket
+  ReleaseBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${ProjectName}-${Stage}-release-bucket

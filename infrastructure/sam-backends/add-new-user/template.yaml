@@ -25,6 +25,7 @@ Resources:
       Architectures:
         - x86_64
       Policies:
+      #TODO reduce perms
         - Statement:
           - Sid: DynamoDBAccess
             Effect: Allow

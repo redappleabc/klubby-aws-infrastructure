@@ -53,9 +53,20 @@ Conditions:
 Resources:
   PipelineArtifactsBucket:
     Type: AWS::S3::Bucket
+    # DependsOn: ProcessingLambdaPermission
     Properties:
+      BucketName: !Sub klubby-${Stage}-andrioid-pipeline-atifacts-bucket
       VersioningConfiguration:
         Status: Enabled
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:*
+      #       Function: !GetAtt ProcessingLambdaFunction.Arn
+      #       # Filter:
+      #       #   S3Key:
+      #       #     Rules:
+      #       #     - Name: suffix
+      #       #       Value: .txt
 
   AndroidBuildRepository:
     Type: AWS::ECR::Repository
@@ -183,3 +194,74 @@ Resources:
           Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess #TODO: Reduce permissions
+
+  # ProcessingLambdaPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     Action: 'lambda:InvokeFunction'
+  #     FunctionName: !Ref ProcessingLambdaFunction
+  #     Principal: s3.amazonaws.com
+  #     SourceArn: !Sub 'arn:aws:s3:::klubby-${Stage}-andrioid-pipeline-atifacts-bucket'
+  #     SourceAccount: !Ref AWS::AccountId
+
+  # ProcessingLambdaExecutionRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service:
+  #           - lambda.amazonaws.com
+  #         Action:
+  #         - sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: allowLogging
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #           - Effect: Allow
+  #             Action:
+  #             - logs:*
+  #             Resource: arn:aws:logs:*:*:*
+  #       #TODO reduce perms
+  #       - PolicyName: admin
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #           - Effect: Allow
+  #             Action:
+  #             - s3:GetObject
+  #             - s3:DeleteObject
+  #             Resource:  '*'
+
+  # ProcessingLambdaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Code:
+  #       ZipFile: >
+  #         const AWS = require("aws-sdk");
+  #         const s3 = new AWS.S3();
+  #         exports.handler = async (event, context) =>{
+  #           console.log(JSON.stringify(event));
+  #           console.log(JSON.stringify(context));
+  #           const params = {
+  #             Bucket: event.Records[0].s3.bucket.name,
+  #             Key: event.Records[0].s3.object.key
+  #            };
+  #           // get file from s3
+  #            const data = await s3.getObject(params).promise();
+  #            console.log('pppp',data);
+  #            const putParams = {
+  #             Bucket: 'klubby-dev-artifacts-bucket',
+  #             Key: 'android/artifact.zip',
+  #             Body: data.Body
+  #            };
+  #            s3.putObject(putParams)
+  #         };
+  #     Handler: index.handler
+  #     Role: !GetAtt ProcessingLambdaExecutionRole.Arn
+  #     Runtime: nodejs12.x
+  #     # MemorySize: 512
+  #     # Timeout: 120

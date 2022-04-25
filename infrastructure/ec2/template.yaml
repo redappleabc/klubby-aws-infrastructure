@@ -1,0 +1,124 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: Geth Node EC2 Stack
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Conditions:
+  IsDev: !Equals [!Ref Stage, dev]
+
+Resources:
+  VPC:
+    Type: AWS::EC2::VPC
+    Properties:
+      CidrBlock: 10.0.0.0/16
+      EnableDnsSupport: true
+      EnableDnsHostnames: true
+      Tags:
+        - Key: Name
+          Value: !Sub klubby-vpc-${Stage}
+
+  IGW:
+    Type: AWS::EC2::InternetGateway
+    Properties:
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${Stage}-igw
+
+  InternetGatewayAttachment:
+    Type: AWS::EC2::VPCGatewayAttachment
+    Properties:
+      VpcId: !Ref VPC
+      InternetGatewayId: !Ref IGW
+
+  PublicSubnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      VpcId: !Ref VPC
+      CidrBlock: 10.0.0.0/24
+      AvailabilityZone: "us-east-1a"
+      MapPublicIpOnLaunch: true
+      Tags:
+      - Key: stage
+        Value: !Ref Stage
+
+  PublicRouteTable:
+    Type: AWS::EC2::RouteTable
+    Properties:
+      VpcId: !Ref VPC
+      Tags:
+        - Key: Name
+          Value: !Sub ${AWS::StackName}-${Stage}-public-route-table
+
+  InternetRoute:
+    Type: AWS::EC2::Route
+    DependsOn: InternetGatewayAttachment
+    Properties:
+      DestinationCidrBlock: 0.0.0.0/0
+      GatewayId: !Ref IGW
+      RouteTableId: !Ref PublicRouteTable
+
+  PublicSubnetRouteTableAssociation1:
+    Type: AWS::EC2::SubnetRouteTableAssociation
+    Properties:
+      RouteTableId: !Ref PublicRouteTable
+      SubnetId: !Ref PublicSubnet
+
+  OpenSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allows instances complete openness
+      VpcId: !Ref VPC
+      SecurityGroupIngress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+      SecurityGroupEgress:
+        - IpProtocol: -1
+          CidrIp: 0.0.0.0/0
+
+  GethInstace:
+    Type: AWS::EC2::Instance
+    Properties:
+      # ImageId: ami-03ededff12e34e59e #aws linux
+      ImageId: ami-04505e74c0741db8d #ubuntu
+      InstanceType: t3.large
+      SubnetId: !Ref PublicSubnet
+      KeyName: brenden-klubby
+      SecurityGroupIds:
+        - !Ref OpenSecurityGroup
+      Tags:
+        - Key: Name
+          Value: !Sub geth-intance-${Stage}
+      BlockDeviceMappings:
+        - DeviceName: /dev/sda1
+          Ebs:
+            VolumeType: gp2
+            VolumeSize: '1000'
+            DeleteOnTermination: 'false'
+            # Encrypted: 'true'
+      UserData:
+        !Base64 |
+          #!/bin/bash
+          sudo add-apt-repository -y ppa:ethereum/ethereum
+          sudo apt-get update
+          sudo apt-get install -y ethereum
+          printf "[Unit]\n\nDescription=Geth Full Node\nAfter=network-online.target\nWants=network-online.target\n\n[Service]\nWantedBy=multi-user.target\nWorkingDirectory=/home/ubuntu\nUser=ubuntu\nExecStart=/usr/bin/geth --syncmode snap --http --http.api personal,eth,net,web3,txpool\nRestart=always\nRestartSec=5s\n\n[Install]\nWantedBy=multi-user.target\n" | sudo tee /lib/systemd/system/geth.service
+          sudo systemctl enable geth
+          sudo systemctl start geth
+
+      
+
+
+### SSM PARAMS ###
+  # NodeId:
+  #   Type: AWS::SSM::Parameter
+  #   Properties:
+  #     Name: !Sub node-id-${Stage}
+  #     Type: String
+  #     Value: !Ref Node
+  #     Description: SSM Parameter for node id
+  #     Tags:
+  #       Environment: !Ref Stage

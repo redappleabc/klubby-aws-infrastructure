@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  add-new-user
+
+  Sample SAM Template for add-new-user
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  AddNewUserFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: add_new_user/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: DynamoDBAccess
+            Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: arn:aws:dynamodb:us-east-1:590503010210:table/*
+
+### SSM PARAMS ###
+  AddNewUserFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub add-new-user-funtion-${Stage}
+      Type: String
+      Value: !GetAtt AddNewUserFunction.Arn
+      Description: SSM Parameter for user ARN of add new user function
+      Tags:
+        Environment: !Ref Stage

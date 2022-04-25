@@ -47,14 +47,34 @@ Parameters:
   #   Default: personal-webpage-data-storage
   #   AllowedPattern: "[A-Za-z0-9-]+"
 
+Conditions:
+  IsDev: !Equals [!Ref Stage, dev]
+
 Resources:
   PipelineArtifactsBucket:
     Type: AWS::S3::Bucket
+    # DependsOn: ProcessingLambdaPermission
     Properties:
+      BucketName: !Sub klubby-${Stage}-andrioid-pipeline-atifacts-bucket
       VersioningConfiguration:
         Status: Enabled
+      # NotificationConfiguration:
+      #   LambdaConfigurations:
+      #     - Event: s3:ObjectCreated:*
+      #       Function: !GetAtt ProcessingLambdaFunction.Arn
+      #       # Filter:
+      #       #   S3Key:
+      #       #     Rules:
+      #       #     - Name: suffix
+      #       #       Value: .txt
 
-  CodeBuildDeployBackend:
+  AndroidBuildRepository:
+    Type: AWS::ECR::Repository
+    Condition: IsDev
+    Properties:
+      RepositoryName: "android-cicd"
+
+  CodeBuildDeployProject:
     Type: AWS::CodeBuild::Project
     Properties:
       Artifacts:
@@ -65,8 +85,9 @@ Resources:
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
-        # Image: 'public.ecr.aws/lambda/nodejs:latest'
-        Image: aws/codebuild/android-java-8:24.4.1
+        # Image: !Sub '${AndroidBuildRepository.RepositoryUri}:latest'
+        Image: 590503010210.dkr.ecr.us-east-1.amazonaws.com/android-cicd:latest
+        ImagePullCredentialsType: SERVICE_ROLE
         EnvironmentVariables:
           - Name: ENVIRONMENT
             Type: PLAINTEXT
@@ -100,24 +121,6 @@ Resources:
             PollForSourceChanges: false
             OAuthToken: !Ref GitHubOAuthToken
           RunOrder: 1
-      # Build and Deploy, etc., stages would follow. Here is an example
-      # - Name: Deploy
-      #   Actions:
-      #   - Name: CloudFormationDeploy
-      #     ActionTypeId:
-      #       Category: Deploy
-      #       Owner: AWS
-      #       Provider: CloudFormation
-      #       Version: '1'
-      #     InputArtifacts:
-      #       - Name: SourceCode
-      #     Configuration:
-      #       ActionMode: CREATE_UPDATE
-      #       Capabilities: CAPABILITY_IAM
-      #       RoleArn: !GetAtt CloudformationRole.Arn
-      #       StackName: !Ref ApplicationStackName
-      #       TemplatePath: !Sub "SourceCode::application.yaml"
-      #     RunOrder: 1
       - Name: Deploy
         Actions:
         - Name: DeployJob
@@ -127,13 +130,12 @@ Resources:
             Version: '1'
             Provider: CodeBuild
           Configuration:
-            ProjectName: !Ref CodeBuildDeployBackend
+            ProjectName: !Ref CodeBuildDeployProject
           InputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-SourceCode'
           OutputArtifacts:
             - Name: !Sub '${ProjectName}-${Stage}-BuildArtifact'
           RunOrder: 1
-          
 
   # 'GithubWebhook' satisfies two requirements:
   # -- Means that updates are pushed from GitHub, rather than AWS having to poll
@@ -192,3 +194,74 @@ Resources:
           Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess #TODO: Reduce permissions
+
+  # ProcessingLambdaPermission:
+  #   Type: AWS::Lambda::Permission
+  #   Properties:
+  #     Action: 'lambda:InvokeFunction'
+  #     FunctionName: !Ref ProcessingLambdaFunction
+  #     Principal: s3.amazonaws.com
+  #     SourceArn: !Sub 'arn:aws:s3:::klubby-${Stage}-andrioid-pipeline-atifacts-bucket'
+  #     SourceAccount: !Ref AWS::AccountId
+
+  # ProcessingLambdaExecutionRole:
+  #   Type: AWS::IAM::Role
+  #   Properties:
+  #     AssumeRolePolicyDocument:
+  #       Version: '2012-10-17'
+  #       Statement:
+  #       - Effect: Allow
+  #         Principal:
+  #           Service:
+  #           - lambda.amazonaws.com
+  #         Action:
+  #         - sts:AssumeRole
+  #     Policies:
+  #       - PolicyName: allowLogging
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #           - Effect: Allow
+  #             Action:
+  #             - logs:*
+  #             Resource: arn:aws:logs:*:*:*
+  #       #TODO reduce perms
+  #       - PolicyName: admin
+  #         PolicyDocument:
+  #           Version: '2012-10-17'
+  #           Statement:
+  #           - Effect: Allow
+  #             Action:
+  #             - s3:GetObject
+  #             - s3:DeleteObject
+  #             Resource:  '*'
+
+  # ProcessingLambdaFunction:
+  #   Type: AWS::Lambda::Function
+  #   Properties:
+  #     Code:
+  #       ZipFile: >
+  #         const AWS = require("aws-sdk");
+  #         const s3 = new AWS.S3();
+  #         exports.handler = async (event, context) =>{
+  #           console.log(JSON.stringify(event));
+  #           console.log(JSON.stringify(context));
+  #           const params = {
+  #             Bucket: event.Records[0].s3.bucket.name,
+  #             Key: event.Records[0].s3.object.key
+  #            };
+  #           // get file from s3
+  #            const data = await s3.getObject(params).promise();
+  #            console.log('pppp',data);
+  #            const putParams = {
+  #             Bucket: 'klubby-dev-artifacts-bucket',
+  #             Key: 'android/artifact.zip',
+  #             Body: data.Body
+  #            };
+  #            s3.putObject(putParams)
+  #         };
+  #     Handler: index.handler
+  #     Role: !GetAtt ProcessingLambdaExecutionRole.Arn
+  #     Runtime: nodejs12.x
+  #     # MemorySize: 512
+  #     # Timeout: 120

@@ -10,6 +10,10 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage of build
+  NewUserFunction:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: add-new-user-funtion-dev
+    Description: user table name
 Resources:
   # Creates a role that allows Cognito to send SNS messages
   SNSRole:
@@ -45,27 +49,21 @@ Resources:
       #   ExternalId: !Sub ${ProjectName}-external
       #   SnsCallerArn: !GetAtt SNSRole.Arn
       Schema:
-        - Name: name
-          AttributeDataType: String
-          Mutable: true
-          Required: true
         - Name: email
           AttributeDataType: String
           Mutable: false
           Required: true
-        # - Name: phone_number
-        #   AttributeDataType: String
-        #   Mutable: false
-        #   Required: true
-        # - Name: slackId
-        #   AttributeDataType: String
-        #   Mutable: true
       EmailConfiguration:
         ConfigurationSet: !Ref ConfigSet
         EmailSendingAccount: DEVELOPER
         From: "no-reply@klubby.me"
         #TODO this was manually created
         SourceArn: "arn:aws:ses:us-east-1:590503010210:identity/klubby.me"
+      LambdaConfig:
+        PostConfirmation: !Ref NewUserFunction
+      #   PostConfirmation: arn:aws:lambda:us-east-1:590503010210:function:add-new-user-function-dev-AddNewUserFunction-8wfT2fkun97F
+      UsernameConfiguration:
+        CaseSensitive: False
   UserPoolDomain: 
     Type: AWS::Cognito::UserPoolDomain 
     Properties:
@@ -104,6 +102,14 @@ Resources:
     Type: 'AWS::SES::ConfigurationSet'
     Properties:
       Name: !Sub ses-configset-${Stage}
+
+  InvokeAddNewUserFunctionPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref NewUserFunction
+      Action: lambda:InvokeFunction
+      Principal: cognito-idp.amazonaws.com
+      SourceArn: !GetAtt UserPool.Arn
 
 ### SSM PARAMS ###
   UserPoolId:

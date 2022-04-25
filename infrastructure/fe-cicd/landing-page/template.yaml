@@ -11,10 +11,10 @@ Parameters:
     Type: String
     Description: GitHub Repository URL
     NoEcho: true
-  # Domain:
-  #   Type: String
-  #   Description: Domain name to host application
-  #   Default: ''
+  Domain:
+    Type: String
+    Description: Domain name to host application
+    Default: ''
   Branch:
     Type: String
     Description: The name of the branch to deploy off of
@@ -68,17 +68,17 @@ Resources:
       AppId: !GetAtt AmplifyApp.AppId
       # Stage: !Ref Stage
 
-  # AmplifyDomain:
-  #   Type: AWS::Amplify::Domain
-  #   # Condition: CreateCustomDomain
-  #   Properties:
-  #     DomainName: !Ref Domain
-  #     AppId: !GetAtt AmplifyApp.AppId
-  #     SubDomainSettings:
-  #       - BranchName: !GetAtt AmplifyBranch.BranchName
-  #         Prefix: ''
-  #       - BranchName: !GetAtt AmplifyBranch.BranchName
-  #         Prefix: www
+  AmplifyDomain:
+    Type: AWS::Amplify::Domain
+    # Condition: CreateCustomDomain
+    Properties:
+      DomainName: !Ref Domain
+      AppId: !GetAtt AmplifyApp.AppId
+      SubDomainSettings:
+        - BranchName: !GetAtt AmplifyBranch.BranchName
+          Prefix: ''
+        - BranchName: !GetAtt AmplifyBranch.BranchName
+          Prefix: www
 
   ###Route 53 Resources###
   # HostedZone:

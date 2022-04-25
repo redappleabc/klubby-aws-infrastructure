@@ -1,0 +1,32 @@
+
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AppSync Stack
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Conditions:
+  IsDev: !Equals [!Ref Stage, dev]
+
+Resources:
+  Node:
+    Type: "AWS::ManagedBlockchain::Node"
+    Condition: IsDev
+    Properties:
+      NetworkId: n-ethereum-mainnet
+      NodeConfiguration:
+        InstanceType: bc.t3.large
+        AvailabilityZone: us-east-1a
+
+### SSM PARAMS ###
+  NodeId:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub node-id-${Stage}
+      Type: String
+      Value: !Ref Node
+      Description: SSM Parameter for node id
+      Tags:
+        Environment: !Ref Stage

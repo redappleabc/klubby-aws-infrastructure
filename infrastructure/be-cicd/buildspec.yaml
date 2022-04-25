@@ -13,7 +13,12 @@ phases:
       - cd ../dynamodb
       - aws cloudformation deploy --stack-name klubby-storage-dynamodb-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
       - cd ../../authentication
-      - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
+      - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
       - cd ../appsync
       - aws cloudformation deploy --stack-name klubby-appsync-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
+      # - cd ../managed-blockchain
+      # - aws cloudformation deploy --stack-name klubby-managed-blockchain-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
+      # - cd ../sam-backends/add-new-user
+      # - sam build
+      # - sam deploy --stack-name add-new-user-function-$STAGE --s3-bucket klubby-prod-artifacts-bucket --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
       #TODO include deployment of FE-CICD in here

@@ -22,6 +22,31 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
+  MessageDynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      # TableName: !Sub 'user-table-${Stage}'
+      AttributeDefinitions:
+      - AttributeName: message_id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: message_id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 10
+
+  ConversationDynamoTable:
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: conversation_id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: conversation_id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 10
 
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table

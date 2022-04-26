@@ -18,6 +18,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: user-table-name-dev
     Description: user table name
+  ConversationTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: conversation-table-name-dev
+    Description: conversation table name
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -118,6 +122,17 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref UserTableName
+  ConversationDynamoDBTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "ConversationDynamoDBTable"
+      Description: The Conversation DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref ConversationTableName
 
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
@@ -142,10 +157,10 @@ Resources:
   CreateConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
       FieldName: "createConversation"
-      DataSourceName: !GetAtt conversationsTableDataSource.Name
+      DataSourceName: !GetAtt ConversationDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",

@@ -25,7 +25,6 @@ Resources:
   MessageDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      # TableName: !Sub 'user-table-${Stage}'
       AttributeDefinitions:
       - AttributeName: message_id
         AttributeType: S
@@ -37,6 +36,7 @@ Resources:
         WriteCapacityUnits: 10
 
   ConversationDynamoTable:
+    Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
       - AttributeName: conversation_id

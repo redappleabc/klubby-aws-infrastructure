@@ -16,11 +16,10 @@ repo_id = 'bjudson1/klubby-react-app'
 def lambda_handler(event, context):
     message = event['Records'][0]['Sns']['Message']
     data = json.loads(message)
-    print (data)
 
     commit_id = data['commitId']
     state = data['status']
-    stage = 'dev'
+    stage = os.environ['STAGE']
     
     #     if data['detail']['state'].upper() in [ "SUCCEEDED" ]:
     #         state = "success"
@@ -33,7 +32,7 @@ def lambda_handler(event, context):
     build_status={}
     build_status['state'] = state
     build_status['context'] = f'amplify-deployment-{stage}'
-    build_status['description'] = f'webapp deploymen {stage}'
+    build_status['description'] = f'webapp deployment {stage}'
     #todo add aplify app id to make target url go there
     build_status['target_url'] = "https://" + region + ".console.aws.amazon.com/amplify/"
     # # else:

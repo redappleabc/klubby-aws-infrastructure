@@ -106,7 +106,7 @@ Resources:
 
         type Mutation {
             #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-            createConversation(createdAt: String, id: ID!, name: String!): Conversation
+            createConversation(username: String!,createdAt: String, id: ID!, name: String!): Conversation
             # addUser(username: String!): User
             updateUser(username: String!,wallets: String!): User
         }

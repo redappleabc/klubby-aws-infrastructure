@@ -249,7 +249,6 @@ Resources:
           INTEGRATION_AUTH_USER: !Ref IntegrationUser
           INTEGRATION_AUTH_PASS: !Ref IntegrationPass
           INTEGRATION_TYPE: !Ref IntegrationType
-          STAGE: !Ref Stage
       Policies:
         - Statement:
           - Effect: Allow

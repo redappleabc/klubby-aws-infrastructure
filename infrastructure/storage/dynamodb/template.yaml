@@ -26,10 +26,10 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: message_id
         AttributeType: S
       KeySchema:
-      - AttributeName: id
+      - AttributeName: message_id
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -39,50 +39,14 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: conversation_id
         AttributeType: S
       KeySchema:
-      - AttributeName: id
+      - AttributeName: conversation_id
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
-
-
-  UserConversationDynamoTable:
-    Type: "AWS::DynamoDB::Table"
-    Properties:
-      AttributeDefinitions:
-        -
-          AttributeName: "userId"
-          AttributeType: "S"
-        -
-          AttributeName: "conversationId"
-          AttributeType: "S"
-      KeySchema:
-        -
-          AttributeName: "userId"
-          KeyType: "HASH"
-        -
-          AttributeName: "conversationId"
-          KeyType: "RANGE"
-      ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
-      GlobalSecondaryIndexes:
-        -
-          IndexName: "conversationId-index"
-          KeySchema:
-            -
-              AttributeName: "conversationId"
-              KeyType: "HASH"
-          Projection:
-            ProjectionType: "ALL"
-          ProvisionedThroughput:
-            ReadCapacityUnits: "5"
-            WriteCapacityUnits: "5"
-
-
 
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table
@@ -114,17 +78,7 @@ Resources:
     Properties:
       Name: !Sub 'conversation-table-name-${Stage}'
       Type: String
-      Value: !Ref ConversationDynamoTable
-      Description: SSM Parameter for user table name
-      Tags:
-        Environment: !Ref Stage
-
-  UserConversationTableNameParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub 'userconversation-table-name-${Stage}'
-      Type: String
-      Value: !Ref UserConversationDynamoTable
+      Value: !Ref UserDynamoTable
       Description: SSM Parameter for user table name
       Tags:
         Environment: !Ref Stage

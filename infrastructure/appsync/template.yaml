@@ -22,10 +22,6 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: conversation-table-name-dev
     Description: conversation table name
-  UserConversationTableName:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: userconversation-table-name-dev
-    Description: user conversation table name
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -111,9 +107,6 @@ Resources:
         type Mutation {
             #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
             createConversation(createdAt: String, id: ID!, name: String!): Conversation
-
-            # Create a user conversation.
-            createUserConversations(conversationId: ID!, userId: ID!): UserConversations
             # addUser(username: String!): User
             updateUser(username: String!,wallets: String!): User
         }
@@ -140,19 +133,6 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref ConversationTableName
-  UserConversationDynamoDBTableDataSource:
-    Type: "AWS::AppSync::DataSource"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      Name: "UserConversationDynamoDBTable"
-      Description: The User Conversation DynamoDB table
-      Type: AMAZON_DYNAMODB
-      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
-      DynamoDBConfig:
-        AwsRegion: "us-east-1"
-        TableName: !Ref UserConversationTableName
-
-
 
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
@@ -196,30 +176,6 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-  CreateUserConversationMutationResolver:
-    Type: "AWS::AppSync::Resolver"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Mutation"
-      FieldName: "createUserConversation"
-      DataSourceName: !GetAtt UserConversationDynamoDBTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "PutItem",
-            "key": {
-                "userId": { "S" : "${context.arguments.userId}"},
-            "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "attributeValues" : {
-                "userId": {  "S": "${context.arguments.userId}" },
-            "conversationId": {  "S": "${context.arguments.conversationId}" }
-            }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
-
 
   GetUsersResolver:
     Type: AWS::AppSync::Resolver

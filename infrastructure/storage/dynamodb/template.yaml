@@ -67,8 +67,8 @@ Resources:
           AttributeName: "conversationId"
           KeyType: "RANGE"
       ProvisionedThroughput:
-        ReadCapacityUnits: "5"
-        WriteCapacityUnits: "5"
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
       GlobalSecondaryIndexes:
         -
           IndexName: "conversationId-index"
@@ -79,8 +79,8 @@ Resources:
           Projection:
             ProjectionType: "ALL"
           ProvisionedThroughput:
-            ReadCapacityUnits: "5"
-            WriteCapacityUnits: "5"
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 5
 
 
 

@@ -48,6 +48,42 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
 
+
+  UserConversationsDynamoTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        -
+          AttributeName: "userId"
+          AttributeType: "S"
+        -
+          AttributeName: "conversationId"
+          AttributeType: "S"
+      KeySchema:
+        -
+          AttributeName: "userId"
+          KeyType: "HASH"
+        -
+          AttributeName: "conversationId"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: "5"
+        WriteCapacityUnits: "5"
+      GlobalSecondaryIndexes:
+        -
+          IndexName: "conversationId-index"
+          KeySchema:
+            -
+              AttributeName: "conversationId"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: "5"
+            WriteCapacityUnits: "5"
+
+
+
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:

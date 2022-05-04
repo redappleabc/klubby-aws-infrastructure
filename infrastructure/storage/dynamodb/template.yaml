@@ -49,7 +49,7 @@ Resources:
         WriteCapacityUnits: 10
 
 
-  UserConversationsDynamoTable:
+  UserConversationDynamoTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:

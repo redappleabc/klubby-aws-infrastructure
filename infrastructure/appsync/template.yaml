@@ -229,11 +229,11 @@ Resources:
             "operation" : "PutItem",
             "key": {
                 "userId": { "S" : "${context.arguments.userId}"},
-            "conversationId": { "S" : "${context.arguments.conversationId}"}
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
             },
             "attributeValues" : {
                 "userId": {  "S": "${context.arguments.userId}" },
-            "conversationId": {  "S": "${context.arguments.conversationId}" }
+                "conversationId": {  "S": "${context.arguments.conversationId}" }
             }
         }
       ResponseMappingTemplate: |
@@ -257,11 +257,11 @@ Resources:
           },
           "attributeValues" : {
               "conversationId": {  "S": "${context.arguments.conversationId}" },
-          "content": {  "S": "${context.arguments.content}" },
+              "content": {  "S": "${context.arguments.content}" },
               "createdAt": {  "S": "${context.arguments.createdAt}" },
-              "sender": {  "S": "${context.identity.sub}" },
+              "sender": {  "S": "${context.identity.username}" },
               "isSent": {  "BOOL": true },
-          "id": { "S": "${context.arguments.id}" }
+              "id": { "S": "${context.arguments.id}" }
           }
         }
 

@@ -26,6 +26,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: userconversation-table-name-dev
     Description: user conversation table name
+  MessageTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: message-table-name-dev
+    Description: message table name
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -112,6 +116,9 @@ Resources:
             #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
             createConversation(createdAt: String, id: ID!, name: String!): Conversation
 
+            #  Create a message in a Conversation.
+            createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
+
             # Create a user conversation.
             createUserConversation(conversationId: ID!, userId: ID!): UserConversations
             # addUser(username: String!): User
@@ -151,6 +158,18 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref UserConversationTableName
+
+  MessageDynamoDBTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "MessageDynamoDBTable"
+      Description: Message DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref MessageTableName
 
 
 
@@ -217,6 +236,35 @@ Resources:
             "conversationId": {  "S": "${context.arguments.conversationId}" }
             }
         }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+
+  CreateMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createMessage"
+      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key" : {
+              "conversationId" : { "S" : "${context.arguments.conversationId}" }
+          },
+          "attributeValues" : {
+              "conversationId": {  "S": "${context.arguments.conversationId}" },
+          "content": {  "S": "${context.arguments.content}" },
+              "createdAt": {  "S": "${context.arguments.createdAt}" },
+              "sender": {  "S": "${context.identity.sub}" },
+              "isSent": {  "BOOL": true },
+          "id": { "S": "${context.arguments.id}" }
+          }
+        }
+
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

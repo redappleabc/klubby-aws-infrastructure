@@ -113,7 +113,7 @@ Resources:
             createConversation(createdAt: String, id: ID!, name: String!): Conversation
 
             # Create a user conversation.
-            createUserConversations(conversationId: ID!, userId: ID!): UserConversations
+            createUserConversation(conversationId: ID!, userId: ID!): UserConversations
             # addUser(username: String!): User
             updateUser(username: String!,wallets: String!): User
         }

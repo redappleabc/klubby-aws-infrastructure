@@ -259,7 +259,7 @@ Resources:
               "conversationId": {  "S": "${context.arguments.conversationId}" },
               "content": {  "S": "${context.arguments.content}" },
               "createdAt": {  "S": "${context.arguments.createdAt}" },
-              "sender": {  "S": "${context.identity.sub}" },
+              "sender": {  "S": "${context.identity.username}" },
               "isSent": {  "BOOL": true },
               "id": { "S": "${context.arguments.id}" }
           }

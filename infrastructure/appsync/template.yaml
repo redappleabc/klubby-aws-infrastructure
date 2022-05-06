@@ -231,28 +231,28 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  CreateUserConversationsMutationResolver:
-    Type: "AWS::AppSync::Resolver"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Mutation"
-      FieldName: "createUserConversations"
-      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "PutItem",
-            "key": {
-                "userId": { "S" : "${context.arguments.userId}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "attributeValues" : {
-                "userId": {  "S": "${context.arguments.userId}" },
-                "conversationId": {  "S": "${context.arguments.conversationId}" }
-            }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+  # CreateUserConversationsMutationResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: "Mutation"
+  #     FieldName: "createUserConversations"
+  #     DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #           "version" : "2017-02-28",
+  #           "operation" : "PutItem",
+  #           "key": {
+  #               "userId": { "S" : "${context.arguments.userId}"},
+  #               "conversationId": { "S" : "${context.arguments.conversationId}"}
+  #           },
+  #           "attributeValues" : {
+  #               "userId": {  "S": "${context.arguments.userId}" },
+  #               "conversationId": {  "S": "${context.arguments.conversationId}" }
+  #           }
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
 
 
 

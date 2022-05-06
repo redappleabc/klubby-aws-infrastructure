@@ -22,6 +22,14 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: conversation-table-name-dev
     Description: conversation table name
+  UserConversationsTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: userconversations-table-name-dev
+    Description: user conversation table name
+  MessageTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: message-table-name-dev
+    Description: message table name
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -43,6 +51,7 @@ Resources:
         schema {
             query: Query
             mutation: Mutation
+            subscription: Subscription
         }
 
         type Conversation {
@@ -83,6 +92,7 @@ Resources:
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
           conversations(after: String, first: Int): UserConverstationsConnection
+          messages(after: String, first: Int): MessageConnection
         }
 
         type UserConversations {
@@ -99,16 +109,32 @@ Resources:
         }
 
         type Query {
-            getUsers: [User]
-            #TODO make this [String]
-            getUserWallets(username: String!): User
+          #get all users
+          getUsers: [User]
+          # get user wallets
+          getUserWallets(username: String!): User
+          # get Me
+          me:User
+
+          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
+
+          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
+          getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
+          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
         }
 
         type Mutation {
-            #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-            createConversation(createdAt: String, id: ID!, name: String!): Conversation
-            # addUser(username: String!): User
-            updateUser(username: String!,wallets: String!): User
+          #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
+          createConversation(createdAt: String, id: ID!, name: String!): Conversation
+
+          #  Create a message in a Conversation.
+          createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
+
+          # Create a user conversation.
+          createUserConversations(conversationId: ID!, userId: ID!): UserConversations
+          # addUser(username: String!): User
+          updateUser(username: String!,wallets: String!): User
         }
 
   UserDynamoDBTableDataSource:
@@ -133,6 +159,31 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref ConversationTableName
+  UserConversationsDynamoDBTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "UserConversationsDynamoDBTable"
+      Description: The User Conversation DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref UserConversationsTableName
+
+  MessageDynamoDBTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "MessageDynamoDBTable"
+      Description: Message DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref MessageTableName
+
+
 
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
@@ -177,6 +228,59 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+  CreateUserConversationsMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createUserConversations"
+      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "PutItem",
+            "key": {
+                "userId": { "S" : "${context.arguments.userId}"},
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
+            },
+            "attributeValues" : {
+                "userId": {  "S": "${context.arguments.userId}" },
+                "conversationId": {  "S": "${context.arguments.conversationId}" }
+            }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+
+  CreateMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createMessage"
+      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key" : {
+              "conversationId" : { "S" : "${context.arguments.conversationId}" }
+          },
+          "attributeValues" : {
+              "conversationId": {  "S": "${context.arguments.conversationId}" },
+              "content": {  "S": "${context.arguments.content}" },
+              "createdAt": {  "S": "${context.arguments.createdAt}" },
+              "sender": {  "S": "${context.identity.username}" },
+              "isSent": {  "BOOL": true },
+              "id": { "S": "${context.arguments.id}" }
+          }
+        }
+
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
   GetUsersResolver:
     Type: AWS::AppSync::Resolver
     Properties:
@@ -216,6 +320,154 @@ Resources:
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
+
+  meResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: me
+      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key": {
+              "username": { "S" : "${context.identity.username}"}
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  getAllMessageConnectionResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllMessageConnection
+      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :conversationId",
+              "expressionValues" : {
+                  ":conversationId" : {
+                      "S" : "${context.arguments.conversationId}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+        ResponseMappingTemplate: |
+        {
+          "messages": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
+
+
+  getAllMessageResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllMessage
+      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :id",
+              "expressionValues" : {
+                  ":id" : {
+                      "S" : "${context.arguments.conversationId}"
+                  }
+              }
+          },
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+  getAllMessageFromResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllMessageFrom
+      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :id and sender = :sender",
+              "expressionValues" : {
+                  ":id" : {
+                      "S" : "${context.arguments.conversationId}"
+                  },
+                  ":sender" : {
+                      "S" : "${context.arguments.sender}"
+                  }
+              }
+          },
+          "index" : "sender",
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+
+
+
+
+  conversationUserConversationsResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversations
+      FieldName: "conversation"
+      DataSourceName: !GetAtt ConversationDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.source.conversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  associatedUserConversationsResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversations
+      FieldName: associated
+      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :conversationId",
+              "expressionValues" : {
+                  ":conversationId" : {
+                      "S" : "${context.source.conversationId}"
+                  }
+              }
+          },
+          "index": "conversationId-index"
+        }
+      ResponseMappingTemplate: |
+        $util.toJson($context.result.items)
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver

@@ -26,10 +26,10 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: message_id
+      - AttributeName: id
         AttributeType: S
       KeySchema:
-      - AttributeName: message_id
+      - AttributeName: id
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -39,10 +39,10 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: conversation_id
+      - AttributeName: id
         AttributeType: S
       KeySchema:
-      - AttributeName: conversation_id
+      - AttributeName: id
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5

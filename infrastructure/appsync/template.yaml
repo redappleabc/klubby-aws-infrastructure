@@ -324,23 +324,23 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
-  meResolver:
-    Type: "AWS::AppSync::Resolver"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: me
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key": {
-              "username": { "S" : "${context.identity.username}"}
-          }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+  # meResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: me
+  #     DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version" : "2017-02-28",
+  #         "operation" : "GetItem",
+  #         "key": {
+  #             "username": { "S" : "${context.identity.username}"}
+  #         }
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
 
 
   # getAllMessageConnectionResolver:

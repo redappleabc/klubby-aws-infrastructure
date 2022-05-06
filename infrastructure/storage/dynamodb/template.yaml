@@ -62,7 +62,7 @@ Resources:
         WriteCapacityUnits: 10
 
 
-  UserConversationDynamoTable:
+  UserConversationsDynamoTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
       AttributeDefinitions:
@@ -143,7 +143,7 @@ Resources:
       Tags:
         Environment: !Ref Stage
 
-  UserConversationTableNameParam:
+  UserConversationsTableNameParam:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Sub 'userconversation-table-name-${Stage}'

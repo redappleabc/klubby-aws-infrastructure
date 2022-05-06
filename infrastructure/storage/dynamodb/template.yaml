@@ -87,10 +87,11 @@ Resources:
       - AttributeName: conversationId
         AttributeType: S
       KeySchema:
-      - AttributeName: id
-        KeyType: RANGE
       - AttributeName: conversationId
         KeyType: HASH
+      - AttributeName: id
+        KeyType: RANGE
+
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10

@@ -92,15 +92,16 @@ Resources:
           getUsers: [User]
           # get user wallets
           getUserWallets(username: String!): User
-          # get Me
-          me: User
 
           #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
           getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
 
           #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
           getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
-          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
+          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]        
+
+          # get Me
+          me: User  
         }
 
         type User {

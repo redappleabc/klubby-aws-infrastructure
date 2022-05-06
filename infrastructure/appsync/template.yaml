@@ -163,7 +163,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: "UserConversationsDynamoTable"
+      Name: "UserConversationsDynamoDBTable"
       Description: The User Conversation DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn

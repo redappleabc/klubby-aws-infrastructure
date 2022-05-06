@@ -117,11 +117,11 @@ Resources:
           me:User
 
           #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-          getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
+          allMessage(after: String, conversationId: ID!, first: Int): [Message]
 
           #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-          getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
-          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
+          allMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
+          allMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
         }
 
         type Mutation {
@@ -340,12 +340,12 @@ Resources:
         $utils.toJson($context.result)
 
 
-  getAllMessageConnectionResolver:
+  allMessageConnectionResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessageConnection
+      FieldName: allMessageConnection
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -370,12 +370,12 @@ Resources:
         }
 
 
-  getAllMessageResolver:
+  allMessageResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessage
+      FieldName: allMessage
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -394,12 +394,12 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
-  getAllMessageFromResolver:
+  allMessageFromResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessageFrom
+      FieldName: allMessageFrom
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {

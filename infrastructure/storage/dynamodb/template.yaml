@@ -146,7 +146,7 @@ Resources:
   UserConversationsTableNameParam:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub 'userconversation-table-name-${Stage}'
+      Name: !Sub 'userconversations-table-name-${Stage}'
       Type: String
       Value: !Ref UserConversationsDynamoTable
       Description: SSM Parameter for user table name

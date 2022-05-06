@@ -148,7 +148,7 @@ Resources:
     Properties:
       Name: !Sub 'userconversation-table-name-${Stage}'
       Type: String
-      Value: !Ref UserConversationDynamoTable
+      Value: !Ref UserConversationsDynamoTable
       Description: SSM Parameter for user table name
       Tags:
         Environment: !Ref Stage

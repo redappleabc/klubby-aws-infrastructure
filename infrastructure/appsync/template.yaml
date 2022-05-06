@@ -109,32 +109,29 @@ Resources:
         }
 
         type Query {
-            getUsers: [User]
-            #TODO make this [String]
-            getUserWallets(username: String!): User
-            #get Me
-            me:User
-
-            #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-            getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
-            #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-            getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
-            getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]
-            #  Scan through all values of type 'User'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'UserConnection' result to fetch pages.
-          
+          getUsers: [User]
+          #TODO make this [String]
+          getUserWallets(username: String!): User
+          #get Me
+          me:User
+          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
+          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
+          getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
+          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
         }
 
         type Mutation {
-            #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-            createConversation(createdAt: String, id: ID!, name: String!): Conversation
+          #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
+          createConversation(createdAt: String, id: ID!, name: String!): Conversation
 
-            #  Create a message in a Conversation.
-            createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
+          #  Create a message in a Conversation.
+          createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
 
-            # Create a user conversation.
-            createUserConversations(conversationId: ID!, userId: ID!): UserConversations
-            # addUser(username: String!): User
-            updateUser(username: String!,wallets: String!): User
+          # Create a user conversation.
+          createUserConversations(conversationId: ID!, userId: ID!): UserConversations
+          # addUser(username: String!): User
+          updateUser(username: String!,wallets: String!): User
         }
 
   UserDynamoDBTableDataSource:

@@ -24,7 +24,7 @@ Parameters:
     Description: conversation table name
   UserConversationsTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userconversation-table-name-dev
+    Default: userconversations-table-name-dev
     Description: user conversation table name
   MessageTableName:
     Type: AWS::SSM::Parameter::Value<String>

@@ -51,7 +51,6 @@ Resources:
         schema {
             query: Query
             mutation: Mutation
-            
         }
 
         type Conversation {
@@ -90,6 +89,7 @@ Resources:
         type Query {
           #get all users
           getUsers: [User]
+
           # get user wallets
           getUserWallets(username: String!): User
 
@@ -125,8 +125,6 @@ Resources:
           userConversations: [UserConversations]
         }
 
-        
-
         type Mutation {
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation(createdAt: String, id: ID!, name: String!): Conversation
@@ -136,11 +134,12 @@ Resources:
 
           # Create a user conversation.
           createUserConversations(conversationId: ID!, userId: ID!): UserConversations
+
           # addUser(username: String!): User
           updateUser(username: String!,wallets: String!): User
         }
 
-  UserDynamoDBTableDataSource:
+  UserTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -151,7 +150,8 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref UserTableName
-  ConversationDynamoDBTableDataSource:
+
+  ConversationTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -162,7 +162,8 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref ConversationTableName
-  UserConversationsDynamoDBTableDataSource:
+
+  UserConversationBridgeTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -174,7 +175,7 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref UserConversationBridgeTableName
 
-  MessageDynamoDBTableDataSource:
+  MessageTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -185,8 +186,6 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
-
-
 
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
@@ -214,7 +213,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
       FieldName: "createConversation"
-      DataSourceName: !GetAtt ConversationDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -237,7 +236,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
       FieldName: "createUserConversations"
-      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
@@ -254,15 +253,13 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-
-
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
       FieldName: "createMessage"
-      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -290,7 +287,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getUsers
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
@@ -311,7 +308,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getUserWallets
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version": "2017-02-28",
@@ -330,7 +327,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: me
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -349,7 +346,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "User"
       FieldName: "conversations"
-      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -379,7 +376,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getAllMessageConnection
-      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -409,7 +406,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getAllMessage
-      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -433,7 +430,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getAllMessageFrom
-      DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -456,16 +453,13 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
 
-
-
-
   conversationUserConversationsResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: UserConversations
       FieldName: "conversation"
-      DataSourceName: !GetAtt ConversationDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -484,7 +478,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: UserConversations
       FieldName: associated
-      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
@@ -508,7 +502,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation
       FieldName: updateUser
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",

@@ -78,7 +78,7 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
 
-  MessageDynamoTable:
+  MessageTable:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:

@@ -355,9 +355,9 @@ Resources:
           "version" : "2017-02-28",
           "operation" : "Query",
           "query" : {
-              "expression": "userId = :userId",
+              "expression": "userId = :username",
               "expressionValues" : {
-                  ":userId" : {
+                  ":username" : {
                       "S" : "${context.identity.username}"
                   }
               }

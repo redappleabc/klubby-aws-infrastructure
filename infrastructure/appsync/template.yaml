@@ -324,7 +324,7 @@ Resources:
   meQueryResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Query"
       FieldName: "me"
       DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
@@ -343,7 +343,7 @@ Resources:
   getAllMessageConnectionQueryResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Query"
       FieldName: "getAllMessageConnection"
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
@@ -373,7 +373,7 @@ Resources:
   getAllMessageQueryResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Query"
       FieldName: "getAllMessage"
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
@@ -397,7 +397,7 @@ Resources:
   getAllMessageFromQueryResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Query"
       FieldName: "getAllMessageFrom"
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
@@ -429,7 +429,7 @@ Resources:
   conversationUserConversationsResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "UserConversations"
       FieldName: "conversation"
       DataSourceName: !GetAtt ConversationDynamoDBTableDataSource.Name
@@ -448,7 +448,7 @@ Resources:
   associatedUserConversationsResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
-      ApiId: !GetAtt chatQLApi.ApiId
+      ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "UserConversations"
       FieldName: "associated"
       DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name

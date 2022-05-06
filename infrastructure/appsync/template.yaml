@@ -230,7 +230,7 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  CreateUserConversationsMutationResolver:
+  CreateUserConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId

@@ -22,9 +22,9 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: conversation-table-name-dev
     Description: conversation table name
-  UserConversationsTableName:
+  UserConversationBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userconversations-table-name-dev
+    Default: userconversationbridge-table-name-dev
     Description: user conversation table name
   MessageTableName:
     Type: AWS::SSM::Parameter::Value<String>
@@ -172,7 +172,7 @@ Resources:
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
       DynamoDBConfig:
         AwsRegion: "us-east-1"
-        TableName: !Ref UserConversationsTableName
+        TableName: !Ref UserConversationBridgeTableName
 
   MessageDynamoDBTableDataSource:
     Type: "AWS::AppSync::DataSource"

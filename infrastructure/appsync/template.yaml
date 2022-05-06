@@ -424,6 +424,7 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
+
   getAllMessageFromResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:

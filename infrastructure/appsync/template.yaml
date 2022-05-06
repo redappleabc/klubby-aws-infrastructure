@@ -349,15 +349,15 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "User"
       FieldName: "conversations"
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserConversationsDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
           "operation" : "Query",
           "query" : {
-              "expression": "userId = :username",
+              "expression": "userId = :userId",
               "expressionValues" : {
-                  ":username" : {
+                  ":userId" : {
                       "S" : "${context.identity.username}"
                   }
               }

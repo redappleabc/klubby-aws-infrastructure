@@ -366,7 +366,7 @@ Resources:
           "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
           "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
         }
-        ResponseMappingTemplate: |
+      ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end

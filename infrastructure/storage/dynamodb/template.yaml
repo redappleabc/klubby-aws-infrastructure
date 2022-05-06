@@ -104,7 +104,7 @@ Resources:
         - AttributeName: "conversationId"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "userId"
+        - AttributeName: "username"
           KeyType: "HASH"
         - AttributeName: "conversationId"
           KeyType: "RANGE"
@@ -131,7 +131,7 @@ Resources:
         - AttributeName: "conversationId"
           AttributeType: "S"
       KeySchema:
-        - AttributeName: "userId"
+        - AttributeName: "klubname"
           KeyType: "HASH"
         - AttributeName: "conversationId"
           KeyType: "RANGE"

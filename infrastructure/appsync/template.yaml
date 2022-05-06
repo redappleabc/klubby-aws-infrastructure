@@ -108,7 +108,7 @@ Resources:
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
-          conversations(after: String, first: Int): UserConverstationsConnection
+          conversations(after: String, first: Int): UserConversationsConnection
           messages(after: String, first: Int): MessageConnection
         }
 
@@ -120,7 +120,7 @@ Resources:
           userId: ID!
         }
 
-        type UserConverstationsConnection {
+        type UserConversationsConnection {
           nextToken: String
           userConversations: [UserConversations]
         }
@@ -341,6 +341,36 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+
+  conversationsUserResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "User"
+      FieldName: "conversations"
+      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "userId = :userId",
+              "expressionValues" : {
+                  ":userId" : {
+                      "S" : "${context.identity.username}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+      ResponseMappingTemplate: |
+        {
+          "userConversations": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
 
 
   getAllMessageConnectionResolver:

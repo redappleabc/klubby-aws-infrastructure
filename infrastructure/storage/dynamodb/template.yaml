@@ -26,10 +26,10 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: message_id
         AttributeType: S
       KeySchema:
-      - AttributeName: id
+      - AttributeName: message_id
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -39,15 +39,16 @@ Resources:
     Type: AWS::DynamoDB::Table
     Properties:
       AttributeDefinitions:
-      - AttributeName: id
+      - AttributeName: conversation_id
         AttributeType: S
       KeySchema:
-      - AttributeName: id
+      - AttributeName: conversation_id
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
 
+<<<<<<< HEAD
   MessageDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -97,6 +98,8 @@ Resources:
 
 
 
+=======
+>>>>>>> 7e412d49406dc65446a4012e04e057e1519e9e02
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:

@@ -87,6 +87,22 @@ Resources:
           nextToken: String
         }
 
+        type Query {
+          #get all users
+          getUsers: [User]
+          # get user wallets
+          getUserWallets(username: String!): User
+          # get Me
+          me:User
+
+          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
+
+          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
+          getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
+          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
+        }
+
         type User {
           username: String!
           wallets: String
@@ -108,21 +124,7 @@ Resources:
           userConversations: [UserConversations]
         }
 
-        type Query {
-          #get all users
-          getUsers: [User]
-          # get user wallets
-          getUserWallets(username: String!): User
-          # get Me
-          me:User
-
-          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-          allMessage(after: String, conversationId: ID!, first: Int): [Message]
-
-          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-          allMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
-          allMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]          
-        }
+        
 
         type Mutation {
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
@@ -340,12 +342,12 @@ Resources:
         $utils.toJson($context.result)
 
 
-  allMessageConnectionResolver:
+  getAllMessageConnectionResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: allMessageConnection
+      FieldName: getAllMessageConnection
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -370,12 +372,12 @@ Resources:
         }
 
 
-  allMessageResolver:
+  getAllMessageResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: allMessage
+      FieldName: getAllMessage
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -394,12 +396,12 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
-  allMessageFromResolver:
+  getAllMessageFromResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: allMessageFrom
+      FieldName: getAllMessageFrom
       DataSourceName: !GetAtt MessageDynamoDBTableDataSource.Name
       RequestMappingTemplate: |
         {

@@ -101,7 +101,7 @@ Resources:
           #getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]        
 
           # get Me
-          me: User  
+          #me: User  
         }
 
         type User {

@@ -48,7 +48,6 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
 
-<<<<<<< HEAD
   MessageDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -98,8 +97,6 @@ Resources:
 
 
 
-=======
->>>>>>> 7e412d49406dc65446a4012e04e057e1519e9e02
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:

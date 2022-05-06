@@ -281,7 +281,7 @@ Resources:
         $utils.toJson($context.result)
 
 
-  GetUsersQueryResolver:
+  GetUsersResolver:
     Type: AWS::AppSync::Resolver
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -302,7 +302,7 @@ Resources:
         *#
         $util.toJson($ctx.result.items)
 
-  GetUserWalletsQueryResolver:
+  GetUserWalletsResolver:
     Type: AWS::AppSync::Resolver
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -321,7 +321,7 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
-  meQueryResolver:
+  meResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -340,7 +340,7 @@ Resources:
         $utils.toJson($context.result)
 
 
-  getAllMessageConnectionQueryResolver:
+  getAllMessageConnectionResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -370,7 +370,7 @@ Resources:
         }
 
 
-  getAllMessageQueryResolver:
+  getAllMessageResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -394,7 +394,7 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
-  getAllMessageFromQueryResolver:
+  getAllMessageFromResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId

@@ -532,7 +532,7 @@ Resources:
               "expressionValues" : {
                   ":username" : {"S": "${context.identity.username}"}
               }
-          }
+          },
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |

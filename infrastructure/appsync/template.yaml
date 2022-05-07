@@ -113,10 +113,9 @@ Resources:
         }
 
         type UserConversations {
-          associated: [UserConversations]
+          associated: String
           conversation: Conversation
           conversationId: ID!
-          user: User
           username: ID!
         }
 
@@ -536,7 +535,7 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        $util.toJson($context.result.items)
+        $util.toJson($context.result[0]["username"])
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver

@@ -535,7 +535,7 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        $util.toJson($context.result[0])
+        $util.toJson($context.result.items[0]["username"])
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver

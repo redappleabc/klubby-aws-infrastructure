@@ -101,7 +101,9 @@ Resources:
           getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]        
 
           # get Me
-          me: User  
+          me: User
+
+          Test: User
         }
 
         type User {
@@ -206,6 +208,24 @@ Resources:
                 Resource: '*'
 
   ### Resolvers ###
+  TestResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: Test
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key": {
+              "username": { "S" : "${context.identity.username}"}
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
   CreateConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:

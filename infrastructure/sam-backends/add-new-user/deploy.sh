@@ -16,6 +16,5 @@ sam deploy \
     --capabilities CAPABILITY_IAM \
     --region us-east-1 \
     --no-fail-on-empty-changeset \
-    --template template.yaml \
     --parameter-overrides \
         ParameterKey=Stage,ParameterValue=dev

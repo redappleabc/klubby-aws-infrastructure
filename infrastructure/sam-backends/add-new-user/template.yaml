@@ -32,6 +32,15 @@ Resources:
             Action:
             - dynamodb:*
             Resource: arn:aws:dynamodb:us-east-1:590503010210:table/*
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
 
 ### SSM PARAMS ###
   AddNewUserFunctionArn:

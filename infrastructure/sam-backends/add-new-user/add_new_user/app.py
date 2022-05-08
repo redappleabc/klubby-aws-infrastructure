@@ -2,7 +2,7 @@ import json
 import boto3
 
 def lambda_handler(event, context):
-    TABLE_NAME="klubby-storage-dynamodb-dev-UserDynamoTable-1QJ30P4U6CW26"
+    TABLE_NAME="klubby-storage-dynamodb-dev-UserTable-IM4YXWAHTLAF"
     
     try:
         username = event['userName']

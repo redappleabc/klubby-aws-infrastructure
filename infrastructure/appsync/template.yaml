@@ -51,6 +51,7 @@ Resources:
         schema {
             query: Query
             mutation: Mutation
+            subscription: Subscription
         }
 
         type Conversation {
@@ -106,6 +107,8 @@ Resources:
           Test: User
         }
 
+        
+
         type User {
           username: String!
           wallets: String
@@ -138,6 +141,14 @@ Resources:
 
           # addUser(username: String!): User
           updateUser(username: String!,wallets: String!): User
+        }
+
+        type Subscription {
+          #  Subscribes to all new messages in a given Conversation.
+          subscribeToNewMessage(conversationId: ID!): Message
+            @aws_subscribe(mutations:["createMessage"])
+          subscribeToNewUserConversations(username:ID!): UserConversations
+        		@aws_subscribe(mutations: ["createUserConversations"])
         }
 
   UserTableDataSource:

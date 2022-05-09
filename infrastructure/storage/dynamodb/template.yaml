@@ -86,10 +86,14 @@ Resources:
         AttributeType: S
       - AttributeName: conversationId
         AttributeType: S
+      - AttributeName: createdAt
+        AttributeType: S
       KeySchema:
       - AttributeName: conversationId
         KeyType: HASH
       - AttributeName: id
+        KeyType: RANGE
+      - AttributeName: createdAt
         KeyType: RANGE
 
       ProvisionedThroughput:

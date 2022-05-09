@@ -95,6 +95,16 @@ Resources:
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
+  GlobalSecondaryIndexes:
+    - IndexName: "conversationId-index"
+      KeySchema:
+        - AttributeName: "conversationId"
+          KeyType: "HASH"
+      Projection:
+        ProjectionType: "ALL"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
 
 
   UserConversationBridgeTable:

@@ -96,10 +96,10 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
   GlobalSecondaryIndexes:
-    - IndexName: "conversationId-index"
+    - IndexName: "id-index"
       KeySchema:
-        - AttributeName: "conversationId"
-          KeyType: "HASH"
+        - AttributeName: "id"
+          KeyType: "RANGE"
       Projection:
         ProjectionType: "ALL"
       ProvisionedThroughput:

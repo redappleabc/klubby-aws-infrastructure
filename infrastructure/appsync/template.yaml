@@ -460,8 +460,7 @@ Resources:
                   }
               }
           },
-          "index" : "createdAt-index",
-          "scanIndexForward": false,
+          "index" : "id",
           "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
           "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
         }

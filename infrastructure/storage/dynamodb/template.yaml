@@ -96,16 +96,6 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 10
 
-      GlobalSecondaryIndexes:
-        - IndexName: "createdAt-index"
-          KeySchema:
-            - AttributeName: "createdAt"
-              KeyType: "RANGE"
-          Projection:
-            ProjectionType: "ALL"
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
 
   UserConversationBridgeTable:
     Type: "AWS::DynamoDB::Table"

@@ -265,3 +265,14 @@ Resources:
   #     Runtime: nodejs12.x
   #     # MemorySize: 512
   #     # Timeout: 120
+
+  ### SSM Params ###
+  androidPipelineNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub android-pipeline-name-${Stage}
+      Type: String
+      Value: !Ref CodePipeline
+      Description: SSM Parameter for android pipeline name
+      Tags:
+        Environment: !Ref Stage

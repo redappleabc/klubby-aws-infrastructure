@@ -28,13 +28,13 @@ Parameters:
     MinLength: 1
     Description: Enter Bitbucket or GitHub API password
   iOSPipelineName:
-    Type: String
-    MinLength: 1
-    Description: Name of CodePipeline pipeline
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: ios-pipeline-name-dev
+    Description: ios pipeline name from SSM
   AndroidPipelineName:
-    Type: String
-    MinLength: 1
-    Description: Name of CodePipeline pipeline
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: android-pipeline-name-dev
+    Description: android pipeline name from SSM
   ProjectName:
     Default: klubby
     Description: Project name

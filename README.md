@@ -53,6 +53,7 @@ The following seection describes the schema of the GraphQL API.
 ##### Subscriptions
 - subscribeToNewMessage(conversationId: ID!): Message
 - subscribeToNewUserConversations(username:ID!): UserConversations
+
 ### DynamoDB Storage
 DynamoDB is the main storage solution for managing the state of the Klubby Application. It was selected for its simplicity, scalability, and real-time capabilities. The following figure shows and Entity Relationship Diagram outlining the major data tables managing the state of the Klubby application and their relationships.
 

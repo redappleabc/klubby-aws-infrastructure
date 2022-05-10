@@ -9,7 +9,9 @@ The following section goes through the major components of the AWS infrastructur
 
 A high level overview for the architecture of the Front-End CICD can be seen in the following diagram.
 
-<img src="documentation/images/fe-cicd-arch.png" width="900"/>
+<p align="center">
+    <img src="documentation/images/fe-cicd-arch.png" width="50%"/>
+</p>
 
 ### Back-End CICD
 TODO need to add this section
@@ -26,7 +28,7 @@ This is the main point of integration between the front end and the back end. Th
 ### DynamoDB Storage
 DynamoDB is the main storage solution for managing the state of the Klubby Application. It was selected for its simplicity, scalability, and real-time capabilities. The following figure shows and Entity Relationship Diagram outlining the major data tables managing the state of the Klubby application and their relationships.
 
-<img src="documentation/images/erd.png" width="1200"/>
+<img src="documentation/images/erd.png" width="100%"/>
 
 
 ## Refrences

@@ -4,8 +4,17 @@ This repo contains the AWS infrastructure for the Klubby Application.
 ## Infrastructure Components
 The following section goes through the major components of the AWS infrastructure.
 
-
+### Back-End CICD
+TODO need to add this section
 ### Front-End CICD
+
+The FE-CICD infrasturcture is responsible for the deployment of the front-end of the Klubby Application on all device types. The following environments are currently supported:
+- webapp dev
+- webapp prod
+- iOS dev
+- iOS prod
+- Android dev
+- Android prod
 
 A high level overview for the architecture of the Front-End CICD can be seen in the following diagram.
 
@@ -13,13 +22,30 @@ A high level overview for the architecture of the Front-End CICD can be seen in 
     <img src="documentation/images/fe-cicd-arch.png" width="50%"/>
 </p>
 
-### Back-End CICD
-TODO need to add this section
 ### AppSync GraphQL API
 
 This is the main point of integration between the front end and the back end. The GraphQL API contains the following routes:
 
-#TODO list all routes
+The following seection describes the schema of the GraphQL API.
+
+##### Types
+- Conversation
+- Message
+- MessageConnection
+- User
+- UserConversations
+- UserConversationsConnection
+
+##### Queries
+- getUsers: [User]
+- getUserWallets(username: String!): User
+- getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
+- getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
+- getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]
+- me: User
+
+##### Mutations
+
 - createConversataion
 - createMessage
 - listConversations

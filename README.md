@@ -37,20 +37,22 @@ The following seection describes the schema of the GraphQL API.
 - UserConversationsConnection
 
 ##### Queries
-- getUsers: [User]
+- getAllUsers: [User]
 - getUserWallets(username: String!): User
-- getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
-- getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
-- getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]
-- me: User
+- getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
+- getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+- getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]
+- getMe: User
 
 ##### Mutations
+- createConversation(createdAt: String, id: ID!, name: String!): Conversation
+- createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
+- createUserConversationBridge(conversationId: ID!, username: ID!): UserConversations
+- updateUser(username: String!,wallets: String!): User
 
-- createConversataion
-- createMessage
-- listConversations
-- listMessages
-
+##### Subscriptions
+- subscribeToNewMessage(conversationId: ID!): Message
+- subscribeToNewUserConversations(username:ID!): UserConversations
 ### DynamoDB Storage
 DynamoDB is the main storage solution for managing the state of the Klubby Application. It was selected for its simplicity, scalability, and real-time capabilities. The following figure shows and Entity Relationship Diagram outlining the major data tables managing the state of the Klubby application and their relationships.
 

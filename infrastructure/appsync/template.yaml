@@ -87,28 +87,6 @@ Resources:
           nextToken: String
         }
 
-        type Query {
-          #get all users
-          getUsers: [User]
-
-          # get user wallets
-          getUserWallets(username: String!): User
-
-          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-          getAllMessage(after: String, conversationId: ID!, first: Int): [Message]
-
-          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-          getAllMessageConnection(after: String, conversationId: ID!, first: Int): MessageConnection
-          getAllMessageFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]        
-
-          # get Me
-          me: User
-
-          Test: User
-        }
-
-        
-
         type User {
           username: String!
           wallets: String
@@ -129,6 +107,26 @@ Resources:
           userConversations: [UserConversations]
         }
 
+        type Query {
+          #get all users
+          getAllUsers: [User]
+
+          # get user wallets
+          getUserWallets(username: String!): User
+
+          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
+
+          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
+          getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+
+          # TODO what does this do
+          getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message]
+
+          # get Me
+          getMe: User
+        }
+
         type Mutation {
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation(createdAt: String, id: ID!, name: String!): Conversation
@@ -137,7 +135,7 @@ Resources:
           createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!, sender:String): Message
 
           # Create a user conversation.
-          createUserConversations(conversationId: ID!, username: ID!): UserConversations
+          createUserConversationBridge(conversationId: ID!, username: ID!): UserConversations
 
           # addUser(username: String!): User
           updateUser(username: String!,wallets: String!): User
@@ -148,7 +146,7 @@ Resources:
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage"])
           subscribeToNewUserConversations(username:ID!): UserConversations
-        		@aws_subscribe(mutations: ["createUserConversations"])
+            @aws_subscribe(mutations: ["createUserConversationBridge"])
         }
 
   UserTableDataSource:
@@ -260,12 +258,12 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  CreateUserConversationsMutationResolver:
+  CreateUserConversationBridgeMutationResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
-      FieldName: "createUserConversations"
+      FieldName: "createUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -311,12 +309,12 @@ Resources:
         $utils.toJson($context.result)
 
 
-  GetUsersResolver:
+  GetAllUsersResolver:
     Type: AWS::AppSync::Resolver
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getUsers
+      FieldName: getAllUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -360,12 +358,12 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
-  meResolver:
+  GetMeResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: me
+      FieldName: getMe
       DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -440,13 +438,37 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-
-  getAllMessageConnectionResolver:
+  getAllMessagesResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessageConnection
+      FieldName: getAllMessages
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :id",
+              "expressionValues" : {
+                  ":id" : {
+                      "S" : "${context.arguments.conversationId}"
+                  }
+              }
+          },
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+
+  getAllMessageConnectionsResolver:
+    Type: "AWS::AppSync::Resolver"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllMessageConnections
       DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -469,38 +491,12 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-
-  getAllMessageResolver:
+  getAllMessagesFromResolver:
     Type: "AWS::AppSync::Resolver"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessage
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :id",
-              "expressionValues" : {
-                  ":id" : {
-                      "S" : "${context.arguments.conversationId}"
-                  }
-              }
-          },
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
-
-  getAllMessageFromResolver:
-    Type: "AWS::AppSync::Resolver"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: getAllMessageFrom
+      FieldName: getAllMessagesFrom
       DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {

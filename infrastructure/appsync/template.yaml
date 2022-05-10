@@ -219,6 +219,7 @@ Resources:
   ### Resolvers ###
   CreateConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
@@ -242,6 +243,7 @@ Resources:
 
   CreateUserConversationBridgeMutationResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
@@ -265,6 +267,7 @@ Resources:
 
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
@@ -293,6 +296,7 @@ Resources:
 
   GetAllUsersResolver:
     Type: AWS::AppSync::Resolver
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
@@ -323,6 +327,7 @@ Resources:
 
   GetUserWalletsResolver:
     Type: AWS::AppSync::Resolver
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
@@ -342,6 +347,7 @@ Resources:
 
   GetMeResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
@@ -362,6 +368,7 @@ Resources:
 
   messagesUserResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "User"
@@ -393,6 +400,7 @@ Resources:
 
   conversationsUserResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "User"
@@ -422,6 +430,7 @@ Resources:
 
   getAllMessagesResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
@@ -447,6 +456,7 @@ Resources:
 
   getAllMessageConnectionsResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
@@ -475,6 +485,7 @@ Resources:
 
   getAllMessagesFromResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
@@ -504,6 +515,7 @@ Resources:
 
   conversationUserConversationsResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: UserConversations
@@ -523,6 +535,7 @@ Resources:
 
   associatedUserConversationsResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: UserConversations
@@ -556,6 +569,7 @@ Resources:
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation

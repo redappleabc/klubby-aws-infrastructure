@@ -23,9 +23,6 @@ This is the main point of integration between the front end and the back end. Th
 - listConversations
 - listMessages
 
-
-Resolvers can be found at `infrastructure/appsync/resolvers`.
-
 ### DynamoDB Storage
 DynamoDB is the main storage solution for managing the state of the Klubby Application. It was selected for its simplicity, scalability, and real-time capabilities. The following figure shows and Entity Relationship Diagram outlining the major data tables managing the state of the Klubby application and their relationships.
 

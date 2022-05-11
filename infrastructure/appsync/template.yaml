@@ -143,7 +143,7 @@ Resources:
           updateUser(username: String!,wallets: String!): User
         }
 
-        type Subscription @aws_cognito_user_pools {
+        type Subscription  {
           #  Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage"])

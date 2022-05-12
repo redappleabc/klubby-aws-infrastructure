@@ -100,7 +100,7 @@ Resources:
           associated: String
           # The conversation related me
           conversation: Conversation
-          # latest message id  which user has read
+          # latest message id  which other user has read
           read: String
 
           conversationId: ID!
@@ -146,6 +146,9 @@ Resources:
 
           # addUser(username: String!): User
           updateUser(username: String!,wallets: String!): User
+
+          # set message id which user read
+          setRead(conversationId: ID!, username: ID!, messageId: ID!)
         }
 
         type Subscription  {
@@ -616,6 +619,35 @@ Resources:
                 ## },
                 "expressionValues": {
                     ":wallets" : $util.dynamodb.toDynamoDBJson($context.arguments.wallets)
+                }
+            }
+        }
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+
+  SetReadResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: setRead
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "UpdateItem",
+            "key": {
+                "username": { "S" : "${context.arguments.username}"},
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
+            },
+            "update" : {
+                "expression" : "SET read = :messageId",
+
+                "expressionValues": {
+                    ":messageId" : $util.dynamodb.toDynamoDBJson($context.arguments.messageId)
                 }
             }
         }

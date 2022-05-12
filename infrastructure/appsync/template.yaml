@@ -96,6 +96,8 @@ Resources:
         }
 
         type UserConversations {
+          # The user conversation name
+          name: String
           # The other user name
           associated: String
           # The conversation related me
@@ -142,7 +144,7 @@ Resources:
           createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
 
           # Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, username: ID!): UserConversations
+          createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversations
 
           # addUser(username: String!): User
           updateUser(username: String!,wallets: String!): User
@@ -288,7 +290,8 @@ Resources:
             },
             "attributeValues" : {
                 "username": {  "S": "${context.arguments.username}" },
-                "conversationId": {  "S": "${context.arguments.conversationId}" }
+                "conversationId": {  "S": "${context.arguments.conversationId}" },
+                "name": {  "S": "${context.arguments.name}" }
             }
         }
       ResponseMappingTemplate: |

@@ -148,7 +148,7 @@ Resources:
           updateUser(username: String!,wallets: String!): User
 
           # set message id which user read
-          setRead(conversationId: ID!, username: ID!, messageId: ID!)
+          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversations
         }
 
         type Subscription  {

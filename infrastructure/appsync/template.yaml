@@ -155,7 +155,7 @@ Resources:
           #  Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage"])
-          subscribeToNewUserConversations(username:ID!): UserConversations
+          subscribeToNewUserConversationBridge(username:ID!): UserConversations
             @aws_subscribe(mutations: ["createUserConversationBridge"])
         }
 
@@ -644,8 +644,10 @@ Resources:
                 "conversationId": { "S" : "${context.arguments.conversationId}"}
             },
             "update" : {
-                "expression" : "SET read = :messageId",
-
+                "expression" : "SET #read = :messageId",
+                "expressionNames" : {
+                  "#read" : "read"
+                },
                 "expressionValues": {
                     ":messageId" : $util.dynamodb.toDynamoDBJson($context.arguments.messageId)
                 }

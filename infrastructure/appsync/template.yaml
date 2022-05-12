@@ -96,8 +96,13 @@ Resources:
         }
 
         type UserConversations {
+          # The other user name
           associated: String
+          # The conversation related me
           conversation: Conversation
+          # latest message id  which user has read
+          read: String
+
           conversationId: ID!
           username: ID!
         }
@@ -495,6 +500,7 @@ Resources:
                   }
               }
           },
+          "scanIndexForward": false,
           "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
           "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
         }

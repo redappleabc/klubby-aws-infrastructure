@@ -261,10 +261,10 @@ Resources:
           "version" : "2017-02-28",
           "operation" : "PutItem",
           "key": {
-              "id": { "S" : "$util.autoId()"}
+              "id": $util.autoId()
           },
           "attributeValues" : {
-             "id": {  "S": "$util.autoId()" },
+             "id": $util.autoId(),
              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
           }
         }
@@ -317,7 +317,7 @@ Resources:
               "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
               "sender": {  "S": "${context.identity.username}" },
               "isSent": {  "BOOL": true },
-              "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" }
+              "id": $util.time.nowEpochMilliSeconds()-$util.autoId()
           }
         }
 

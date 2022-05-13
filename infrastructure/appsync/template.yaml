@@ -141,7 +141,7 @@ Resources:
           createConversation(): Conversation
 
           #  Create a message in a Conversation.
-          createMessage(content: String, conversationId: ID!, id: ID!): Message
+          createMessage(content: String, conversationId: ID!): Message
 
           # Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversations

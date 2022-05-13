@@ -138,7 +138,7 @@ Resources:
 
         type Mutation {
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-          createConversation(id: ID!): Conversation
+          createConversation(): Conversation
 
           #  Create a message in a Conversation.
           createMessage(content: String, conversationId: ID!, id: ID!): Message
@@ -265,7 +265,6 @@ Resources:
           },
           "attributeValues" : {
              "id": {  "S": "$util.autoId()" },
-             "name": {  "S": "${context.arguments.name}" },
              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
           }
         }

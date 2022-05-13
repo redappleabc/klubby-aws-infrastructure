@@ -138,10 +138,10 @@ Resources:
 
         type Mutation {
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-          createConversation(createdAt: String, id: ID!): Conversation
+          createConversation(id: ID!): Conversation
 
           #  Create a message in a Conversation.
-          createMessage(content: String, conversationId: ID!, createdAt: String!, id: ID!): Message
+          createMessage(content: String, conversationId: ID!, id: ID!): Message
 
           # Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversations
@@ -261,12 +261,12 @@ Resources:
           "version" : "2017-02-28",
           "operation" : "PutItem",
           "key": {
-              "id": { "S" : "${context.arguments.id}"}
+              "id": { "S" : "$util.autoId()"}
           },
           "attributeValues" : {
-             "id": {  "S": "${context.arguments.id}" },
-             "name": {  "S": "${context.arguments.name}" }
-             #if(${context.arguments.createdAt}) ,"createdAt": { "S": "${context.arguments.createdAt}"} #end
+             "id": {  "S": "$util.autoId()" },
+             "name": {  "S": "${context.arguments.name}" },
+             "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
           }
         }
       ResponseMappingTemplate: |
@@ -315,10 +315,10 @@ Resources:
           "attributeValues" : {
               "conversationId": {  "S": "${context.arguments.conversationId}" },
               "content": {  "S": "${context.arguments.content}" },
-              "createdAt": {  "S": "${context.arguments.createdAt}" },
+              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
               "sender": {  "S": "${context.identity.username}" },
               "isSent": {  "BOOL": true },
-              "id": { "S": "${context.arguments.id}" }
+              "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" }
           }
         }
 

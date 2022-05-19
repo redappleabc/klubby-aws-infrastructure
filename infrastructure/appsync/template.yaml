@@ -150,7 +150,10 @@ Resources:
           setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversations
 
           # remove message in Messages table
-          removeMessage(conversationId:ID!, id: String!): Message
+          removeMessage(conversationId: ID!, id: String!): Message
+
+          # edit message in Messages table
+          editMessage(conversationId: ID!, id: String!, content: String!): Message
 
         }
 
@@ -358,6 +361,47 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+  
+  EditMessageMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: editMessage
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "UpdateItem",
+            "key" : {
+              "id" : { "S" : "${context.arguments.id}" },
+              "conversationId": {"S" : "${context.arguments.conversationId}"}
+            },
+            "condition" : {
+              "expression" : "#sender = :sender",
+              "expressionNames" : {
+                  "#sender" : "sender"
+              },
+              "expressionValues" : {
+                  ":sender" : {"S": "${context.identity.username}"}
+              }
+            }
+            "update" : {
+                "expression" : "SET content = :content, updatedAt = :updatedAt",
+                ## "expressionNames": {
+                ##     "#url" : "url"
+                ## },
+                "expressionValues": {
+                    ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content),
+                    ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
+                }
+            }
+        }
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
 
 
   GetAllUsersResolver:

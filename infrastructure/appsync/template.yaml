@@ -61,13 +61,9 @@ Resources:
           id: ID!
           #  The Conversation's messages.
           messages(after: String, first: Int): MessageConnection
-          #  The Conversation's name.
-          name: String!
         }
 
         type Message {
-          #  The author object. Note: `authorId` is only available because we list it in `extraAttributes` in `Conversation.messages`
-          author: User
           #  The message content.
           content: String!
           #  The id of the Conversation this message belongs to. This is the table primary key.
@@ -78,7 +74,6 @@ Resources:
           id: ID!
           #  Flag denoting if this message has been accepted by the server or not.
           isSent: Boolean
-          recipient: User
           sender: String
         }
 
@@ -92,7 +87,6 @@ Resources:
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
           conversations(after: String, first: Int): UserConversationsConnection
-          messages(after: String, first: Int): MessageConnection
         }
 
         type UserConversations {
@@ -394,40 +388,9 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-    
-  
 
-  messagesUserResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "User"
-      FieldName: "messages"
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "sender = :id",
-              "expressionValues" : {
-                  ":id" : {
-                      "S" : "${context.identity.username}"
-                  }
-              }
-          },
-          "index": "sender-conversationId-index",
-          "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
-      ResponseMappingTemplate: |
-        {
-          "messages": $utils.toJson($context.result.items),
-          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
-        }
 
+        
 
   conversationsUserResolver:
     Type: "AWS::AppSync::Resolver"

@@ -158,8 +158,13 @@ Resources:
           #  Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage"])
+
           subscribeToNewUserConversationBridge(username:ID!): UserConversations
             @aws_subscribe(mutations: ["createUserConversationBridge"])
+
+          # Subscribes to all removed messages in a given Conversation
+          subscribeToRemovedMessage(conversationId: ID!): Message
+            @aws_subscribe(mutations: ["removeMessage"]) 
         }
 
   UserTableDataSource:

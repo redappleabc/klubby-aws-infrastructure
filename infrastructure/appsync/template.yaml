@@ -112,6 +112,9 @@ Resources:
           #get all users
           getAllUsers: [User]
 
+          #get users whose username starts with _username
+          searchUsers(username: String!): [User]
+
           # get user wallets
           getUserWallets(username: String!): User
 
@@ -349,6 +352,43 @@ Resources:
             Return a flat list of results from a Query or Scan operation.
         *#
         $util.toJson($ctx.result.items)
+
+
+
+  SearchUsersResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: searchUsers
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Scan",
+            "filter" : {
+              "expression" : "#username <> :myname and begins_with(#username, :username)",
+              "expressionNames" : {
+                  "#username" : "username"
+              },
+              "expressionValues" : {
+                  ":myname" : {"S": "${context.identity.username}"},
+                  ":username" : {"S": "${context.arguments.username}"}
+              }
+          },
+            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
+            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+        }
+      ResponseMappingTemplate: |
+        #**
+            Return a flat list of results from a Query or Scan operation.
+        *#
+        $util.toJson($ctx.result.items)
+
+
+
 
   GetUserWalletsResolver:
     Type: AWS::AppSync::Resolver

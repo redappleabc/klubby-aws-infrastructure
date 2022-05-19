@@ -30,10 +30,29 @@ The following seection describes the schema of the GraphQL API.
 
 ##### Types
 - Conversation
+    * createdAt
+    * id
+    * messages
+    * name <-- i think we can rm
 - Message
+    * author <-- i think we can rm
+    * content
+    * conversationId
+    * createdAt
+    * id
+    * isSent
+    * recipient <-- i think we can rm
+    * sender
 - MessageConnection
+    * messages
+    * nextToken
 - User
+    * username
+    * wallets
+    * conversations  <-- i think we can rm
+    * messages  <-- i think we can rm
 - UserConversations
+
 - UserConversationsConnection
 
 ##### Queries

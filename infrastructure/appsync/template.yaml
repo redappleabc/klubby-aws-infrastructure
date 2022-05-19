@@ -148,6 +148,10 @@ Resources:
 
           # set message id which user read
           setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversations
+
+          # remove message in Messages table
+          removeMessage(id: ID!): Message
+
         }
 
         type Subscription  {
@@ -318,6 +322,34 @@ Resources:
           }
         }
 
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  RemoveMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeMessage"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "DeleteItem",
+          "key" : {
+            "id" : $util.dynamodb.toDynamoDBJson($ctx.args.id)
+          },
+          "condition" : {
+              "expression" : "#sender = :sender",
+              "expressionNames" : {
+                  "#sender" : "sender"
+              },
+              "expressionValues" : {
+                  ":sender" : {"S": "${context.identity.username}"}
+              }
+          }
+        }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

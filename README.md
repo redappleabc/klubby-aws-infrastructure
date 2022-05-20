@@ -33,15 +33,12 @@ The following seection describes the schema of the GraphQL API.
     * createdAt
     * id
     * messages
-    * name <-- i think we can rm
 - Message
-    * author <-- i think we can rm
     * content
     * conversationId
     * createdAt
     * id
     * isSent
-    * recipient <-- i think we can rm
     * sender
 - MessageConnection
     * messages
@@ -50,11 +47,14 @@ The following seection describes the schema of the GraphQL API.
     * username
     * wallets
     * conversations  <-- i think we can rm
-    * messages  <-- i think we can rm
-- UserConversations
-
-- UserConversationsConnection
-
+- UserConversations <--- rename UserConversationBridge
+    * name <--- todo think if we want/need
+    * associated <--- todo i dont think we need
+    * conversation <--- todo this should just be conversationId
+    * read <--- todo this should be an attribute of a message
+    * conversationId <--- we have both conversation and conversationId
+    * username
+- UserConversationsConnection <--- why do we need this
 ##### Queries
 - getAllUsers: [User]
 - getUserWallets(username: String!): User

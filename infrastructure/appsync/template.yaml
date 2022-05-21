@@ -390,12 +390,14 @@ Resources:
               }
             }
             "update" : {
-                "expression" : "SET #content = :content",
+                "expression" : "SET #content = :content, ADD #updatedAt = :updatedAt",
                 "expressionNames": {
-                   "#content" : "content"
+                   "#content" : "content",
+                   "#updatedAt" : "updatedAt"
                  },
                 "expressionValues": {
-                    ":content" : {  "S": "${context.arguments.content}" }
+                    ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content) ,
+                    ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
                 }
             }
         }

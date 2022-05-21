@@ -392,8 +392,7 @@ Resources:
             "update" : {
                 "expression" : "SET #content = :content",
                 "expressionNames": {
-                   "#content" : "content",
-                   "#updatedAt" : "updatedAt"
+                   "#content" : "content"
                  },
                 "expressionValues": {
                     ":content" : {  "S": "${context.arguments.content}" }

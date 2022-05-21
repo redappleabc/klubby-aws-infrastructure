@@ -390,7 +390,7 @@ Resources:
               }
             },
             "update" : {
-                "expression" : "SET #content = :content ADD #updatedAt :updatedAt",
+                "expression" : "SET #content = :content, #updatedAt = :updatedAt",
                 "expressionNames": {
                    "#content" : "content",
                    "#updatedAt" : "updatedAt"

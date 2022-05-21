@@ -388,7 +388,7 @@ Resources:
               "expressionValues" : {
                   ":sender" : {"S": "${context.identity.username}"}
               }
-            }
+            },
             "update" : {
                 "expression" : "SET #content = :content, ADD #updatedAt = :updatedAt",
                 "expressionNames": {

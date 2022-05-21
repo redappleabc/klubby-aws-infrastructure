@@ -70,6 +70,7 @@ Resources:
           conversationId: ID!
           #  The message timestamp. This is also the table sort key.
           createdAt: String
+          updatedAt: String
           #  Generated id for a message -- read-only
           id: ID!
           #  Flag denoting if this message has been accepted by the server or not.

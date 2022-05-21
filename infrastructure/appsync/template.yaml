@@ -161,7 +161,7 @@ Resources:
         type Subscription  {
           #  Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message
-            @aws_subscribe(mutations:["createMessage"])
+            @aws_subscribe(mutations:["createMessage","editMessage"])
 
           subscribeToNewUserConversationBridge(username:ID!): UserConversations
             @aws_subscribe(mutations: ["createUserConversationBridge"])
@@ -395,7 +395,7 @@ Resources:
                 ##     "#url" : "url"
                 ## },
                 "expressionValues": {
-                    ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content),
+                    ":content" : {  "S": "$context.arguments.content" } ,
                     ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
                 }
             }

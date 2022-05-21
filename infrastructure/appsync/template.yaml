@@ -390,14 +390,13 @@ Resources:
               }
             }
             "update" : {
-                "expression" : "SET #content = :content, ADD #updatedAt = :updatedAt",
+                "expression" : "SET #content = :content",
                 "expressionNames": {
                    "#content" : "content",
                    "#updatedAt" : "updatedAt"
                  },
                 "expressionValues": {
-                    ":content" : {  "S": "${context.arguments.content}" } ,
-                    ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
+                    ":content" : {  "S": "${context.arguments.content}" }
                 }
             }
         }

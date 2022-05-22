@@ -87,7 +87,7 @@ Resources:
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
-          conversations(after: String, first: Int): UserConversationsConnection
+          conversations(after: String, first: Int): [UserConversations]
         }
 
         type UserConversations {
@@ -104,10 +104,6 @@ Resources:
           username: ID!
         }
 
-        type UserConversationsConnection {
-          nextToken: String
-          userConversations: [UserConversations]
-        }
 
         type Query {
           #get all users
@@ -537,14 +533,11 @@ Resources:
               }
           },
           "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 1000 #end,
         }
       ResponseMappingTemplate: |
-        {
-          "userConversations": $utils.toJson($context.result.items),
-          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
-        }
+        $utils.toJson($context.result.items),
+    
 
   getAllMessagesResolver:
     Type: "AWS::AppSync::Resolver"

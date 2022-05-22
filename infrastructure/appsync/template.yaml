@@ -533,7 +533,7 @@ Resources:
               }
           },
           "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 1000 #end,
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 1000 #end
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items),

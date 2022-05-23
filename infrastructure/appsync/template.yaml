@@ -135,7 +135,7 @@ Resources:
           createConversation: Conversation
 
           # Delete the Conversation and UserConversationBrdige
-          removeConversation(conversationId: ID!): String
+          removeConversation(conversationId: ID!): Conversation
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -309,15 +309,15 @@ Resources:
               }
           }
         - { 
-            ConversationTable: !GetAtt ConversationTableDataSource.Name,
-            UserConversationBridgeTable: !GetAtt UserConversationBridgeTableDataSource.Name
+            ConversationTable: !Ref ConversationTableName,
+            UserConversationBridgeTable: !Ref UserConversationBridgeTableName
           }
 
       ResponseMappingTemplate: !Sub
         - |
-          $utils.toJson("${ConversationTable}")
+          $utils.toJson($context.result["${ConversationTable}"])
         - { 
-            ConversationTable: !GetAtt ConversationTableDataSource.Name
+            ConversationTable: !Ref ConversationTableName
           }
 
 

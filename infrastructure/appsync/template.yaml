@@ -533,10 +533,10 @@ Resources:
               }
           },
           "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 1000 #end
+          "limit": 1000
         }
       ResponseMappingTemplate: |
-        $utils.toJson($context.result.items),
+        $utils.toJson($context.result.items)
     
 
   getAllMessagesResolver:

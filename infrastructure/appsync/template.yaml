@@ -709,7 +709,11 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        #if($util.isNull($ctx.result))  $util.toJson($context.result.items[0]["username"]) #else null #end
+        #if($util.isNull($ctx.result)) 
+          null 
+        #else 
+          $util.toJson($context.result.items[0]["username"]) 
+        #end
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver

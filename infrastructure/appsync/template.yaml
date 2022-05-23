@@ -321,7 +321,8 @@ Resources:
 
       ResponseMappingTemplate: !Sub
         - |
-          $utils.toJson($context.result.data["${ConversationTable}"])
+          #set($result=$ctx.result.data["${ConversationTable}"])
+          $util.toJson($result)
         - { 
             ConversationTable: !Ref ConversationTableName
           }

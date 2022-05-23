@@ -12,23 +12,23 @@ Parameters:
     Description: Stage of build
   UserPoolId:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userpool-id-dev
+    Default: userpool-id-${Stage}
     Description: user pool id from SSM
   UserTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: user-table-name-dev
+    Default: user-table-name-${Stage}
     Description: user table name
   ConversationTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: conversation-table-name-dev
+    Default: conversation-table-name-${Stage}
     Description: conversation table name
   UserConversationBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userconversationbridge-table-name-dev
+    Default: userconversationbridge-table-name-${Stage}
     Description: user conversation table name
   MessageTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: message-table-name-dev
+    Default: message-table-name-${Stage}
     Description: message table name
 Resources:
   GraphQLApi:
@@ -133,6 +133,9 @@ Resources:
         type Mutation {
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation: Conversation
+
+          # Delete the Conversation and UserConversationBrdige
+          removeConversation(conversationId: ID!): Conversation
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -276,6 +279,41 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+  removeConversationMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeConversation"
+      RequestMappingTemplate: 
+        - |
+          {
+              "version" : "2018-05-29",
+              "operation" : "BatchDeleteItem",
+              "tables":{
+                "${ConversationTableName}": [
+                  {
+                    id : {  "S": "${context.arguments.conversationId}" }
+                  }
+                ],
+                "${UserConversationBridgeTableName}" : [
+                  {
+                    conversationId : {  "S": "${context.arguments.conversationId}" }
+                  }
+                ]
+                
+              }
+          }
+        - { 
+            ConversationTableName: !GetAtt ConversationTableDataSource.Name,
+            UserConversationBridgeTableName: !GetAtt UserConversationBridgeTableDataSource.Name
+          }
+
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
 
   CreateUserConversationBridgeMutationResolver:
     Type: "AWS::AppSync::Resolver"

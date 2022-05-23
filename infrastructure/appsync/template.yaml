@@ -309,12 +309,16 @@ Resources:
               }
           }
         - { 
-            ConversationTable: !Ref ConversationTableName,
-            UserConversationBridgeTable: !Ref UserConversationBridgeTableName
+            ConversationTable: !GetAtt ConversationTableDataSource.Name,
+            UserConversationBridgeTable: !GetAtt UserConversationBridgeTableDataSource.Name
           }
 
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+      ResponseMappingTemplate: !Sub
+        - |
+          $utils.toJson($context.result["${ConversationTable}"])
+        - { 
+            ConversationTable: !GetAtt ConversationTableDataSource.Name
+          }
 
 
   CreateUserConversationBridgeMutationResolver:

@@ -316,8 +316,7 @@ Resources:
 
       ResponseMappingTemplate: !Sub
         - |
-          #set($conversationId = $context.arguments.conversationId)
-          $utils.toJson($conversationId)
+          $utils.toJson($context.result.data)
         - { 
             ConversationTable: !Ref ConversationTableName
           }

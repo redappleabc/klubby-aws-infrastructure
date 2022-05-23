@@ -308,7 +308,6 @@ Resources:
                 
               }
           }
-        - {  UserConversationBridgeTable: !GetAtt UserConversationBridgeTableDataSource.Name }
         - { ConversationTable: !GetAtt ConversationTableDataSource.Name }
 
       ResponseMappingTemplate: !Sub

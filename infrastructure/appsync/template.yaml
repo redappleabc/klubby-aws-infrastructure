@@ -306,8 +306,8 @@ Resources:
               }
           },
           { 
-            ConversationTableName: !GetAtt ConversationTableDataSource.Name,
-            UserConversationBridgeTableName: !GetAtt UserConversationBridgeTableDataSource.Name
+            ConversationTableName: !Ref ConversationTableName,
+            UserConversationBridgeTableName: !Ref UserConversationBridgeTableName
           }
 
       ResponseMappingTemplate: |

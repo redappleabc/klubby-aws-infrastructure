@@ -294,12 +294,12 @@ Resources:
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
               "tables":{
-                "${ConversationTableName}": [
+                "${ConversationTable}": [
                   {
                     "id" : {  "S": "$conversationId" }
                   }
                 ],
-                "${UserConversationBridgeTableName}" : [
+                "${UserConversationBridgeTable}" : [
                   {
                     "conversationId" : {  "S": "$conversationId" }
                   }
@@ -308,8 +308,8 @@ Resources:
               }
           }
         - { 
-            ConversationTableName: !Ref ConversationTableName,
-            UserConversationBridgeTableName: !Ref UserConversationBridgeTableName
+            ConversationTable: !Ref ConversationTableName,
+            UserConversationBridgeTable: !Ref UserConversationBridgeTableName
           }
 
       ResponseMappingTemplate: |

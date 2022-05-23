@@ -135,7 +135,7 @@ Resources:
           createConversation: Conversation
 
           # Delete the Conversation and UserConversationBrdige
-          removeConversation(conversationId: ID!): String
+          removeConversation(conversationId: ID!): [Conversation]
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -296,16 +296,15 @@ Resources:
               "operation" : "BatchDeleteItem",
               "tables":{
                 "${ConversationTable}": {
-                    "keys":
-                      {
-                        "id" : {  "S": "$conversationId" }
-                      }
+                  "keys": {
+                      "id" : {  "S": "$conversationId" }
+                    }
                 },
-                "${UserConversationBridgeTable}" : [
-                  {
+                "${UserConversationBridgeTable}" : {
+                  "keys": {
                     "conversationId" : {  "S": "$conversationId" }
                   }
-                ]
+                }
                 
               }
           }

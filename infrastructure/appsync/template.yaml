@@ -135,7 +135,7 @@ Resources:
           createConversation: Conversation
 
           # Delete the Conversation and UserConversationBrdige
-          removeConversation(conversationId: ID!): Conversation
+          removeConversation(conversationId: ID!): String
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -298,12 +298,12 @@ Resources:
                 "${ConversationTable}": [
                   {
                     "id" : {  "S": "$conversationId" }
-                  }
+                  },
                 ],
                 "${UserConversationBridgeTable}" : [
                   {
                     "conversationId" : {  "S": "$conversationId" }
-                  }
+                  },
                 ]
                 
               }

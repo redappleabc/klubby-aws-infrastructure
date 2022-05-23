@@ -293,12 +293,12 @@ Resources:
           #set($conversationId = $context.arguments.conversationId)
           #set($keys_1=[])
           #set($key_1={})
-          $util.qr($key_1.put("id", $util.dynamodb.toString($conversationId)))
+          $util.qr($key_1.put("id", $util.dynamodb.toString("c658bff8-ebf3-41d8-ac16-07edc8d29a58")))
           $util.qr($keys_1.add($util.dynamodb.toMapValues($key_1)))
 
           #set($keys_2=[])
           #set($key_2={})
-          $util.qr($key_2.put("conversationId", $util.dynamodb.toString($conversationId)))
+          $util.qr($key_2.put("conversationId", $util.dynamodb.toString("c658bff8-ebf3-41d8-ac16-07edc8d29a58")))
           $util.qr($keys_2.add($util.dynamodb.toMapValues($key_2)))
          
           {

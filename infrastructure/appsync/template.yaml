@@ -87,10 +87,10 @@ Resources:
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
-          conversations(after: String, first: Int): [UserConversations]
+          conversations(after: String, first: Int): [UserConversationBridge]
         }
 
-        type UserConversations {
+        type UserConversationBridge {
           # The user conversation name
           name: String
           # The other user name
@@ -138,13 +138,13 @@ Resources:
           createMessage(content: String!, conversationId: ID!): Message
 
           # Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversations
+          createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversationBridge
 
           # addUser(username: String!): User
           updateUser(username: String!,wallets: String!): User
 
           # set message id which user read
-          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversations
+          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
 
           # remove message in Messages table
           removeMessage(conversationId: ID!, id: String!): Message
@@ -159,7 +159,7 @@ Resources:
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage","editMessage"])
 
-          subscribeToNewUserConversationBridge(username:ID!): UserConversations
+          subscribeToNewUserConversationBridge(username:ID!): UserConversationBridge
             @aws_subscribe(mutations: ["createUserConversationBridge"])
 
           # Subscribes to all removed messages in a given Conversation
@@ -195,7 +195,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: "UserConversationsDynamoDBTable"
+      Name: "UserConversationBridgeDynamoDBTable"
       Description: The User Conversation DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
@@ -657,12 +657,12 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-  conversationUserConversationsResolver:
+  conversationUserConversationBridgeResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: UserConversations
+      TypeName: UserConversationBridge
       FieldName: "conversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
       RequestMappingTemplate: |
@@ -677,12 +677,12 @@ Resources:
         $utils.toJson($context.result)
 
 
-  associatedUserConversationsResolver:
+  associatedUserConversationBridgeResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: UserConversations
+      TypeName: UserConversationBridge
       FieldName: associated
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |

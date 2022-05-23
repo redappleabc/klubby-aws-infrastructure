@@ -295,12 +295,12 @@ Resources:
               "tables":{
                 "${ConversationTableName}": [
                   {
-                    id : {  "S": "${context.arguments.conversationId}" }
+                    "id" : {  "S": "${context.arguments.conversationId}" }
                   }
                 ],
                 "${UserConversationBridgeTableName}" : [
                   {
-                    conversationId : {  "S": "${context.arguments.conversationId}" }
+                    "conversationId" : {  "S": "${context.arguments.conversationId}" }
                   }
                 ]
                 

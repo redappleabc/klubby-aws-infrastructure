@@ -305,13 +305,8 @@ Resources:
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
               "tables":{
-                "${ConversationTable}": {
-                  "keys": $util.toJson($keys_1)
-                },
-                "${UserConversationBridgeTable}" : {
-                  "keys": $util.toJson($keys_2)
-                }
-                
+                "${ConversationTable}":  $utils.toJson($keys_1),
+                "${UserConversationBridgeTable}" :  $utils.toJson($keys_2)
               }
           }
         - { 
@@ -321,9 +316,7 @@ Resources:
 
       ResponseMappingTemplate: !Sub
         - |
-          #set($conversationId = $context.arguments.conversationId)
-          #set($result=$ctx.result)
-          $util.toJson($conversationId)
+          $utils.toJson($context.result.data["${ConversationTable}"])
         - { 
             ConversationTable: !Ref ConversationTableName
           }

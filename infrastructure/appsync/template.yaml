@@ -295,11 +295,12 @@ Resources:
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
               "tables":{
-                "${ConversationTable}": [
-                  {
-                    "id" : {  "S": "$conversationId" }
-                  }
-                ],
+                "${ConversationTable}": {
+                    "keys":
+                      {
+                        "id" : {  "S": "$conversationId" }
+                      }
+                },
                 "${UserConversationBridgeTable}" : [
                   {
                     "conversationId" : {  "S": "$conversationId" }
@@ -315,7 +316,7 @@ Resources:
 
       ResponseMappingTemplate: !Sub
         - |
-          $utils.toJson("${ConversationTable}")
+          $utils.toJson($context.result["${ConversationTable}"])
         - { 
             ConversationTable: !Ref ConversationTableName
           }

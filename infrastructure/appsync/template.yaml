@@ -291,20 +291,26 @@ Resources:
       RequestMappingTemplate: !Sub 
         - | 
           #set($conversationId = $context.arguments.conversationId)
+          #set($keys_1=[])
+          #set($key_1={})
+          $util.qr($key_1.put("id", $util.dynamodb.toString($conversationId)))
+          $util.qr($keys_1.add($key_1))
+
+          #set($keys_2=[])
+          #set($key_2={})
+          $util.qr($key_2.put("conversationId", $util.dynamodb.toString($conversationId)))
+          $util.qr($keys_2.add($key_2))
+         
           {
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
               "tables":{
-                "${ConversationTable}": [
-                  {
-                    "id" : {  "S": "$conversationId" }
-                  },
-                ],
-                "${UserConversationBridgeTable}" : [
-                  {
-                    "conversationId" : {  "S": "$conversationId" }
-                  },
-                ]
+                "${ConversationTable}": {
+                  "keys": $util.toJson($keys_1)
+                },
+                "${UserConversationBridgeTable}" : {
+                  "keys": $util.toJson($keys_2)
+                }
                 
               }
           }

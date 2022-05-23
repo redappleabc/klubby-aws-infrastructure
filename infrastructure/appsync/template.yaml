@@ -306,7 +306,7 @@ Resources:
                 ]
                 
               }
-          },
+          }
         - { 
             ConversationTableName: !Ref ConversationTableName,
             UserConversationBridgeTableName: !Ref UserConversationBridgeTableName

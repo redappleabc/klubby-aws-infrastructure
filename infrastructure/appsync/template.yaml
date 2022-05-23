@@ -687,7 +687,7 @@ Resources:
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
         {
-          "version" : "2017-02-28",
+          "version" : "2018-05-29",
           "operation" : "Query",
           "query" : {
               "expression": "conversationId = :conversationId",
@@ -709,7 +709,7 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        #if(${context.result})  $util.toJson($context.result.items[0]["username"]) #else null #end
+        #if($util.isNull($ctx.result))  $util.toJson($context.result.items[0]["username"]) #else null #end
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver

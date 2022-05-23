@@ -287,8 +287,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
       FieldName: "removeConversation"
-      RequestMappingTemplate: 
-        - |
+      RequestMappingTemplate: |
           {
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
@@ -305,8 +304,8 @@ Resources:
                 ]
                 
               }
-          }
-        - { 
+          },
+          { 
             ConversationTableName: !GetAtt ConversationTableDataSource.Name,
             UserConversationBridgeTableName: !GetAtt UserConversationBridgeTableDataSource.Name
           }

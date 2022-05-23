@@ -289,19 +289,19 @@ Resources:
       FieldName: "removeConversation"
       RequestMappingTemplate: !Sub 
         - | 
-          #set($conversationId = ${context.arguments.conversationId})
+          #set($conversationId = $context.arguments.conversationId)
           {
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
               "tables":{
                 "${ConversationTableName}": [
                   {
-                    "id" : {  "S": "${conversationId}" }
+                    "id" : {  "S": "$conversationId" }
                   }
                 ],
                 "${UserConversationBridgeTableName}" : [
                   {
-                    "conversationId" : {  "S": "${conversationId}" }
+                    "conversationId" : {  "S": "$conversationId" }
                   }
                 ]
                 

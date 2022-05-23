@@ -287,24 +287,30 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
       FieldName: "removeConversation"
-      RequestMappingTemplate: | 
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: !Sub 
+        - | 
           #set($conversationId = $context.arguments.conversationId)
           {
               "version" : "2018-05-29",
               "operation" : "BatchDeleteItem",
               "tables":{
-                "${ConversationTableName}": [
+                "${ConversationTable}": [
                   {
                     "id" : {  "S": "$conversationId" }
                   }
                 ],
-                "${UserConversationBridgeTableName}" : [
+                "${UserConversationBridgeTable}" : [
                   {
                     "conversationId" : {  "S": "$conversationId" }
                   }
                 ]
                 
               }
+          }
+        - { 
+            ConversationTable: !Ref ConversationTableName,
+            UserConversationBridgeTable: !Ref UserConversationBridgeTableName
           }
 
       ResponseMappingTemplate: |

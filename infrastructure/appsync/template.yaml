@@ -709,7 +709,7 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        #if($context.result.items.length > 0) 
+        #if($context.result.items.size() > 0) 
           $util.toJson($context.result.items[0]["username"]) 
         #else 
           null

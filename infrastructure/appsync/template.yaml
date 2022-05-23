@@ -315,7 +315,7 @@ Resources:
 
       ResponseMappingTemplate: !Sub
         - |
-          $utils.toJson($context.result["${ConversationTable}"])
+          $utils.toJson("${ConversationTable}")
         - { 
             ConversationTable: !GetAtt ConversationTableDataSource.Name
           }

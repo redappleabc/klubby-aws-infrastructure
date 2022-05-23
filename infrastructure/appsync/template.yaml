@@ -135,7 +135,7 @@ Resources:
           createConversation: Conversation
 
           # Delete the Conversation and UserConversationBrdige
-          removeConversation(conversationId: String!): Conversation
+          removeConversation(conversationId: ID!): Conversation
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -290,7 +290,7 @@ Resources:
       DataSourceName: !GetAtt ConversationTableDataSource.Name
       RequestMappingTemplate: !Sub 
         - | 
-          #set($conversationId = ${context.arguments.conversationId})
+          #set($conversationId = $context.arguments.conversationId)
           #set($keys_1=[])
           #set($key_1={})
           $util.qr($key_1.put("id", $util.dynamodb.toString($conversationId)))

@@ -55,12 +55,49 @@ Resources:
         }
 
         type Conversation {
-          #  The Conversation's timestamp.
-          createdAt: String
+
           #  A unique identifier for the Conversation.
           id: ID!
+
+          #  The Conversation's timestamp.
+          createdAt: String
+          
           #  The Conversation's messages.
           messages(after: String, first: Int): MessageConnection
+        }
+
+
+
+        type Klub {
+
+          #  A unique identifier for the Klub.
+          id: ID!
+
+          # The klub's name
+          name: String
+
+          # The creator of klub
+          owner: String
+
+          # the blockchain network i.e. Ethereum
+          network: String
+
+          # the contract address 
+          contractAddress: String
+
+          # the link where to buy.
+          linkToBuy: String
+
+          # threshold for owning tokens to be a member of MAIN GROUP.
+          minimumAmountForMainGroup: String
+
+          # threshold for owning tokens to be a member of WHALE GROUP.
+          minimumAmountForWhaleGroup: String
+
+          #  The Conversation's timestamp.
+          createdAt: String
+         
+          
         }
 
         type Message {
@@ -75,6 +112,7 @@ Resources:
 
           # The original id for a replay messages.
           originalId: ID
+          
           # The original message for a replay messages.
           originalMessage: Message
 
@@ -102,17 +140,62 @@ Resources:
         }
 
         type UserConversationBridge {
-          # The user conversation name
+
+          # This is partition key
+          username: ID!
+
+          # This is sort key
+          conversationId: ID!
+          
+          # The conversation name
+
           name: String
+
           # The other user name
           associated: String
+
           # The conversation related me
           conversation: Conversation
-          # latest message id  which other user has read
+
+          # latest message id  which I has read
           read: String
 
-          conversationId: ID!
+        }
+
+        type UserKlubBridge {
+
+          # This is partition key
           username: ID!
+
+          # This is sort key
+          klubId: ID!
+
+
+          # latest message id for main group which I has read
+          readMainGroup: String
+
+          # latest message id for whale group which I has read
+          readWhaleGroup: String
+
+          # latest message id for announcement which I has read
+          readAnnouncement: String
+
+        }
+
+        type KlubConversationBridge {
+          
+          # This is partition key
+          klubId: ID!
+
+          # This is sort key
+          announcementConversationId: ID!
+
+          # This is sort key
+          mainGroupConversationId: ID!
+
+          # This is sort key
+          whaleGroupConversationID: ID!
+
         }
 
 

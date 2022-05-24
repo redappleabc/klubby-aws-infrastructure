@@ -137,8 +137,8 @@ Resources:
           # Delete the Conversation
           removeConversation(conversationId: ID!): Conversation
 
-          # Delete  UserConversationBrdige
-          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBrdige
+          # Delete  UserConversationBridge
+          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message

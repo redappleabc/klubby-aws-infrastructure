@@ -112,7 +112,7 @@ Resources:
 
           # The original id for a replay messages.
           originalId: ID
-          
+
           # The original message for a replay messages.
           originalMessage: Message
 
@@ -136,7 +136,8 @@ Resources:
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
-          conversations(after: String, first: Int): [UserConversationBridge]
+          conversations: [UserConversationBridge]
+          klubs: [UserKlubBridge]
         }
 
         type UserConversationBridge {
@@ -240,6 +241,9 @@ Resources:
           # Replay the message in a Conversation.
           replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
 
+          # edit message in Messages table
+          editMessage(conversationId: ID!, id: String!, content: String!): Message
+
           # Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversationBridge
 
@@ -252,8 +256,7 @@ Resources:
           # remove message in Messages table
           removeMessage(conversationId: ID!, id: String!): Message
 
-          # edit message in Messages table
-          editMessage(conversationId: ID!, id: String!, content: String!): Message
+         
 
         }
 

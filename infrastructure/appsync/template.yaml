@@ -134,8 +134,11 @@ Resources:
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation: Conversation
 
-          # Delete the Conversation and UserConversationBrdige
+          # Delete the Conversation
           removeConversation(conversationId: ID!): Conversation
+
+          # Delete  UserConversationBrdige
+          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBrdige
 
           #  Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -280,6 +283,48 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+  # removeConversationMutationResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: "Mutation"
+  #     FieldName: "removeConversation"
+  #     DataSourceName: !GetAtt ConversationTableDataSource.Name
+  #     RequestMappingTemplate: !Sub 
+  #       - | 
+  #         #set($conversationId = $context.arguments.conversationId)
+  #         #set($keys_1=[])
+  #         #set($key_1={})
+  #         $util.qr($key_1.put("id", $util.dynamodb.toString($conversationId)))
+  #         $util.qr($keys_1.add($util.dynamodb.toMapValues($key_1)))
+
+  #         #set($keys_2=[])
+  #         #set($key_2={})
+  #         $util.qr($key_2.put("conversationId", $util.dynamodb.toString($conversationId)))
+  #         $util.qr($keys_2.add($util.dynamodb.toMapValues($key_2)))
+         
+  #         {
+  #             "version" : "2018-05-29",
+  #             "operation" : "BatchDeleteItem",
+  #             "tables":{
+  #               "${ConversationTable}":  $utils.toJson($keys_1),
+  #               "${UserConversationBridgeTable}" :  $utils.toJson($keys_2)
+  #             }
+  #         }
+  #       - { 
+  #           ConversationTable: !Ref ConversationTableName,
+  #           UserConversationBridgeTable: !Ref UserConversationBridgeTableName
+  #         }
+
+  #     ResponseMappingTemplate: !Sub
+  #       - |
+  #         $utils.toJson($context.result.data["${ConversationTable}"])
+  #       - { 
+  #           ConversationTable: !Ref ConversationTableName
+  #         }
+
+
   removeConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -288,38 +333,16 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: !Sub 
-        - | 
-          #set($conversationId = $context.arguments.conversationId)
-          #set($keys_1=[])
-          #set($key_1={})
-          $util.qr($key_1.put("id", $util.dynamodb.toString($conversationId)))
-          $util.qr($keys_1.add($util.dynamodb.toMapValues($key_1)))
-
-          #set($keys_2=[])
-          #set($key_2={})
-          $util.qr($key_2.put("conversationId", $util.dynamodb.toString($conversationId)))
-          $util.qr($keys_2.add($util.dynamodb.toMapValues($key_2)))
-         
-          {
-              "version" : "2018-05-29",
-              "operation" : "BatchDeleteItem",
-              "tables":{
-                "${ConversationTable}":  $utils.toJson($keys_1),
-                "${UserConversationBridgeTable}" :  $utils.toJson($keys_2)
-              }
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "DeleteItem",
+          "key" : {
+            "id" : { "S" : "${context.arguments.conversationId}" }
           }
-        - { 
-            ConversationTable: !Ref ConversationTableName,
-            UserConversationBridgeTable: !Ref UserConversationBridgeTableName
-          }
-
-      ResponseMappingTemplate: !Sub
-        - |
-          $utils.toJson($context.result.data["${ConversationTable}"])
-        - { 
-            ConversationTable: !Ref ConversationTableName
-          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
 
 
   CreateUserConversationBridgeMutationResolver:
@@ -346,6 +369,31 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+
+  
+  RemoveUserConversationBridgeMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeUserConversationBridge"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "DeleteItem",
+            "key": {
+                "username": { "S" : "${context.arguments.username}"},
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
+            }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+
 
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"

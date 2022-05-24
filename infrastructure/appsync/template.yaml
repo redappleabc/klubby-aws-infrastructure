@@ -75,7 +75,7 @@ Resources:
 
           # The original id for a replay messages.
           originalId: ID
-          # The original content for a replay messages.
+          # The original message for a replay messages.
           originalMessage: Message
 
       
@@ -86,7 +86,7 @@ Resources:
           #  Flag denoting if this message has been accepted by the server or not.
           isSent: Boolean
           sender: String
-          
+
         }
 
         type MessageConnection {

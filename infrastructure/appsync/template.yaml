@@ -168,6 +168,9 @@ Resources:
           subscribeToNewUserConversationBridge(username:ID!): UserConversationBridge
             @aws_subscribe(mutations: ["createUserConversationBridge"])
 
+          subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["removeUserConversationBridge"])
+
           # Subscribes to all removed messages in a given Conversation
           subscribeToRemovedMessage(conversationId: ID!): Message
             @aws_subscribe(mutations: ["removeMessage"]) 

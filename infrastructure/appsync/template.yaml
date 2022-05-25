@@ -152,10 +152,10 @@ Resources:
 
           name: String
 
-          # The other user name
-          associated: String
+          # The other's UserConversationBrdige. This field has resolver.
+          associated: UserConversationBridge
 
-          # The conversation related me
+          # The conversation related me. This field has resolver.
           conversation: Conversation
 
           # latest message id  which I has read
@@ -276,6 +276,10 @@ Resources:
           # Subscribes to all removed messages in a given Conversation
           subscribeToRemovedMessage(conversationId: ID!): Message
             @aws_subscribe(mutations: ["removeMessage"]) 
+          
+          # Subscribes to read message
+          subscribeToReadMessage(conversationId: ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["setRead"])
         }
 
   UserTableDataSource:
@@ -963,7 +967,7 @@ Resources:
         }
       ResponseMappingTemplate: |
         #if($context.result.items.size() > 0) 
-          $util.toJson($context.result.items[0]["username"]) 
+          $util.toJson($context.result.items[0]) 
         #else 
           null
         #end

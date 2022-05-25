@@ -201,20 +201,21 @@ Resources:
 
 
         type Query {
-          #get all users
+
+          # get all users
           getAllUsers: [User]
 
-          #get users whose username starts with _username
+          # get users whose username starts with _username
           searchUsers(username: String!): [User]
 
           # get user wallets
           getUserWallets(username: String!): User
 
           # For now this is not used.
-          #  Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          # Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
           getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
 
-          For now this is not being used.
+          #For now this is not being used.
           # TODO what does this do
           getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
 

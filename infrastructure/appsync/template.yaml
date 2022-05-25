@@ -213,11 +213,11 @@ Resources:
 
           # For now this is not used.
           # Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-          getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
+          # getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
 
           #For now this is not being used.
           # TODO what does this do
-          getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
+          # getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
 
           #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
           getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
@@ -823,65 +823,65 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
 
-  getAllMessageConnectionsResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: getAllMessageConnections
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :conversationId",
-              "expressionValues" : {
-                  ":conversationId" : {
-                      "S" : "${context.arguments.conversationId}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
-      ResponseMappingTemplate: |
-        {
-          "messages": $utils.toJson($context.result.items),
-          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
-        }
+  # getAllMessageConnectionsResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: getAllMessageConnections
+  #     DataSourceName: !GetAtt MessageTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version" : "2017-02-28",
+  #         "operation" : "Query",
+  #         "query" : {
+  #             "expression": "conversationId = :conversationId",
+  #             "expressionValues" : {
+  #                 ":conversationId" : {
+  #                     "S" : "${context.arguments.conversationId}"
+  #                 }
+  #             }
+  #         },
+  #         "scanIndexForward": false,
+  #         "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+  #         "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+  #       }
+  #     ResponseMappingTemplate: |
+  #       {
+  #         "messages": $utils.toJson($context.result.items),
+  #         "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+  #       }
 
-  getAllMessagesFromResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: getAllMessagesFrom
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :id and sender = :sender",
-              "expressionValues" : {
-                  ":id" : {
-                      "S" : "${context.arguments.conversationId}"
-                  },
-                  ":sender" : {
-                      "S" : "${context.arguments.sender}"
-                  }
-              }
-          },
-          "index" : "sender",
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
+  # getAllMessagesFromResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: getAllMessagesFrom
+  #     DataSourceName: !GetAtt MessageTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version" : "2017-02-28",
+  #         "operation" : "Query",
+  #         "query" : {
+  #             "expression": "conversationId = :id and sender = :sender",
+  #             "expressionValues" : {
+  #                 ":id" : {
+  #                     "S" : "${context.arguments.conversationId}"
+  #                 },
+  #                 ":sender" : {
+  #                     "S" : "${context.arguments.sender}"
+  #                 }
+  #             }
+  #         },
+  #         "index" : "sender",
+  #         "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+  #         "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result.items)
 
   
 

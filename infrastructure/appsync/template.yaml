@@ -797,31 +797,31 @@ Resources:
         $utils.toJson($context.result.items)
     
 
-  getAllMessagesResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: getAllMessages
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :id",
-              "expressionValues" : {
-                  ":id" : {
-                      "S" : "${context.arguments.conversationId}"
-                  }
-              }
-          },
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
+  # getAllMessagesResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: getAllMessages
+  #     DataSourceName: !GetAtt MessageTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version" : "2017-02-28",
+  #         "operation" : "Query",
+  #         "query" : {
+  #             "expression": "conversationId = :id",
+  #             "expressionValues" : {
+  #                 ":id" : {
+  #                     "S" : "${context.arguments.conversationId}"
+  #                 }
+  #             }
+  #         },
+  #         "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+  #         "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result.items)
 
   getAllMessageConnectionsResolver:
     Type: "AWS::AppSync::Resolver"

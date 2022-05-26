@@ -33,3 +33,12 @@ Resources:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
       BucketName: !Sub ${ProjectName}-${Stage}-release-bucket
+
+  DebugBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+      BucketName: !Sub ${ProjectName}-${Stage}-debug-bucket

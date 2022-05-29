@@ -30,6 +30,11 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: message-table-name-${Stage}
     Description: message table name
+  UserStatusManageFunction:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: user-status-manage-funtion-${Stage}
+    Description: user status manage function
+
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -52,6 +57,16 @@ Resources:
             query: Query
             mutation: Mutation
             subscription: Subscription
+        }
+
+        enum Status {
+          online
+          offline
+        }
+
+        type Presence {
+          username: ID!
+          status: Status!
         }
 
         type Conversation {
@@ -202,6 +217,10 @@ Resources:
 
         type Query {
 
+          heartbeat(username: ID!): Presence
+
+          status(username: ID!): Presence
+
           # get all users
           getAllUsers: [User]
 
@@ -224,11 +243,21 @@ Resources:
 
           # get Me
           getMe: User
+          
 
           test: User
         }
 
         type Mutation {
+
+          
+          connect(username: ID!): Presence
+          
+          disconnect(username: ID!): Presence
+          
+          disconnected(username: ID!): Presence
+
+
           #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation: Conversation
 
@@ -281,6 +310,10 @@ Resources:
           # Subscribes to read message
           subscribeToReadMessage(conversationId: ID!): UserConversationBridge
             @aws_subscribe(mutations: ["setRead"])
+
+          onStatus(id: ID!): Presence
+            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
+
         }
 
   UserTableDataSource:
@@ -331,6 +364,18 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
 
+
+  UserStatusManageFunctionDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: UserStatusManageFunction
+      Description: Lambda function to manage user status
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref UserStatusManageFunction
+
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
     Properties:
@@ -349,6 +394,52 @@ Resources:
               - Effect: Allow
                 Action: dynamodb:*
                 Resource: '*'
+
+  AppSyncLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AppSyncLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: '*'
+
+
+
+  
+
+  ### Lambda Resolvers ###
+  HeartbeatResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: heartbeat
+      DataSourceName: !GetAtt UserStatusManageFunctionDataSource.Name
+
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "Invoke",
+          "payload": {
+            "action": "heartbeat",
+            "arguments":  $utils.toJson($ctx.arguments)
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
 
   ### Resolvers ###
   TestResolver:

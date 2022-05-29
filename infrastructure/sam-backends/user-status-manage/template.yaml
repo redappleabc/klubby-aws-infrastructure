@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  online offline status manage
+
+  Sample SAM Template for userstatus
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 3
+
+Resources:
+  UserStatusManageFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: user_status_manage/
+      Handler: index.lambda_handler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: DynamoDBAccess
+            Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: arn:aws:dynamodb:us-east-1:590503010210:table/*
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+### SSM PARAMS ###
+  UserStatusManageFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub user-status-manage-funtion-${Stage}
+      Type: String
+      Value: !GetAtt UserStatusManageFunction.Arn
+      Description: SSM Parameter for user ARN of user status management function
+      Tags:
+        Environment: !Ref Stage

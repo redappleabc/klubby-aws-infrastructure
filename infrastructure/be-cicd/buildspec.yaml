@@ -4,8 +4,8 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-      python: 3.9
-      nodejs: 14.17.4
+      python: 3.x
+      nodejs: 14.x
   build:
     commands:
       - cd infrastructure/storage/s3

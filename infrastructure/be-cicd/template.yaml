@@ -61,12 +61,11 @@ Resources:
         Type: CODEPIPELINE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: infrastructure/be-cicd/buildspec.yaml
+        BuildSpec: infrastructure/be-cicd/buildspecaaa.yaml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
         Image: aws/codebuild/standard:5.0
-        PrivilegedMode: true
         EnvironmentVariables:
           - Name: STAGE
             Type: PLAINTEXT

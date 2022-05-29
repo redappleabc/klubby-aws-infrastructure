@@ -12,6 +12,11 @@ phases:
       - echo pre building for be cicd
       - aws --version
       - python --version
+
+      - sudo apt-get update
+      - sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+      - sudo sh ./setup_14.sh
+      - sudo apt-get install -y nodejs
       - node --version
   build:
     commands:

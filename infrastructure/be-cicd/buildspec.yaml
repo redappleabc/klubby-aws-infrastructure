@@ -13,10 +13,10 @@ phases:
       - aws --version
       - python --version
 
-      - sudo apt-get update
-      - sudo curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
-      - sudo sh ./setup_14.sh
-      - sudo apt-get install -y nodejs
+      - apt-get update
+      - curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
+      - sh ./setup_14.sh
+      - apt-get install -y nodejs
       - node --version
   build:
     commands:

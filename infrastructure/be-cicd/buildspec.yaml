@@ -11,6 +11,7 @@ phases:
     commands:
       - echo pre building for be cicd
       - aws --version
+      - python --version
       - node --version
   build:
     commands:

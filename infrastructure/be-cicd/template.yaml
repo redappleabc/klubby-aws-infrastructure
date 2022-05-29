@@ -65,7 +65,8 @@ Resources:
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
-        Image: aws/codebuild/standard:5.0
+        Image: 
+
         EnvironmentVariables:
           - Name: STAGE
             Type: PLAINTEXT

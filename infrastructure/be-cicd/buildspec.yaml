@@ -7,10 +7,10 @@ phases:
       python: 3.x
       nodejs: 14.x
     commands:
-      - sudo apt-get update
-      - curl -sL https://deb.nodesource.com/setup_14.x | sudo bash -
-      - sudo sh ./setup_14.sh
-      - sudo apt-get install -y nodejs
+      - apt-get update
+      - curl -sL https://deb.nodesource.com/setup_14.x -o setup_14.sh
+      - sh ./setup_14.sh
+      - apt-get install -y nodejs
 
   pre_build:
     commands:

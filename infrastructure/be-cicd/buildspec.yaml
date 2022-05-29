@@ -12,7 +12,9 @@ phases:
       - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
 
 
-      - cd ../sam-backends/user-status-manage
+      - cd ../sam-backends/user-status-manage/user_status_manage
+      - npm install
+      - cd ..
       - sam build
       - sam deploy --stack-name user-status-manage-function-$STAGE --s3-bucket klubby-prod-artifacts-bucket --capabilities CAPABILITY_IAM --region us-east-1 --no-fail-on-empty-changeset
 

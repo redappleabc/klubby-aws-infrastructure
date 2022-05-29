@@ -6,6 +6,12 @@ phases:
     runtime-versions:
       python: 3.x
       nodejs: 14.x
+
+  pre_build:
+    commands:
+      - echo pre building for be cicd
+      - aws --version
+      - node --version
   build:
     commands:
       - cd infrastructure/storage/s3

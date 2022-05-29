@@ -3,24 +3,23 @@ version: 0.2
 
 env:
   shell: bash
+
 phases:
   install:
     runtime-versions:
       python: 3.x
       nodejs: 14.x
-    commands:
-      - apt-get update
-      - curl -sL https://deb.nodesource.com/setup_14.x -o setup_14.sh
-      - sh ./setup_14.sh
-      - apt-get install -y nodejs
+    # commands:
+    #   - apt-get update
+    #   - curl -sL https://deb.nodesource.com/setup_14.x -o setup_14.sh
+    #   - sh ./setup_14.sh
+    #   - apt-get install -y nodejs
 
   pre_build:
     commands:
       - echo pre building for be cicd
       - aws --version
       - python --version
-
-
       - node --version
   build:
     commands:

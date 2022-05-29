@@ -61,7 +61,7 @@ Resources:
         Type: CODEPIPELINE
       Source:
         Type: CODEPIPELINE
-        BuildSpec: infrastructure/be-cicd/buildspecaaa.yaml
+        BuildSpec: infrastructure/be-cicd/buildspec.yaml
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER

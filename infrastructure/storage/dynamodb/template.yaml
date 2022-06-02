@@ -21,7 +21,7 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
 
   KlubTable:
     Type: AWS::DynamoDB::Table
@@ -35,7 +35,7 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
 
   UserKlubBridgeTable:
     Type: AWS::DynamoDB::Table
@@ -53,7 +53,7 @@ Resources:
         KeyType: RANGE
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
       GlobalSecondaryIndexes:
         - IndexName: "username-index"
           KeySchema:
@@ -63,7 +63,7 @@ Resources:
             ProjectionType: "ALL"
           ProvisionedThroughput:
             ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
+            WriteCapacityUnits: 3
 
   ConversationTable:
     Type: AWS::DynamoDB::Table
@@ -76,7 +76,7 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
 
   MessageTable:
     Type: AWS::DynamoDB::Table
@@ -94,7 +94,7 @@ Resources:
 
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
       
 
       
@@ -114,7 +114,7 @@ Resources:
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+        WriteCapacityUnits: 3
       GlobalSecondaryIndexes:
         - IndexName: "conversationId-index"
           KeySchema:
@@ -124,7 +124,7 @@ Resources:
             ProjectionType: "ALL"
           ProvisionedThroughput:
             ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
+            WriteCapacityUnits: 3
 
   KlubConversationBridgeTable:
     Type: "AWS::DynamoDB::Table"
@@ -141,7 +141,7 @@ Resources:
           KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 5
+        WriteCapacityUnits: 3
       GlobalSecondaryIndexes:
         - IndexName: "conversationId-index"
           KeySchema:
@@ -151,7 +151,7 @@ Resources:
             ProjectionType: "ALL"
           ProvisionedThroughput:
             ReadCapacityUnits: 5
-            WriteCapacityUnits: 5
+            WriteCapacityUnits: 3
 
 
 ### for landing page ###
@@ -167,7 +167,7 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
 
 
 ### SSM Params ###

@@ -4,7 +4,7 @@ const AWS = require('aws-sdk');
 const Web3 = require('web3')
 
 const TABLE_NAME = "klubby-storage-dynamodb-dev-UserTable-IM4YXWAHTLAF"
-
+const RPC_URL="http://18.206.231.219:8545"
 
 //funuction to get eth balance
 async function getBalance(web3,walletAddress){
@@ -16,7 +16,6 @@ async function getBalance(web3,walletAddress){
 exports.lambdaHandler = async (event, context) => {
     try {
         //conect to GETH node
-        const RPC_URL="http://18.206.231.219:8545"
         const web3 = new Web3(RPC_URL)
 
         //get users from dynamo

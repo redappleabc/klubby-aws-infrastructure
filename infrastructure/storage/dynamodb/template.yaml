@@ -169,7 +169,6 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 3
 
-
 ### SSM Params ###
   UserTableNameParam:
     Type: AWS::SSM::Parameter

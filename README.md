@@ -90,3 +90,5 @@ DynamoDB is the main storage solution for managing the state of the Klubby Appli
 [AWS Blog Post - Android GitPipeline](https://aws.amazon.com/blogs/mobile/build-a-cicd-pipeline-for-your-android-app-with-aws-services/)
 
 [Example Android CICD Docker Image](https://github.com/javiersantos/android-ci)
+
+[Example Online/Offline Status](https://aws.amazon.com/blogs/gametech/building-a-presence-api-using-aws-appsync-aws-lambda-amazon-elasticache-and-amazon-eventbridge/)

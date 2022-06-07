@@ -30,10 +30,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: message-table-name-${Stage}
     Description: message table name
-  UserStatusManageFunction:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: user-status-manage-funtion-${Stage}
-    Description: user status manage function
+  # UserStatusManageFunction:
+  #   Type: AWS::SSM::Parameter::Value<String>
+  #   Default: user-status-manage-funtion-${Stage}
+  #   Description: user status manage function
 
 Resources:
   GraphQLApi:
@@ -365,16 +365,16 @@ Resources:
         TableName: !Ref MessageTableName
 
 
-  UserStatusManageFunctionDataSource:
-    Type: AWS::AppSync::DataSource
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      Name: UserStatusManageFunction
-      Description: Lambda function to manage user status
-      Type: AWS_LAMBDA
-      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
-      LambdaConfig:
-        LambdaFunctionArn: !Ref UserStatusManageFunction
+  # UserStatusManageFunctionDataSource:
+  #   Type: AWS::AppSync::DataSource
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     Name: UserStatusManageFunction
+  #     Description: Lambda function to manage user status
+  #     Type: AWS_LAMBDA
+  #     ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+  #     LambdaConfig:
+  #       LambdaFunctionArn: !Ref UserStatusManageFunction
 
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
@@ -419,26 +419,26 @@ Resources:
   
 
   ### Lambda Resolvers ###
-  HeartbeatResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: heartbeat
-      DataSourceName: !GetAtt UserStatusManageFunctionDataSource.Name
+  # HeartbeatResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: heartbeat
+  #     DataSourceName: !GetAtt UserStatusManageFunctionDataSource.Name
 
-      RequestMappingTemplate: |
-        {
-          "version": "2017-02-28",
-          "operation": "Invoke",
-          "payload": {
-            "action": "heartbeat",
-            "arguments":  $utils.toJson($ctx.arguments)
-          }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version": "2017-02-28",
+  #         "operation": "Invoke",
+  #         "payload": {
+  #           "action": "heartbeat",
+  #           "arguments":  $utils.toJson($ctx.arguments)
+  #         }
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
 
 
   ### Resolvers ###

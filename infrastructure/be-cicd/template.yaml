@@ -75,7 +75,7 @@ Resources:
       Source:
         Type: GITHUB
         Location: https://github.com/bjudson1/klubby-aws-infrastructure.git
-      #   BuildSpec: infrastructure/be-cicd/buildspec.yaml
+        BuildSpec: infrastructure/be-cicd/buildspec.yaml
         Auth:
           Resource: !Ref CodeBuildSourceCredential
           Type: OAUTH

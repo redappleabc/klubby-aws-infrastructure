@@ -78,7 +78,7 @@ Resources:
       #   BuildSpec: infrastructure/be-cicd/buildspec.yaml
       Source:
         Type: GITHUB
-        Location: https://github.com/bjudson1/klubby-aws-infrastructure.git
+        Location: !Sub https://github.com/${GitHubOwner}/${GitHubRepo}.git
         BuildSpec: infrastructure/be-cicd/buildspec.yaml
         # Auth:
         #   Resource: !Ref CodeBuildSourceCredential
@@ -100,6 +100,38 @@ Resources:
             - Type: FILE_PATH
               ExcludeMatchedPattern: False
               Pattern: '.*'
+            - Type: HEAD_REF
+              Pattern: !Sub "^refs/heads/${GitHubBranch}$"
+
+  SamDeployProject:
+    Type: AWS::CodeBuild::Project
+    Properties:
+      Artifacts:
+        Type: NO_ARTIFACTS
+      Source:
+        Type: GITHUB
+        Location: !Sub https://github.com/${GitHubOwner}/${GitHubRepo}.git
+        BuildSpec: infrastructure/sam-backends/buildspec.yaml
+        # Auth:
+        #   Resource: !Ref CodeBuildSourceCredential
+        #   Type: OAUTH
+      Environment:
+        ComputeType: BUILD_GENERAL1_SMALL
+        Type: LINUX_CONTAINER
+        Image: aws/codebuild/standard:5.0
+        EnvironmentVariables:
+          - Name: STAGE
+            Type: PLAINTEXT
+            Value: !Ref Stage
+      ServiceRole: !Ref CodeBuildRole
+      Triggers:
+        Webhook: True
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: "PUSH, PULL_REQUEST_MERGED"
+            - Type: FILE_PATH
+              ExcludeMatchedPattern: False
+              Pattern: 'infrastructure/sam-backends/.*'
             - Type: HEAD_REF
               Pattern: !Sub "^refs/heads/${GitHubBranch}$"
 

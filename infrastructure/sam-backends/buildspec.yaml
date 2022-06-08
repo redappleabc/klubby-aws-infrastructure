@@ -3,6 +3,7 @@ version: 0.2
 phases:
   build:
     commands:
+    #----Deploy add-new-user Function-------#
       - cd infrastructure/sam-backends/add-new-user
       - sam build
       - sam deploy
@@ -13,4 +14,15 @@ phases:
         --no-fail-on-empty-changeset
         --parameter-overrides
             ParameterKey=Stage,ParameterValue=$STAGE
-      - ls
+    #----Deploy landing-page Function-------#
+      #not actually deploying this for now
+
+    #----Deploy web3-queries Function-------#
+      - cd ../web3-queries
+      - sam build
+      - sam deploy \
+        --stack-name klubby-$STAGE-web3-queries \
+        --s3-bucket klubby-$STAGE-artifacts-bucket \
+        --capabilities CAPABILITY_IAM \
+        --region us-east-1 \
+        --no-fail-on-empty-changeset

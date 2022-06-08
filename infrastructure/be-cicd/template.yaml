@@ -76,9 +76,9 @@ Resources:
         Type: GITHUB
         Location: https://github.com/bjudson1/klubby-aws-infrastructure.git
         BuildSpec: infrastructure/be-cicd/buildspec.yaml
-        Auth:
-          Resource: !Ref CodeBuildSourceCredential
-          Type: OAUTH
+        # Auth:
+        #   Resource: !Ref CodeBuildSourceCredential
+        #   Type: OAUTH
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
@@ -92,10 +92,12 @@ Resources:
         Webhook: True
         FilterGroups:
           - - Type: EVENT
-              Pattern: "PUSH, PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED, PULL_REQUEST_REOPENED, PULL_REQUEST_MERGED"
+              Pattern: "PUSH, PULL_REQUEST_MERGED"
             - Type: FILE_PATH
               ExcludeMatchedPattern: False
               Pattern: '.*'
+            - Type: HEAD_REF
+              Pattern: "^refs/heads/dev$"
 
   # CodePipeline:
   #   Type: AWS::CodePipeline::Pipeline

@@ -6,11 +6,11 @@ phases:
       - cd infrastructure/sam-backends/add-new-user
       - sam build
       - sam deploy
-        --stack-name add-new-user-function-prod
-        --s3-bucket klubby-prod-artifacts-bucket
+        --stack-name add-new-user-function-$STAGE
+        --s3-bucket klubby-$STAGE-artifacts-bucket
         --capabilities CAPABILITY_IAM
         --region us-east-1
         --no-fail-on-empty-changeset
         --parameter-overrides
-            ParameterKey=Stage,ParameterValue=prod
+            ParameterKey=Stage,ParameterValue=$STAGE
       - ls

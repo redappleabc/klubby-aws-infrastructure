@@ -5,5 +5,5 @@ phases:
     commands:
       - echo 'test'
       - ls
-      - cd add-new-user
+      - cd infrastructure/add-new-user
       - sam build

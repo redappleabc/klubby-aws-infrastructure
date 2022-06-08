@@ -54,14 +54,31 @@ Resources:
       VersioningConfiguration:
         Status: Enabled
 
+  CodeBuildSourceCredential:
+    Type: 'AWS::CodeBuild::SourceCredential'
+    Properties:
+      # Token: '{{resolve:secretsmanager:github_enterprise:SecretString:token}}'
+      Token: !Ref GitHubOAuthToken
+      ServerType: GITHUB
+      AuthType: PERSONAL_ACCESS_TOKEN
+
   CodeBuildDeployBackend:
     Type: AWS::CodeBuild::Project
+    DependsOn: CodeBuildSourceCredential
     Properties:
       Artifacts:
-        Type: CODEPIPELINE
+        Type: NO_ARTIFACTS
+      #   Type: CODEPIPELINE
+      # Source:
+      #   Type: CODEPIPELINE
+      #   BuildSpec: infrastructure/be-cicd/buildspec.yaml
       Source:
-        Type: CODEPIPELINE
-        BuildSpec: infrastructure/be-cicd/buildspec.yaml
+        Type: GITHUB
+        Location: https://github.com/bjudson1/klubby-aws-infrastructure.git
+      #   BuildSpec: infrastructure/be-cicd/buildspec.yaml
+        Auth:
+          Resource: !Ref CodeBuildSourceCredential
+          Type: OAUTH
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER
@@ -71,10 +88,14 @@ Resources:
             Type: PLAINTEXT
             Value: !Ref Stage
       ServiceRole: !Ref CodeBuildRole
-      WebhookFilter:
-        ExcludeMatchedPattern: False
-        Pattern: '*'
-        Type: FILE_PATH
+      Triggers:
+        Webhook: True
+        FilterGroups:
+          - - Type: EVENT
+              Pattern: "PUSH, PULL_REQUEST_CREATED, PULL_REQUEST_UPDATED, PULL_REQUEST_REOPENED, PULL_REQUEST_MERGED"
+            - Type: FILE_PATH
+              ExcludeMatchedPattern: False
+              Pattern: '.*'
 
   CodePipeline:
     Type: AWS::CodePipeline::Pipeline
@@ -151,6 +172,9 @@ Resources:
       Filters:
       - JsonPath: "$.ref"
         MatchEquals: refs/heads/{Branch}
+      # - Type: FILE_PATH
+      #   ExcludeMatchedPattern: False
+      #   Pattern: '*'
       TargetPipeline: !Ref CodePipeline
       TargetAction: Source
       TargetPipelineVersion: !GetAtt CodePipeline.Version

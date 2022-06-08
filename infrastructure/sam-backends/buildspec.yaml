@@ -20,9 +20,9 @@ phases:
     #----Deploy web3-queries Function-------#
       - cd ../web3-queries
       - sam build
-      - sam deploy \
-        --stack-name klubby-$STAGE-web3-queries \
-        --s3-bucket klubby-$STAGE-artifacts-bucket \
-        --capabilities CAPABILITY_IAM \
-        --region us-east-1 \
+      - sam deploy
+        --stack-name klubby-$STAGE-web3-queries
+        --s3-bucket klubby-$STAGE-artifacts-bucket
+        --capabilities CAPABILITY_IAM
+        --region us-east-1
         --no-fail-on-empty-changeset

@@ -8,7 +8,6 @@ Parameters:
     Default: dev
     Description: The deployment stage for this stack. Used to name a variety of different resources.
     Type: String
-
 Resources:
   ArtifactsBucket:
     Type: AWS::S3::Bucket

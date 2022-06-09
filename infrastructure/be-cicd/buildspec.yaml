@@ -10,7 +10,7 @@ phases:
       - cd ../../authentication
       - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
       - cd ../appsync
-      - aws cloudformation deploy --stack-name klubby-appsync-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE UserTableName=user-table-name-$STAGE ConversationTableName=conversation-table-name-$STAGE UserConversationBridgeTableName=userconversationbridge-table-name-${Stage} MessageTableName=message-table-name-${Stage} KlubTableName=klub-table-name-$STAGE
+      - aws cloudformation deploy --stack-name klubby-appsync-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE UserTableName=user-table-name-$STAGE ConversationTableName=conversation-table-name-$STAGE UserConversationBridgeTableName=userconversationbridge-table-name-$Stage MessageTableName=message-table-name-$Stage KlubTableName=klub-table-name-$STAGE
       # - cd ../managed-blockchain
       # - aws cloudformation deploy --stack-name klubby-managed-blockchain-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
       # - cd ../sam-backends/add-new-user

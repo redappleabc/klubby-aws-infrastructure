@@ -326,7 +326,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub UserDynamoDBTable-${Stage}
+      Name: !Sub UserDynamoDBTable_${Stage}
       Description: The Post DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
@@ -338,7 +338,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub ConversationDynamoDBTable-${Stage}
+      Name: !Sub ConversationDynamoDBTable_${Stage}
       Description: The Conversation DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
@@ -350,7 +350,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub UserConversationBridgeDynamoDBTable-${Stage}
+      Name: !Sub UserConversationBridgeDynamoDBTable_${Stage}
       Description: The User Conversation DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
@@ -362,7 +362,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub MessageDynamoDBTable-${Stage}
+      Name: !Sub MessageDynamoDBTable_${Stage}
       Description: Message DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
@@ -374,7 +374,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub KlubDynamoDBTable-${Stage}
+      Name: !Sub KlubDynamoDBTable_${Stage}
       Description: The Klub DynamoDB table
       Type: AMAZON_DYNAMODB
       ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn

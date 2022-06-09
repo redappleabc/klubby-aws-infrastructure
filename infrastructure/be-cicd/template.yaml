@@ -66,7 +66,7 @@ Resources:
       ServerType: GITHUB
       AuthType: PERSONAL_ACCESS_TOKEN
 
-  CodeBuildDeployBackend:
+  GeneralDeployProject:
     Type: AWS::CodeBuild::Project
     # DependsOn: CodeBuildSourceCredential
     Properties:
@@ -99,7 +99,7 @@ Resources:
               Pattern: "PUSH, PULL_REQUEST_MERGED"
             - Type: FILE_PATH
               ExcludeMatchedPattern: False
-              Pattern: '.*'
+              Pattern: 'infrastructure/storage/.*|infrastructure/appsync/.*|infrastructure/authentication/.*'
             - Type: HEAD_REF
               Pattern: !Sub "^refs/heads/${GitHubBranch}$"
 
@@ -112,9 +112,6 @@ Resources:
         Type: GITHUB
         Location: !Sub https://github.com/${GitHubOwner}/${GitHubRepo}.git
         BuildSpec: infrastructure/sam-backends/buildspec.yaml
-        # Auth:
-        #   Resource: !Ref CodeBuildSourceCredential
-        #   Type: OAUTH
       Environment:
         ComputeType: BUILD_GENERAL1_SMALL
         Type: LINUX_CONTAINER

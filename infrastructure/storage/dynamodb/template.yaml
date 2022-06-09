@@ -155,6 +155,7 @@ Resources:
 
 
 ### for landing page ###
+
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table
     Properties:

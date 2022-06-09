@@ -60,7 +60,6 @@ Resources:
         schema {
             query: Query
             mutation: Mutation
-            subscription: Subscription
         }
 
         enum Status {
@@ -1110,6 +1109,7 @@ Resources:
         #else 
           null
         #end
+
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver

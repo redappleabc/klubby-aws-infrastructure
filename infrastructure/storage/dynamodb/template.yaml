@@ -190,7 +190,6 @@ Resources:
       Tags:
         Environment: !Ref Stage
 
-
   MessageTableNameParam:
     Type: AWS::SSM::Parameter
     Properties:
@@ -208,5 +207,15 @@ Resources:
       Type: String
       Value: !Ref UserConversationBridgeTable
       Description: SSM Parameter for UserConversationBrdige table name
+      Tags:
+        Environment: !Ref Stage
+
+  KlubTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'klub-table-name-${Stage}'
+      Type: String
+      Value: !Ref KlubTable
+      Description: SSM Parameter for klub table name
       Tags:
         Environment: !Ref Stage

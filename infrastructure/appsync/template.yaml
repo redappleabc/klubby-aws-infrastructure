@@ -32,7 +32,7 @@ Parameters:
     Description: message table name
   KlubTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    # Default: klub-table-name-${Stage}
+    Default: klub-table-name-${Stage}
     Description: klub table name
   # UserStatusManageFunction:
   #   Type: AWS::SSM::Parameter::Value<String>

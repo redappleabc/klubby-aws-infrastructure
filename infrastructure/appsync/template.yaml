@@ -30,6 +30,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: message-table-name-${Stage}
     Description: message table name
+  KlubTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: klub-table-name-${Stage}
+    Description: klub table name
   # UserStatusManageFunction:
   #   Type: AWS::SSM::Parameter::Value<String>
   #   Default: user-status-manage-funtion-${Stage}
@@ -241,6 +245,9 @@ Resources:
           #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
           getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
 
+          #get all klubs
+          getAllKlubs: [Klub]
+
           # get Me
           getMe: User
           
@@ -363,6 +370,18 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
+
+  KubTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "KlubDynamoDBTable"
+      Description: The Klub DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref KlubTableName
 
 
   # UserStatusManageFunctionDataSource:
@@ -592,9 +611,6 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-
-
 
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
@@ -943,6 +959,37 @@ Resources:
           "messages": $utils.toJson($context.result.items),
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
+
+  GetAllUsersResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllUsers
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Scan",
+            "filter" : {
+              "expression" : "#name <> :name",
+              "expressionNames" : {
+                  "#name" : "name"
+              },
+              "expressionValues" : {
+                  ":name" : {"S": "${context.identity.name}"}
+              }
+          },
+            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
+            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+        }
+      ResponseMappingTemplate: |
+        #**
+            Return a flat list of results from a Query or Scan operation.
+        *#
+        $util.toJson($ctx.result.items)
 
   # getAllMessagesFromResolver:
   #   Type: "AWS::AppSync::Resolver"

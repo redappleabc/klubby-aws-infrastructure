@@ -60,21 +60,24 @@ Resources:
       OauthToken: !Ref OauthToken
       AccessToken: !Ref OauthToken
       CustomRules:
-        - Source: /dashboard
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /login
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /login/
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /logout
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
-        - Source: /logout/
-          Status: 200
-          Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+          - Source: /*
+            Status: 200
+            Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        # - Source: /dashboard
+        #   Status: 200
+        #   Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        # - Source: /login
+        #   Status: 200
+        #   Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        # - Source: /login/
+        #   Status: 200
+        #   Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        # - Source: /logout
+        #   Status: 200
+        #   Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+        # - Source: /logout/
+        #   Status: 200
+        #   Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
 
   AmplifyBranch:
     Type: AWS::Amplify::Branch

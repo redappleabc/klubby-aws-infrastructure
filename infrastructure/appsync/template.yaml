@@ -12,16 +12,33 @@ Parameters:
     Description: Stage of build
   UserPoolId:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userpool-id-dev
+    Default: userpool-id-${Stage}
     Description: user pool id from SSM
   UserTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: user-table-name-dev
+    Default: user-table-name-${Stage}
     Description: user table name
   ConversationTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: conversation-table-name-dev
+    Default: conversation-table-name-${Stage}
     Description: conversation table name
+  UserConversationBridgeTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: userconversationbridge-table-name-${Stage}
+    Description: user conversation table name
+  MessageTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: message-table-name-${Stage}
+    Description: message table name
+  KlubTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: klub-table-name-${Stage}
+    Description: klub table name
+  # UserStatusManageFunction:
+  #   Type: AWS::SSM::Parameter::Value<String>
+  #   Default: user-status-manage-funtion-${Stage}
+  #   Description: user status manage function
+
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -45,32 +62,87 @@ Resources:
             mutation: Mutation
         }
 
+        enum Status {
+          online
+          offline
+        }
+
+        type Presence {
+          username: ID!
+          status: Status!
+        }
+
         type Conversation {
-          #  The Conversation's timestamp.
-          createdAt: String
+
           #  A unique identifier for the Conversation.
           id: ID!
+
+          #  The Conversation's timestamp.
+          createdAt: String
+          
           #  The Conversation's messages.
           messages(after: String, first: Int): MessageConnection
-          #  The Conversation's name.
-          name: String!
+        }
+
+
+
+        type Klub {
+
+          #  A unique identifier for the Klub.
+          id: ID!
+
+          # The klub's name
+          name: String
+
+          # The creator of klub
+          owner: String
+
+          # the blockchain network i.e. Ethereum
+          network: String
+
+          # the contract address 
+          contractAddress: String
+
+          # the link where to buy.
+          linkToBuy: String
+
+          # threshold for owning tokens to be a member of MAIN GROUP.
+          minimumAmountForMainGroup: String
+
+          # threshold for owning tokens to be a member of WHALE GROUP.
+          minimumAmountForWhaleGroup: String
+
+          #  The Conversation's timestamp.
+          createdAt: String
+         
+          
         }
 
         type Message {
-          #  The author object. Note: `authorId` is only available because we list it in `extraAttributes` in `Conversation.messages`
-          author: User
-          #  The message content.
-          content: String!
-          #  The id of the Conversation this message belongs to. This is the table primary key.
-          conversationId: ID!
-          #  The message timestamp. This is also the table sort key.
-          createdAt: String
           #  Generated id for a message -- read-only
           id: ID!
+
+          #  The id of the Conversation this message belongs to. This is the table primary key.
+          conversationId: ID!
+
+          #  The message content.
+          content: String!
+
+          # The original id for a replay messages.
+          originalId: ID
+
+          # The original message for a replay messages.
+          originalMessage: Message
+
+      
+          #  The message timestamp.
+          createdAt: String
+          updatedAt: String
+         
           #  Flag denoting if this message has been accepted by the server or not.
           isSent: Boolean
-          recipient: User
           sender: String
+
         }
 
         type MessageConnection {
@@ -82,36 +154,175 @@ Resources:
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
-          conversations(after: String, first: Int): UserConverstationsConnection
+          conversations: [UserConversationBridge]
+          klubs: [UserKlubBridge]
         }
 
-        type UserConversations {
-          associated: [UserConversations]
-          conversation: Conversation
+        type UserConversationBridge {
+
+          # This is partition key
+          username: ID!
+
+          # This is sort key
           conversationId: ID!
-          user: User
-          userId: ID!
+          
+          # The conversation name
+
+          name: String
+
+          # The other's UserConversationBrdige. This field has resolver.
+          associated: UserConversationBridge
+
+          # The conversation related me. This field has resolver.
+          conversation: Conversation
+
+          # latest message id  which I has read
+          read: String
+
         }
 
-        type UserConverstationsConnection {
-          nextToken: String
-          userConversations: [UserConversations]
+        type UserKlubBridge {
+
+          # This is partition key
+          username: ID!
+
+          # This is sort key
+          klubId: ID!
+
+
+          # latest message id for main group which I has read
+          readMainGroup: String
+
+          # latest message id for whale group which I has read
+          readWhaleGroup: String
+
+          # latest message id for announcement which I has read
+          readAnnouncement: String
+
         }
+
+        type KlubConversationBridge {
+          
+          # This is partition key
+          klubId: ID!
+
+          # This is sort key
+          announcementConversationId: ID!
+
+          # This is sort key
+          mainGroupConversationId: ID!
+
+          # This is sort key
+          whaleGroupConversationID: ID!
+
+        }
+
 
         type Query {
-            getUsers: [User]
-            #TODO make this [String]
-            getUserWallets(username: String!): User
+
+          heartbeat(username: ID!): Presence
+
+          status(username: ID!): Presence
+
+          # get all users
+          getAllUsers: [User]
+
+          # get users whose username starts with _username
+          searchUsers(username: String!): [User]
+
+          # get user wallets
+          getUserWallets(username: String!): User
+
+          # For now this is not used.
+          # Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          # getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
+
+          #For now this is not being used.
+          # TODO what does this do
+          # getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
+
+          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
+          getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+
+          #get all klubs
+          getAllKlubs: [Klub]
+
+          # get Me
+          getMe: User
+          
+
+          test: User
         }
 
         type Mutation {
-            #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-            createConversation(createdAt: String, id: ID!, name: String!): Conversation
-            # addUser(username: String!): User
-            updateUser(username: String!,wallets: String!): User
+
+          
+          connect(username: ID!): Presence
+          
+          disconnect(username: ID!): Presence
+          
+          disconnected(username: ID!): Presence
+
+
+          #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
+          createConversation: Conversation
+
+          # Delete the Conversation
+          removeConversation(conversationId: ID!): Conversation
+
+          # Delete  UserConversationBridge
+          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
+
+          #  Create a message in a Conversation.
+          createMessage(content: String!, conversationId: ID!): Message
+
+          # Replay the message in a Conversation.
+          replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
+
+          # edit message in Messages table
+          editMessage(conversationId: ID!, id: String!, content: String!): Message
+
+          # Create a user conversation.
+          createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversationBridge
+
+          # addUser(username: String!): User
+          updateUser(username: String!,wallets: String!): User
+
+          # set message id which user read
+          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
+
+          # remove message in Messages table
+          removeMessage(conversationId: ID!, id: String!): Message
+
+         
+
         }
 
-  UserDynamoDBTableDataSource:
+        type Subscription  {
+          #  Subscribes to all new messages in a given Conversation.
+          subscribeToNewMessage(conversationId: ID!): Message
+            @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
+
+          subscribeToNewUserConversationBridge(username:ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["createUserConversationBridge"])
+
+          subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["removeUserConversationBridge"])
+
+          # Subscribes to all removed messages in a given Conversation
+          subscribeToRemovedMessage(conversationId: ID!): Message
+            @aws_subscribe(mutations: ["removeMessage"]) 
+          
+          # Subscribes to read message
+          subscribeToReadMessage(conversationId: ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["setRead"])
+
+          onStatus(id: ID!): Presence
+            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
+
+        }
+
+  UserTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -122,7 +333,8 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref UserTableName
-  ConversationDynamoDBTableDataSource:
+
+  ConversationTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -133,6 +345,54 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref ConversationTableName
+
+  UserConversationBridgeTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "UserConversationBridgeDynamoDBTable"
+      Description: The User Conversation DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref UserConversationBridgeTableName
+
+  MessageTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "MessageDynamoDBTable"
+      Description: Message DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref MessageTableName
+
+  KubTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: "KlubDynamoDBTable"
+      Description: The Klub DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref KlubTableName
+
+
+  # UserStatusManageFunctionDataSource:
+  #   Type: AWS::AppSync::DataSource
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     Name: UserStatusManageFunction
+  #     Description: Lambda function to manage user status
+  #     Type: AWS_LAMBDA
+  #     ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+  #     LambdaConfig:
+  #       LambdaFunctionArn: !Ref UserStatusManageFunction
 
   AppSyncDynamoDBRole:
     Type: AWS::IAM::Role
@@ -153,41 +413,380 @@ Resources:
                 Action: dynamodb:*
                 Resource: '*'
 
+  AppSyncLambdaRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AppSyncLambdaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: lambda:InvokeFunction
+                Resource: '*'
+
+
+
+  
+
+  ### Lambda Resolvers ###
+  # HeartbeatResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: heartbeat
+  #     DataSourceName: !GetAtt UserStatusManageFunctionDataSource.Name
+
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version": "2017-02-28",
+  #         "operation": "Invoke",
+  #         "payload": {
+  #           "action": "heartbeat",
+  #           "arguments":  $utils.toJson($ctx.arguments)
+  #         }
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
+
+
   ### Resolvers ###
-  CreateConversationMutationResolver:
+  TestResolver:
     Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Mutation"
-      FieldName: "createConversation"
-      DataSourceName: !GetAtt ConversationDynamoDBTableDataSource.Name
+      TypeName: Query
+      FieldName: test
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
           "version" : "2017-02-28",
-          "operation" : "PutItem",
+          "operation" : "GetItem",
           "key": {
-              "id": { "S" : "${context.arguments.id}"}
-          },
-          "attributeValues" : {
-             "id": {  "S": "${context.arguments.id}" },
-             "name": {  "S": "${context.arguments.name}" }
-             #if(${context.arguments.createdAt}) ,"createdAt": { "S": "${context.arguments.createdAt}"} #end
+              "username": { "S" : "${context.identity.username}"}
           }
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  GetUsersResolver:
+  CreateConversationMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key": {
+              "id": { "S" : "$util.autoId()"}
+          },
+          "attributeValues" : {
+             "id": {  "S": "$util.autoId()" },
+             "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  # removeConversationMutationResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: "Mutation"
+  #     FieldName: "removeConversation"
+  #     DataSourceName: !GetAtt ConversationTableDataSource.Name
+  #     RequestMappingTemplate: !Sub 
+  #       - | 
+  #         #set($conversationId = $context.arguments.conversationId)
+  #         #set($keys_1=[])
+  #         #set($key_1={})
+  #         $util.qr($key_1.put("id", $util.dynamodb.toString($conversationId)))
+  #         $util.qr($keys_1.add($util.dynamodb.toMapValues($key_1)))
+
+  #         #set($keys_2=[])
+  #         #set($key_2={})
+  #         $util.qr($key_2.put("conversationId", $util.dynamodb.toString($conversationId)))
+  #         $util.qr($keys_2.add($util.dynamodb.toMapValues($key_2)))
+         
+  #         {
+  #             "version" : "2018-05-29",
+  #             "operation" : "BatchDeleteItem",
+  #             "tables":{
+  #               "${ConversationTable}":  $utils.toJson($keys_1),
+  #               "${UserConversationBridgeTable}" :  $utils.toJson($keys_2)
+  #             }
+  #         }
+  #       - { 
+  #           ConversationTable: !Ref ConversationTableName,
+  #           UserConversationBridgeTable: !Ref UserConversationBridgeTableName
+  #         }
+
+  #     ResponseMappingTemplate: !Sub
+  #       - |
+  #         $utils.toJson($context.result.data["${ConversationTable}"])
+  #       - { 
+  #           ConversationTable: !Ref ConversationTableName
+  #         }
+
+
+  removeConversationMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "DeleteItem",
+          "key" : {
+            "id" : { "S" : "${context.arguments.conversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  CreateUserConversationBridgeMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createUserConversationBridge"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "PutItem",
+            "key": {
+                "username": { "S" : "${context.arguments.username}"},
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
+            },
+            "attributeValues" : {
+                "username": {  "S": "${context.arguments.username}" },
+                "conversationId": {  "S": "${context.arguments.conversationId}" },
+                "name": {  "S": "${context.arguments.name}" }
+            }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  
+  RemoveUserConversationBridgeMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeUserConversationBridge"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "DeleteItem",
+            "key": {
+                "username": { "S" : "${context.arguments.username}"},
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
+            }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  CreateMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createMessage"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key" : {
+              "conversationId" : { "S" : "${context.arguments.conversationId}" }
+          },
+          "attributeValues" : {
+              "conversationId": {  "S": "${context.arguments.conversationId}" },
+              "content": {  "S": "${context.arguments.content}" },
+              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
+              "sender": {  "S": "${context.identity.username}" },
+              "isSent": {  "BOOL": true },
+              "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" }
+          }
+        }
+
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  ReplyMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "replyMessage"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key" : {
+              "conversationId" : { "S" : "${context.arguments.conversationId}" }
+          },
+          "attributeValues" : {
+              "conversationId": {  "S": "${context.arguments.conversationId}" },
+              "content": {  "S": "${context.arguments.content}" },
+              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
+              "sender": {  "S": "${context.identity.username}" },
+              "isSent": {  "BOOL": true },
+              "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" },
+              "originalId": { "S": "${context.arguments.originalId}" }
+          }
+        }
+
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  RemoveMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeMessage"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "DeleteItem",
+          "key" : {
+            "id" : { "S" : "${context.arguments.id}" },
+            "conversationId": {"S" : "${context.arguments.conversationId}"}
+          },
+          "condition" : {
+              "expression" : "#sender = :sender",
+              "expressionNames" : {
+                  "#sender" : "sender"
+              },
+              "expressionValues" : {
+                  ":sender" : {"S": "${context.identity.username}"}
+              }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  
+  EditMessageMutationResolver:
     Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: editMessage
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "UpdateItem",
+            "key" : {
+              "id" : { "S" : "${context.arguments.id}" },
+              "conversationId": {"S" : "${context.arguments.conversationId}"}
+            },
+            "condition" : {
+              "expression" : "#sender = :sender",
+              "expressionNames" : {
+                  "#sender" : "sender"
+              },
+              "expressionValues" : {
+                  ":sender" : {"S": "${context.identity.username}"}
+              }
+            },
+            "update" : {
+                "expression" : "SET #content = :content, #updatedAt = :updatedAt",
+                "expressionNames": {
+                   "#content" : "content",
+                   "#updatedAt" : "updatedAt"
+                 },
+                "expressionValues": {
+                    ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content) ,
+                    ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
+                }
+            }
+        }
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+
+
+  OriginalMessageMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Message
+      FieldName: originalMessage
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "GetItem",
+            "key" : {
+              "id" : { "S" : "${context.source.originalId}" },
+              "conversationId": {"S" : "${context.source.conversationId}"}
+            }
+        }
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+
+
+
+  GetAllUsersResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getUsers
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      FieldName: getAllUsers
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
             "operation" : "Scan",
+            "filter" : {
+              "expression" : "#username <> :username",
+              "expressionNames" : {
+                  "#username" : "username"
+              },
+              "expressionValues" : {
+                  ":username" : {"S": "${context.identity.username}"}
+              }
+          },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
             ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
             ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
@@ -198,13 +797,51 @@ Resources:
         *#
         $util.toJson($ctx.result.items)
 
+
+
+  SearchUsersResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: searchUsers
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Scan",
+            "filter" : {
+              "expression" : "#username <> :myname and begins_with(#username, :username)",
+              "expressionNames" : {
+                  "#username" : "username"
+              },
+              "expressionValues" : {
+                  ":myname" : {"S": "${context.identity.username}"},
+                  ":username" : {"S": "${context.arguments.username}"}
+              }
+          },
+            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
+            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+        }
+      ResponseMappingTemplate: |
+        #**
+            Return a flat list of results from a Query or Scan operation.
+        *#
+        $util.toJson($ctx.result.items)
+
+
+
+
   GetUserWalletsResolver:
     Type: AWS::AppSync::Resolver
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getUserWallets
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version": "2017-02-28",
@@ -217,13 +854,271 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
+  GetMeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getMe
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key": {
+              "username": { "S" : "${context.identity.username}"}
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+        
+
+  conversationsUserResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "User"
+      FieldName: "conversations"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "username = :username",
+              "expressionValues" : {
+                  ":username" : {
+                      "S" : "${context.identity.username}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": 1000
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+    
+
+  # getAllMessagesResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: getAllMessages
+  #     DataSourceName: !GetAtt MessageTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version" : "2017-02-28",
+  #         "operation" : "Query",
+  #         "query" : {
+  #             "expression": "conversationId = :id",
+  #             "expressionValues" : {
+  #                 ":id" : {
+  #                     "S" : "${context.arguments.conversationId}"
+  #                 }
+  #             }
+  #         },
+  #         "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+  #         "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result.items)
+
+  getAllMessageConnectionsResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllMessageConnections
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :conversationId",
+              "expressionValues" : {
+                  ":conversationId" : {
+                      "S" : "${context.arguments.conversationId}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+      ResponseMappingTemplate: |
+        {
+          "messages": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
+
+  GetAllUsersResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getAllUsers
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Scan",
+            "filter" : {
+              "expression" : "#name <> :name",
+              "expressionNames" : {
+                  "#name" : "name"
+              },
+              "expressionValues" : {
+                  ":name" : {"S": "${context.identity.name}"}
+              }
+          },
+            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
+            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+        }
+      ResponseMappingTemplate: |
+        #**
+            Return a flat list of results from a Query or Scan operation.
+        *#
+        $util.toJson($ctx.result.items)
+
+  # getAllMessagesFromResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Query
+  #     FieldName: getAllMessagesFrom
+  #     DataSourceName: !GetAtt MessageTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       {
+  #         "version" : "2017-02-28",
+  #         "operation" : "Query",
+  #         "query" : {
+  #             "expression": "conversationId = :id and sender = :sender",
+  #             "expressionValues" : {
+  #                 ":id" : {
+  #                     "S" : "${context.arguments.conversationId}"
+  #                 },
+  #                 ":sender" : {
+  #                     "S" : "${context.arguments.sender}"
+  #                 }
+  #             }
+  #         },
+  #         "index" : "sender",
+  #         "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+  #         "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result.items)
+
+  
+
+  MessagesConversationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Conversation"
+      FieldName: "messages"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :id",
+              "expressionValues" : {
+                  ":id" : {
+                      "S" : "${context.source.id}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+        }
+      ResponseMappingTemplate: |
+        {
+          "messages": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
+
+  conversationUserConversationBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversationBridge
+      FieldName: "conversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.source.conversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  associatedUserConversationBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversationBridge
+      FieldName: associated
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2018-05-29",
+          "operation" : "Query",
+          "query" : {
+              "expression": "conversationId = :conversationId",
+              "expressionValues" : {
+                  ":conversationId" : {
+                      "S" : "${context.source.conversationId}"
+                  }
+              }
+          },
+          "filter" : {
+              "expression" : "#username <> :username",
+              "expressionNames" : {
+                  "#username" : "username"
+              },
+              "expressionValues" : {
+                  ":username" : {"S": "${context.identity.username}"}
+              }
+          },
+          "index": "conversationId-index"
+        }
+      ResponseMappingTemplate: |
+        #if($context.result.items.size() > 0) 
+          $util.toJson($context.result.items[0]) 
+        #else 
+          null
+        #end
+
+
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver
+    DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation
       FieldName: updateUser
-      DataSourceName: !GetAtt UserDynamoDBTableDataSource.Name
+      DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
@@ -238,6 +1133,37 @@ Resources:
                 ## },
                 "expressionValues": {
                     ":wallets" : $util.dynamodb.toDynamoDBJson($context.arguments.wallets)
+                }
+            }
+        }
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+
+  SetReadResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: setRead
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "UpdateItem",
+            "key": {
+                "username": { "S" : "${context.arguments.username}"},
+                "conversationId": { "S" : "${context.arguments.conversationId}"}
+            },
+            "update" : {
+                "expression" : "SET #read = :messageId",
+                "expressionNames" : {
+                  "#read" : "read"
+                },
+                "expressionValues": {
+                    ":messageId" : $util.dynamodb.toDynamoDBJson($context.arguments.messageId)
                 }
             }
         }

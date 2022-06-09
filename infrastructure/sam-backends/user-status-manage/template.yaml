@@ -1,9 +1,9 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  add-new-user
+  online offline status manage
 
-  Sample SAM Template for add-new-user
+  Sample SAM Template for userstatus
 
 Parameters:
   Stage:
@@ -16,12 +16,12 @@ Globals:
     Timeout: 3
 
 Resources:
-  AddNewUserFunction:
+  UserStatusManageFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: add_new_user/
-      Handler: app.lambda_handler
-      Runtime: python3.9
+      CodeUri: user_status_manage/
+      Handler: index.lambda_handler
+      Runtime: nodejs14.x
       Architectures:
         - x86_64
       Policies:
@@ -43,12 +43,12 @@ Resources:
           STAGE: !Ref Stage
 
 ### SSM PARAMS ###
-  AddNewUserFunctionArn:
+  UserStatusManageFunctionArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub add-new-user-funtion-${Stage}
+      Name: !Sub user-status-manage-funtion-${Stage}
       Type: String
-      Value: !GetAtt AddNewUserFunction.Arn
-      Description: SSM Parameter for user ARN of add new user function
+      Value: !GetAtt UserStatusManageFunction.Arn
+      Description: SSM Parameter for user ARN of user status management function
       Tags:
         Environment: !Ref Stage

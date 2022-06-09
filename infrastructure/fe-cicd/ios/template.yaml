@@ -262,3 +262,14 @@ Resources:
           Action: sts:AssumeRole
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess #TODO: Reduce permissions
+
+### SSM Params ###
+  iOSPipelineNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub ios-pipeline-name-${Stage}
+      Type: String
+      Value: !Ref CodePipeline
+      Description: SSM Parameter for ios pipeline name
+      Tags:
+        Environment: !Ref Stage

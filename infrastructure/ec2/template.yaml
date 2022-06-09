@@ -67,6 +67,7 @@ Resources:
       RouteTableId: !Ref PublicRouteTable
       SubnetId: !Ref PublicSubnet
 
+  #TODO lock down to ssh and ports used by GETH
   OpenSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:

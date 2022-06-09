@@ -9,7 +9,7 @@ Parameters:
     Description: The deployment stage for this stack. Used to name a variety of different resources.
     Type: String
 Resources:
-  UserDynamoTable: 
+  UserTable:
     Type: AWS::DynamoDB::Table
     Properties:
       # TableName: !Sub 'user-table-${Stage}'
@@ -21,32 +21,140 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
-  MessageDynamoTable:
-    Type: AWS::DynamoDB::Table
-    Properties:
-      AttributeDefinitions:
-      - AttributeName: message_id
-        AttributeType: S
-      KeySchema:
-      - AttributeName: message_id
-        KeyType: HASH
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
 
-  ConversationDynamoTable:
+  KlubTable:
     Type: AWS::DynamoDB::Table
     Properties:
+      # TableName: !Sub 'user-table-${Stage}'
       AttributeDefinitions:
-      - AttributeName: conversation_id
+      - AttributeName: klubname
         AttributeType: S
       KeySchema:
-      - AttributeName: conversation_id
+      - AttributeName: klubname
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
+
+  UserKlubBridgeTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      # TableName: !Sub 'user-table-${Stage}'
+      AttributeDefinitions:
+      - AttributeName: klubname
+        AttributeType: S
+      - AttributeName: username
+        AttributeType: S
+      KeySchema:
+      - AttributeName: klubname
+        KeyType: HASH
+      - AttributeName: username
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+      GlobalSecondaryIndexes:
+        - IndexName: "username-index"
+          KeySchema:
+            - AttributeName: "username"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 3
+
+  ConversationTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: id
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+
+  MessageTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: id
+        AttributeType: S
+      - AttributeName: conversationId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: conversationId
+        KeyType: HASH
+      - AttributeName: id
+        KeyType: RANGE
+
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+      
+
+      
+
+  UserConversationBridgeTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "username"
+          AttributeType: "S"
+        - AttributeName: "conversationId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "username"
+          KeyType: "HASH"
+        - AttributeName: "conversationId"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+      GlobalSecondaryIndexes:
+        - IndexName: "conversationId-index"
+          KeySchema:
+            - AttributeName: "conversationId"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 3
+
+  KlubConversationBridgeTable:
+    Type: "AWS::DynamoDB::Table"
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: "klubname"
+          AttributeType: "S"
+        - AttributeName: "conversationId"
+          AttributeType: "S"
+      KeySchema:
+        - AttributeName: "klubname"
+          KeyType: "HASH"
+        - AttributeName: "conversationId"
+          KeyType: "RANGE"
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+      GlobalSecondaryIndexes:
+        - IndexName: "conversationId-index"
+          KeySchema:
+            - AttributeName: "conversationId"
+              KeyType: "HASH"
+          Projection:
+            ProjectionType: "ALL"
+          ProvisionedThroughput:
+            ReadCapacityUnits: 5
+            WriteCapacityUnits: 3
+
+
+### for landing page ###
 
   EmailDynamoTable:
     Type: AWS::DynamoDB::Table
@@ -60,7 +168,7 @@ Resources:
         KeyType: HASH
       ProvisionedThroughput:
         ReadCapacityUnits: 5
-        WriteCapacityUnits: 10
+        WriteCapacityUnits: 3
 
 ### SSM Params ###
   UserTableNameParam:
@@ -68,7 +176,7 @@ Resources:
     Properties:
       Name: !Sub 'user-table-name-${Stage}'
       Type: String
-      Value: !Ref UserDynamoTable
+      Value: !Ref UserTable
       Description: SSM Parameter for user table name
       Tags:
         Environment: !Ref Stage
@@ -78,7 +186,37 @@ Resources:
     Properties:
       Name: !Sub 'conversation-table-name-${Stage}'
       Type: String
-      Value: !Ref UserDynamoTable
-      Description: SSM Parameter for user table name
+      Value: !Ref ConversationTable
+      Description: SSM Parameter for conversation table name
+      Tags:
+        Environment: !Ref Stage
+
+  MessageTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'message-table-name-${Stage}'
+      Type: String
+      Value: !Ref MessageTable
+      Description: SSM Parameter for message table name
+      Tags:
+        Environment: !Ref Stage
+
+  UserConversationBridgeTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'userconversationbridge-table-name-${Stage}'
+      Type: String
+      Value: !Ref UserConversationBridgeTable
+      Description: SSM Parameter for UserConversationBrdige table name
+      Tags:
+        Environment: !Ref Stage
+
+  KlubTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'klub-table-name-${Stage}'
+      Type: String
+      Value: !Ref KlubTable
+      Description: SSM Parameter for klub table name
       Tags:
         Environment: !Ref Stage

@@ -370,7 +370,7 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
 
-  KubTableDataSource:
+  KlubTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -959,14 +959,14 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-  GetAllUsersResolver:
+  GetAllKlubsResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllUsers
-      DataSourceName: !GetAtt UserTableDataSource.Name
+      FieldName: geAllKlubs
+      DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",

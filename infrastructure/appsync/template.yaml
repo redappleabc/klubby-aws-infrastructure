@@ -92,19 +92,19 @@ Resources:
           id: ID!
 
           # The klub's name
-          name: String
+          klubname: String
 
           # The creator of klub
           owner: String
 
-          # the blockchain network i.e. Ethereum
+          # the blockchain network e.g. Ethereum
           network: String
 
           # the contract address 
           contractAddress: String
 
           # the link where to buy.
-          linkToBuy: String
+          # linkToBuy: String
 
           # threshold for owning tokens to be a member of MAIN GROUP.
           minimumAmountForMainGroup: String
@@ -112,7 +112,7 @@ Resources:
           # threshold for owning tokens to be a member of WHALE GROUP.
           minimumAmountForWhaleGroup: String
 
-          #  The Conversation's timestamp.
+          #  The Klubs's timestamp.
           createdAt: String
          
           

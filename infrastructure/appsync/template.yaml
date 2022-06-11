@@ -134,15 +134,15 @@ Resources:
           # The original message for a replay messages.
           originalMessage: Message
 
-      
           #  The message timestamp.
           createdAt: String
+
           updatedAt: String
          
           #  Flag denoting if this message has been accepted by the server or not.
           isSent: Boolean
-          sender: String
 
+          sender: String
         }
 
         type MessageConnection {
@@ -151,6 +151,7 @@ Resources:
         }
 
         type User {
+          # This is partition key
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
@@ -255,50 +256,49 @@ Resources:
 
         type Mutation {
 
-          
+          # addUser(username: String!): User
+
           connect(username: ID!): Presence
-          
-          disconnect(username: ID!): Presence
-          
-          disconnected(username: ID!): Presence
 
-
-          #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
+          #Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation: Conversation
 
-          # Delete the Conversation
-          removeConversation(conversationId: ID!): Conversation
-
-          # Delete  UserConversationBridge
-          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
-
-          #  Create a message in a Conversation.
+          #Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
 
-          # Replay the message in a Conversation.
-          replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
-
-          # edit message in Messages table
-          editMessage(conversationId: ID!, id: String!, content: String!): Message
-
-          # Create a user conversation.
+          #Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversationBridge
 
-          # addUser(username: String!): User
-          updateUser(username: String!,wallets: String!): User
+          disconnect(username: ID!): Presence
 
-          # set message id which user read
-          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
+          disconnected(username: ID!): Presence
 
-          # remove message in Messages table
+          #edit message in Messages table
+          editMessage(conversationId: ID!, id: String!, content: String!): Message
+
+          #Delete the Conversation
+          removeConversation(conversationId: ID!): Conversation
+
+          #remove message in Messages table
           removeMessage(conversationId: ID!, id: String!): Message
 
-         
+          #Delete  UserConversationBridge
+          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
 
+          #add reply to the message in a Conversation.
+          replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
+
+          #set message id which user read
+          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
+
+          updateUser(username: String!,wallets: String!): User
         }
 
         type Subscription  {
-          #  Subscribes to all new messages in a given Conversation.
+          onStatus(id: ID!): Presence
+            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
+
+          #Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
 
@@ -308,17 +308,13 @@ Resources:
           subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
             @aws_subscribe(mutations: ["removeUserConversationBridge"])
 
-          # Subscribes to all removed messages in a given Conversation
+          #Subscribes to all removed messages in a given Conversation
           subscribeToRemovedMessage(conversationId: ID!): Message
             @aws_subscribe(mutations: ["removeMessage"]) 
           
-          # Subscribes to read message
+          #Subscribes to read message
           subscribeToReadMessage(conversationId: ID!): UserConversationBridge
             @aws_subscribe(mutations: ["setRead"])
-
-          onStatus(id: ID!): Presence
-            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
-
         }
 
   UserTableDataSource:

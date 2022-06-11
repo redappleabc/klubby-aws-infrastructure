@@ -965,7 +965,7 @@ Resources:
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: geAllKlubs
+      FieldName: getAllKlubs
       DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: |
         {

@@ -972,12 +972,12 @@ Resources:
             "version" : "2017-02-28",
             "operation" : "Scan",
             "filter" : {
-              "expression" : "#name <> :name",
+              "expression" : "#klubname <> :klubname",
               "expressionNames" : {
-                  "#name" : "name"
+                  "#klubname" : "klubname"
               },
               "expressionValues" : {
-                  ":name" : {"S": "${context.identity.name}"}
+                  ":klubname" : {"S": "${context.identity.klubname}"}
               }
           },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **

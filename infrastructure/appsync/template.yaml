@@ -62,15 +62,15 @@ Resources:
             mutation: Mutation
         }
 
-        # enum Status {
-        #   online
-        #   offline
-        # }
+        enum Status {
+          online
+          offline
+        }
 
-        # type Presence {
-        #   username: ID!
-        #   status: Status!
-        # }
+        type Presence {
+          username: ID!
+          status: Status!
+        }
 
         type Conversation {
 

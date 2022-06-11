@@ -225,7 +225,7 @@ Resources:
           status(username: ID!): Presence
 
           # get all users
-          getAllUsers: [User]
+          listUsers: [User]
 
           # get users whose username starts with _username
           searchUsers(username: String!): [User]
@@ -242,14 +242,14 @@ Resources:
           # getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
 
           #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-          getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+          listMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
 
           #get all klubs
-          getAllKlubs: [Klub]
+          ListKlubs: [Klub]
 
           # get Me
           getMe: User
-          
+
 
           test: User
         }
@@ -766,13 +766,13 @@ Resources:
 
 
 
-  GetAllUsersResolver:
+  ListUsersResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllUsers
+      FieldName: listUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -929,13 +929,13 @@ Resources:
   #     ResponseMappingTemplate: |
   #       $utils.toJson($context.result.items)
 
-  getAllMessageConnectionsResolver:
+  ListMessageConnectionsResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessageConnections
+      FieldName: listMessageConnections
       DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -959,13 +959,13 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-  GetAllKlubsResolver:
+  ListKlubsResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllKlubs
+      FieldName: ListKlubs
       DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: |
         {

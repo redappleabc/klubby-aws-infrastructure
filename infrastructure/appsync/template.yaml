@@ -98,7 +98,8 @@ Resources:
           owner: String
 
           # the blockchain network e.g. Ethereum
-          network: String
+          #TODO only starting with eth network
+          #network: String
 
           # the contract address 
           contractAddress: String

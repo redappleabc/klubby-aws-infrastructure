@@ -237,7 +237,6 @@ Resources:
           mainGroupConversation: Conversation
 
 
-
           # This is sort key
           whaleGroupConversationID: ID!
 

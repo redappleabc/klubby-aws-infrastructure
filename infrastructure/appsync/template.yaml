@@ -216,6 +216,7 @@ Resources:
           conversations: KlubConversationBridge
 
         }
+        
 
         type KlubConversationBridge {
           

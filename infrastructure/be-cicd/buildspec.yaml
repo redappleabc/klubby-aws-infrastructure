@@ -10,7 +10,7 @@ phases:
       - cd ../../authentication
       - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
       - cd ../appsync
-      - aws cloudformation deploy --s3-bucket klubby-dev-artifacts-bucket  --stack-name klubby-appsync-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM \
+      - aws cloudformation deploy --s3-bucket klubby-dev-artifacts-bucket --stack-name klubby-appsync-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM CAPABILITY_NAMED_IAM CAPABILITY_AUTO_EXPAND\
         --parameter-override Stage=$STAGE UserTableName=user-table-name-$STAGE ConversationTableName=conversation-table-name-$STAGE \
          UserConversationBridgeTableName=userconversationbridge-table-name-$STAGE \
          UserKlubBridgeTableName=userklubbridge-table-name-$STAGE \

@@ -325,8 +325,8 @@ Resources:
 
         type Subscription  {
 
-          #onStatus(id: ID!): Presence
-          #  @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
+          onStatus(id: ID!): Presence
+            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
 
           #Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message

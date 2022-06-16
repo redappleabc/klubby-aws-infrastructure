@@ -68,9 +68,9 @@ Resources:
       #   Ref: graphQlSchemaS3DescriptionLocation
       Definition: |
         schema {
-            query: Query
-            mutation: Mutation
-            subscription: Subscription
+          query: Query
+          mutation: Mutation
+          subscription: Subscription
         }
 
         enum Status {
@@ -325,8 +325,8 @@ Resources:
 
         type Subscription  {
 
-          onStatus(id: ID!): Presence
-            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
+          #onStatus(id: ID!): Presence
+          #  @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
 
           #Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message

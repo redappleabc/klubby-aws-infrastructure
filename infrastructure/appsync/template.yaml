@@ -323,6 +323,7 @@ Resources:
         }
 
 
+
         type Subscription  {
 
           onStatus(id: ID!): Presence

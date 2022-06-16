@@ -60,6 +60,7 @@ Resources:
         AwsRegion: us-east-1
         DefaultAction: ALLOW
         # Ref: defaultAction
+
   Schema:
     Type: AWS::AppSync::GraphQLSchema
     Properties:

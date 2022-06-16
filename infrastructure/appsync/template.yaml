@@ -616,7 +616,6 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-
   CreateUserConversationBridgeMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema

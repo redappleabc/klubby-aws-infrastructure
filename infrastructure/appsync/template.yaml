@@ -48,7 +48,6 @@ Parameters:
   #   Type: AWS::SSM::Parameter::Value<String>
   #   Default: user-status-manage-funtion-${Stage}
   #   Description: user status manage function
-
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -217,7 +216,6 @@ Resources:
 
         }
         
-
         type KlubConversationBridge {
           
           # This is partition key

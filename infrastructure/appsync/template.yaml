@@ -114,6 +114,36 @@ Resources:
           # the contract address 
           contractAddress: String
 
+          # the blockchain explorer
+          blockchainExplorer: String
+          
+          # Website
+          website: String
+
+          # Social coinmarketcap
+          coinmarketcap: String
+
+          # Social coingecho
+          coingecho: String
+
+          # Social dextools
+          dextools: String
+
+          # Social telegram
+          telegram: String
+
+          # Social discord
+          discord: String
+
+          # Social twitter
+          twitter: String
+
+          # Social reddit
+          reddit: String
+
+          # Social instagram
+          instagram: String
+
           # the link where to buy.
           # linkToBuy: String
 

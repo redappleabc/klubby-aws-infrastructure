@@ -320,6 +320,9 @@ Resources:
           #Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation: Conversation
 
+          #Create a klub
+          createKlub(klubName: ID!): Klub
+
           #Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
 
@@ -689,6 +692,25 @@ Resources:
                 "username": { "S" : "${context.arguments.username}"},
                 "conversationId": { "S" : "${context.arguments.conversationId}"}
             }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  CreateKlubMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createKlub"
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key" : {
+              "klubName" : { "S" : "${context.arguments.klubName}" }
+          }
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)

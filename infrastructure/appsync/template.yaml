@@ -321,7 +321,7 @@ Resources:
           createConversation: Conversation
 
           #Create a klub
-          createKlub(klubName: ID!): Klub
+          createKlub(klubname: ID!): Klub
 
           #Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -709,7 +709,7 @@ Resources:
           "version" : "2017-02-28",
           "operation" : "PutItem",
           "key" : {
-              "klubName" : { "S" : "${context.arguments.klubName}" }
+              "klubname" : { "S" : "${context.arguments.klubname}" }
           }
         }
       ResponseMappingTemplate: |

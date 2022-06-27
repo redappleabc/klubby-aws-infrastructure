@@ -733,7 +733,7 @@ Resources:
           #set( $logo = $util.dynamodb.toS3Object($logo.key, $logo.bucket, $logo.region) )
           "attributeValues" : {
               "owner": {  "S": "${context.identity.username}" },
-              "logo" : $util.toJson($logo)
+              "logo" : $util.toJson($logo),
               "description": {  "S": "${context.arguments.description}" },
               "contractAddress": {  "S": "${context.arguments.contractAddress}" },
               "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },

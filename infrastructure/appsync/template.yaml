@@ -98,25 +98,25 @@ Resources:
 
         type Klub {
 
-          #  A unique identifier for the Klub.
-          id: ID!
-
           # The klub's name
-          klubname: String
+          klubname: String!
 
           # The creator of klub
-          owner: String
+          owner: String!
 
           # the blockchain network e.g. Ethereum
           #TODO only starting with eth network
           #network: String
 
           # the contract address 
-          contractAddress: String
+          contractAddress: String!
 
           # the blockchain explorer
-          blockchainExplorer: String
-          
+          blockchainExplorer: String!
+
+          # token type e.g. ERC20, ETH or ERC721
+          tokenType: String!
+
           # Website
           website: String
 
@@ -321,7 +321,9 @@ Resources:
           createConversation: Conversation
 
           #Create a klub
-          createKlub(klubname: ID!): Klub
+          '''createKlub(klubname: ID!, description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
+            website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String, 
+            coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
           #Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
@@ -710,6 +712,24 @@ Resources:
           "operation" : "PutItem",
           "key" : {
               "klubname" : { "S" : "${context.arguments.klubname}" }
+          },
+          "attributeValues" : {
+              "owner": {  "S": "${context.identity.username}" },
+              "contractAddress": {  "S": "${context.arguments.contractAddress}" },
+              "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
+              "tokenType": {  "S": "${context.arguments.tokenType}" },
+              "minimumAmountForMainGroup": {  "S": "${context.arguments.minimumAmountForMainGroup}" },
+              "minimumAmountForWhaleGroup": {  "S": "${context.arguments.minimumAmountForWhaleGroup}" },
+              "website": {  "S": "${context.arguments.website}" },
+              "coinmarketcap": {  "S": "${context.arguments.coinmarketcap}" },
+              "coingecho": {  "S": "${context.arguments.coingecho}" },
+              "dextools": {  "S": "${context.arguments.dextools}" },
+              "telegram": {  "S": "${context.arguments.telegram}" },
+              "discord": {  "S": "${context.arguments.discord}" },
+              "twitter": {  "S": "${context.arguments.twitter}" },
+              "reddit": {  "S": "${context.arguments.reddit}" },
+              "instagram": {  "S": "${context.arguments.instagram}" },
+              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
           }
         }
       ResponseMappingTemplate: |

@@ -719,7 +719,7 @@ Resources:
               "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
               "tokenType": {  "S": "${context.arguments.tokenType}" },
               "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "S": "${context.arguments.minimumAmountForMainGroup}" } #else {"S":"0"} #end,
-              "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "S": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"S":"0"},
+              "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "S": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"S":"0"} #end,
               "website": {  "S": "${context.arguments.website}" },
               "coinmarketcap": {  "S": "${context.arguments.coinmarketcap}" },
               "coingecho": {  "S": "${context.arguments.coingecho}" },

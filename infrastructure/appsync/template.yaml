@@ -94,12 +94,25 @@ Resources:
           messages(after: String, first: Int): MessageConnection
         }
 
+        type S3Object {
+          bucket: String!
+          key: String!
+          region: String!
+        }
 
+        input S3ObjectInput {
+          bucket: String!
+          key: String!
+          region: String!
+        }
 
         type Klub {
 
           # The klub's name
           klubname: String!
+
+          # logo image for this klub
+          logo: S3Object!
 
           # description for this klub
           description: String!
@@ -324,7 +337,7 @@ Resources:
           createConversation: Conversation
 
           #Create a klub
-          '''createKlub(klubname: ID!, description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
+          '''createKlub(klubname: ID!, logo: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
             website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String, 
             coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
@@ -716,8 +729,11 @@ Resources:
           "key" : {
               "klubname" : { "S" : "${context.arguments.klubname}" }
           },
+          #set( $logo = ${context.arguments.logo} )
+          #set( $logo = $util.dynamodb.toS3Object($logo.key, $logo.bucket, $logo.region) )
           "attributeValues" : {
               "owner": {  "S": "${context.identity.username}" },
+              "logo" : $util.toJson($logo)
               "description": {  "S": "${context.arguments.description}" },
               "contractAddress": {  "S": "${context.arguments.contractAddress}" },
               "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
@@ -725,7 +741,7 @@ Resources:
               "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "S": "${context.arguments.minimumAmountForMainGroup}" } #else {"S":"0"} #end,
               "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "S": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"S":"0"} #end,
               "website": {  "S": "${context.arguments.website}" },
-              "coinmarketcap": {  "S": "${context.arguments.coinmarketcap}" },
+              "coinmarketcap": {  "S": "$context.arguments.coinmarketcap" },
               "coingecho": {  "S": "${context.arguments.coingecho}" },
               "dextools": {  "S": "${context.arguments.dextools}" },
               "telegram": {  "S": "${context.arguments.telegram}" },
@@ -737,6 +753,8 @@ Resources:
           }
         }
       ResponseMappingTemplate: |
+        #set($logo = $util.dynamodb.fromS3ObjectJson($context.result.logo))
+        #set($context.result.logo = $logo)
         $utils.toJson($context.result)
 
   CreateMessageMutationResolver:

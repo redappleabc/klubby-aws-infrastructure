@@ -111,8 +111,8 @@ Resources:
           # The klub's name
           klubname: String!
 
-          # logo image for this klub
-          logo: S3Object!
+          # avatar image for this klub
+          avatar: S3Object!
 
           # description for this klub
           description: String!
@@ -303,7 +303,7 @@ Resources:
           heartbeat(username: ID!): Presence
 
           #get all klubs
-          ListKlubs: [Klub]
+          searchKlubs(klubname: String!): [Klub]
 
           #Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
           listMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
@@ -337,7 +337,7 @@ Resources:
           createConversation: Conversation
 
           #Create a klub
-          '''createKlub(klubname: ID!, logo: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
+          '''createKlub(klubname: ID!, avatar: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
             website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String, 
             coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
@@ -729,11 +729,11 @@ Resources:
           "key" : {
               "klubname" : { "S" : "${context.arguments.klubname}" }
           },
-          #set( $logo = ${context.arguments.logo} )
-          #set( $logo = $util.dynamodb.toS3Object($logo.key, $logo.bucket, $logo.region) )
+          #set( $avatar = ${context.arguments.avatar} )
+          #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
           "attributeValues" : {
               "owner": {  "S": "${context.identity.username}" },
-              "logo" : $util.toJson($logo),
+              "avatar" : $util.toJson($avatar),
               "description": {  "S": "${context.arguments.description}" },
               "contractAddress": {  "S": "${context.arguments.contractAddress}" },
               "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
@@ -753,8 +753,8 @@ Resources:
           }
         }
       ResponseMappingTemplate: |
-        #set($logo = $util.dynamodb.fromS3ObjectJson($context.result.logo))
-        #set($context.result.logo = $logo)
+        #set($avatar = $util.dynamodb.fromS3ObjectJson($context.result.avatar))
+        #set($context.result.avatar = $avatar)
         $utils.toJson($context.result)
 
   CreateMessageMutationResolver:
@@ -966,7 +966,7 @@ Resources:
                   ":myname" : {"S": "${context.identity.username}"},
                   ":username" : {"S": "${context.arguments.username}"}
               }
-          },
+            },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
             ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
             ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
@@ -1159,27 +1159,27 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-  ListKlubsResolver:
+  SearchKlubsResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: ListKlubs
+      FieldName: searchKlubs
       DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
             "operation" : "Scan",
             "filter" : {
-              "expression" : "#klubname <> :klubname",
+              "expression" : "begins_with(#klubname, :klubname)",
               "expressionNames" : {
                   "#klubname" : "klubname"
               },
               "expressionValues" : {
-                  ":klubname" : {"S": "${context.identity.klubname}"}
+                  ":klubname" : {"S": "${context.arguments.klubname}"}
               }
-          },
+            },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
             ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
             ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))

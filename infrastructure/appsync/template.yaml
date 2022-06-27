@@ -741,14 +741,14 @@ Resources:
               "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "S": "${context.arguments.minimumAmountForMainGroup}" } #else {"S":"0"} #end,
               "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "S": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"S":"0"} #end,
               "website": {  "S": "${context.arguments.website}" },
-              "coinmarketcap": {  "S": "$context.arguments.coinmarketcap" },
-              "coingecho": {  "S": "${context.arguments.coingecho}" },
-              "dextools": {  "S": "${context.arguments.dextools}" },
-              "telegram": {  "S": "${context.arguments.telegram}" },
-              "discord": {  "S": "${context.arguments.discord}" },
-              "twitter": {  "S": "${context.arguments.twitter}" },
-              "reddit": {  "S": "${context.arguments.reddit}" },
-              "instagram": {  "S": "${context.arguments.instagram}" },
+              "coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
+              "coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
+              "dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
+              "telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
+              "discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
+              "twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
+              "reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
+              "instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end,
               "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
           }
         }

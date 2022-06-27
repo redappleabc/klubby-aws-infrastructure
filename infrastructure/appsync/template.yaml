@@ -101,6 +101,9 @@ Resources:
           # The klub's name
           klubname: String!
 
+          # description for this klub
+          description: String!
+
           # The creator of klub
           owner: String!
 
@@ -715,6 +718,7 @@ Resources:
           },
           "attributeValues" : {
               "owner": {  "S": "${context.identity.username}" },
+              "description": {  "S": "${context.arguments.description}" },
               "contractAddress": {  "S": "${context.arguments.contractAddress}" },
               "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
               "tokenType": {  "S": "${context.arguments.tokenType}" },

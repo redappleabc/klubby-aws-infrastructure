@@ -729,6 +729,9 @@ Resources:
           "key" : {
               "klubname" : { "S" : "${context.arguments.klubname}" }
           },
+          "condition" : {
+            "expression": "attribute_not_exists(${context.arguments.klubname})"
+          },
           #set( $avatar = ${context.arguments.avatar} )
           #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
           "attributeValues" : {

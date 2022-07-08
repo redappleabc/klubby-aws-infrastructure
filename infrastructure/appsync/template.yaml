@@ -229,7 +229,7 @@ Resources:
           name: String
 
           # The other's UserConversationBrdige. This field has resolver.
-          associated: UserConversationBridge
+          associated: [UserConversationBridge]
 
           # The conversation related me. This field has resolver.
           conversation: Conversation
@@ -1307,11 +1307,8 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        #if($context.result.items.size() > 0) 
-          $util.toJson($context.result.items[0]) 
-        #else 
-          null
-        #end
+        $util.toJson($context.result.items) 
+   
 
 
   UpdateUserResolver:

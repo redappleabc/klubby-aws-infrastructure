@@ -228,6 +228,8 @@ Resources:
 
           name: String
 
+          accepted: Boolean;
+
           # The other's UserConversationBrdige. This field has resolver.
           associated: [UserConversationBridge]
 
@@ -345,7 +347,9 @@ Resources:
           createMessage(content: String!, conversationId: ID!): Message
 
           #Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversationBridge
+          createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
+
+          acceptConversation(conversationId: ID!): UserConversationBridge
 
           disconnect(username: ID!): Presence
 
@@ -686,7 +690,35 @@ Resources:
             "attributeValues" : {
                 "username": {  "S": "${context.arguments.username}" },
                 "conversationId": {  "S": "${context.arguments.conversationId}" },
-                "name": {  "S": "${context.arguments.name}" }
+                "name": {  "S": "${context.arguments.name}" },
+                "accepted": {  "BOOL": ${context.arguments.accepted} }
+            }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  AcceptConversationUserConversationBridgeMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "acceptConversation"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "UpdateItem",
+            "key" : {
+                "username" : {  "S": "${context.identity.username}" },
+                "conversationId" : {  "S": "${context.arguments.conversationId}" }
+            },
+            "update" : {
+                "expression" : "SET accepted = :accepted",
+                "expressionValues": {
+                    ":accepted" :  {  "BOOL": true }
+                }
             }
         }
       ResponseMappingTemplate: |

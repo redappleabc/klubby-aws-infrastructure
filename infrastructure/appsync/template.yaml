@@ -347,7 +347,7 @@ Resources:
           createMessage(content: String!, conversationId: ID!): Message
 
           #Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
+          createUserConversationBridge(conversationId: ID!, usernames: [ID]!): [UserConversationBridge]
 
           acceptConversation(conversationId: ID!): UserConversationBridge
 
@@ -680,20 +680,29 @@ Resources:
       FieldName: "createUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
+        #set($userConversationBridges = [])
+        #foreach($username in ${ctx.args.usernames})
+            #set($userConversation = {})
+            $util.qr($userConversation.put("username", $util.dynamodb.toString($username)))
+            $util.qr($userConversation.put("conversationId", $util.dynamodb.toString(${context.arguments.conversationId})))
+            $util.qr($userConversation.put("name", ""))
+            $util.qr($userConversation.put("accepted", $util.dynamodb.toBoolean(false)))
+            $util.qr($userConversationBridges.add($util.dynamodb.toMapValues($userConversation)))
+        #end
+        #set($userConversation = {})
+        $util.qr($userConversation.put("username", $util.dynamodb.toString(${context.identity.username})))
+        $util.qr($userConversation.put("conversationId", $util.dynamodb.toString(${context.arguments.conversationId})))
+        $util.qr($userConversation.put("name", ""))
+        $util.qr($userConversation.put("accepted", $util.dynamodb.toBoolean(true)))
+        $util.qr($userConversationBridges.add($util.dynamodb.toMapValues($userConversation)))
         {
             "version" : "2017-02-28",
-            "operation" : "PutItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "attributeValues" : {
-                "username": {  "S": "${context.arguments.username}" },
-                "conversationId": {  "S": "${context.arguments.conversationId}" },
-                "name": {  "S": "${context.arguments.name}" },
-                "accepted": {  "BOOL": ${context.arguments.accepted} }
+            "operation" : "BatchPutItem",
+            "tables" : {
+                "${UserConversationBridgeTable}": $utils.toJson($userConversationBridges)
             }
         }
+        - {UserConversationBridgeTable: !Ref UserConversationBridgeTableName}
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

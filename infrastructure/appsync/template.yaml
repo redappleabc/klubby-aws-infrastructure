@@ -690,8 +690,8 @@ Resources:
             "attributeValues" : {
                 "username": {  "S": "${context.arguments.username}" },
                 "conversationId": {  "S": "${context.arguments.conversationId}" },
-                "name": {  "S": "${context.arguments.name}" },
-                "accepted": {  "BOOL": ${context.arguments.accepted} }
+                "name": #if(${context.arguments.name}) {  "S": "${context.arguments.name}" } #else {"S":""} #end,
+                "accepted": #if(${context.arguments.accepted}) {  "BOOL": ${context.arguments.accepted} } #else {"BOOL":false} #end
             }
         }
       ResponseMappingTemplate: |

@@ -347,7 +347,7 @@ Resources:
           createMessage(content: String!, conversationId: ID!): Message
 
           #Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, usernames: [ID]!): [UserConversationBridge]
+          createUserConversationBridge(usernames: [ID]!): [UserConversationBridge]
 
           acceptConversation(conversationId: ID!): UserConversationBridge
 
@@ -387,7 +387,7 @@ Resources:
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
 
-          subscribeToNewUserConversationBridge(username:ID!): UserConversationBridge
+          subscribeToNewUserConversationBridge: [UserConversationBridge]
             @aws_subscribe(mutations: ["createUserConversationBridge"])
 
           subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
@@ -680,31 +680,59 @@ Resources:
       FieldName: "createUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
       RequestMappingTemplate: |
+        #set($conversation = {})
+        #set($conversationId = $util.autoId())
+        #set($createdAt = $util.time.nowEpochMilliSeconds())
+        $util.qr($conversation.put("conversationId", $util.dynamodb.toString($conversationId)))
+        $util.qr($conversation.put("createdAt", $util.dynamodb.toString($createdAt)))
+
         #set($userConversationBridges = [])
         #foreach($username in ${ctx.args.usernames})
             #set($userConversation = {})
             $util.qr($userConversation.put("username", $util.dynamodb.toString($username)))
-            $util.qr($userConversation.put("conversationId", $util.dynamodb.toString(${context.arguments.conversationId})))
+            $util.qr($userConversation.put("conversationId", $util.dynamodb.toString($conversationId)))
             $util.qr($userConversation.put("name", ""))
             $util.qr($userConversation.put("accepted", $util.dynamodb.toBoolean(false)))
             $util.qr($userConversationBridges.add($util.dynamodb.toMapValues($userConversation)))
         #end
         #set($userConversation = {})
         $util.qr($userConversation.put("username", $util.dynamodb.toString(${context.identity.username})))
-        $util.qr($userConversation.put("conversationId", $util.dynamodb.toString(${context.arguments.conversationId})))
+        $util.qr($userConversation.put("conversationId", $util.dynamodb.toString($conversationId)))
         $util.qr($userConversation.put("name", ""))
         $util.qr($userConversation.put("accepted", $util.dynamodb.toBoolean(true)))
         $util.qr($userConversationBridges.add($util.dynamodb.toMapValues($userConversation)))
+        
         {
             "version" : "2017-02-28",
             "operation" : "BatchPutItem",
             "tables" : {
-                "${UserConversationBridgeTable}": $utils.toJson($userConversationBridges)
+                "${UserConversationBridgeTable}": $utils.toJson($userConversationBridges),
+                "${ConversationTable}": $utils.toJson([$util.dynamodb.toMapValues($conversation)])
             }
         }
-        - {UserConversationBridgeTable: !Ref UserConversationBridgeTableName}
+        {
+          UserConversationBridgeTable: !Ref UserConversationBridgeTableName,
+          ConversationTable: !Ref ConversationTableName
+        }
       ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+        $extensions.setSubscriptionFilter({
+            "filterGroup": [
+                {
+                  "filters" : [
+                        {
+                            "fieldName" : "username",
+                            "operator" : "in",
+                            "value" : ${ctx.args.usernames}
+                        }
+                  ]
+                }
+            ]
+        })
+        
+        $utils.toJson($context.result.data["${UserConversationBridgeTable}"])
+        { 
+          UserConversationBridgeTable: !Ref UserConversationBridgeTableName
+        }
 
 
   AcceptConversationUserConversationBridgeMutationResolver:

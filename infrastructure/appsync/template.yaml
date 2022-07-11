@@ -387,7 +387,7 @@ Resources:
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
 
-          subscribeToNewUserConversationBridge: [UserConversationBridge]
+          subscribeToNewUserConversationBridge(username: ID!): [UserConversationBridge]
             @aws_subscribe(mutations: ["createUserConversationBridge"])
 
           subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
@@ -715,20 +715,6 @@ Resources:
           ConversationTable: !Ref ConversationTableName
         }
       ResponseMappingTemplate: |
-        $extensions.setSubscriptionFilter({
-            "filterGroup": [
-                {
-                  "filters" : [
-                        {
-                            "fieldName" : "username",
-                            "operator" : "in",
-                            "value" : ${ctx.args.usernames}
-                        }
-                  ]
-                }
-            ]
-        })
-        
         $utils.toJson($context.result.data["${UserConversationBridgeTable}"])
         { 
           UserConversationBridgeTable: !Ref UserConversationBridgeTableName

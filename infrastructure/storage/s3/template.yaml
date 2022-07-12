@@ -84,6 +84,7 @@ Resources:
               AWS:
                 - '*'
 
+
 ### SSM PARAMS ###
   ArtifactsBucketName:
     Type: AWS::SSM::Parameter

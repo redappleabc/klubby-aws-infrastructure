@@ -17,7 +17,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub ${ProjectName}-${Stage}-artifacts-bucket
 
   AndroidBuildBucket:
     Type: AWS::S3::Bucket
@@ -26,7 +25,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub ${ProjectName}-android-build-${Stage}-bucket
 
   ReleaseBucket:
     Type: AWS::S3::Bucket
@@ -35,7 +33,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub ${ProjectName}-${Stage}-release-bucket
 
   DebugBucket:
     Type: AWS::S3::Bucket
@@ -44,7 +41,6 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      BucketName: !Sub ${ProjectName}-${Stage}-debug-bucket
 
   KlubAvatarBucket:
     Type: AWS::S3::Bucket
@@ -70,9 +66,6 @@ Resources:
               - x-amz-id-2
               - ETag
             MaxAge: 3600
-      BucketName: !Sub ${ProjectName}-${Stage}-klub-avatar-bucket
-    
-    
     
   KlubAvatarBucketPolicy:
     Type: AWS::S3::BucketPolicy
@@ -90,3 +83,14 @@ Resources:
             Principal:
               AWS:
                 - '*'
+
+### SSM PARAMS ###
+  ArtifactsBucketName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub artifacts-bucket-name-${Stage}
+      Type: String
+      Value: !Ref ArtifactsBucket
+      Description: SSM Parameter for artifacts bucket name
+      Tags:
+        Environment: !Ref Stage

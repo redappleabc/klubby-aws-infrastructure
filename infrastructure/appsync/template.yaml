@@ -87,6 +87,9 @@ Resources:
           #  A unique identifier for the Conversation.
           id: ID!
 
+          # The Conversation's creator
+          creator: String
+
           #  The Conversation's timestamp.
           createdAt: String
           
@@ -604,11 +607,13 @@ Resources:
           },
           "attributeValues" : {
              "id": {  "S": "$util.autoId()" },
+             "creator": {  "S": "${context.identity.username}" },
              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
           }
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
 
   # removeConversationMutationResolver:
   #   Type: "AWS::AppSync::Resolver"

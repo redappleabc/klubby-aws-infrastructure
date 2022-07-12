@@ -17,6 +17,7 @@ phases:
     #----Deploy landing-page Function-------#
       #not actually deploying this for now
 
+
     #----Deploy web3-queries Function-------#
       - cd ../web3-queries
       - sam build

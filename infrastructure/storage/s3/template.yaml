@@ -90,3 +90,15 @@ Resources:
             Principal:
               AWS:
                 - '*'
+
+
+### SSM PARAMS ###
+  ArtifactsBucketName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub artifacts-bucket-name-${Stage}
+      Type: String
+      Value: !Ref ArtifactsBucket
+      Description: SSM Parameter for artifacts bucket name
+      Tags:
+        Environment: !Ref Stage

@@ -26,6 +26,16 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: userconversationbridge-table-name-${Stage}
     Description: user conversation table name
+
+  KlubConversationBridgeTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: klubconversationbridge-table-name-${Stage}
+    Description: user conversation table name
+
+  UserKlubBridgeTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: userklubbridge-table-name-${Stage}
+    Description: user conversation table name
   MessageTableName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: message-table-name-${Stage}
@@ -38,7 +48,6 @@ Parameters:
   #   Type: AWS::SSM::Parameter::Value<String>
   #   Default: user-status-manage-funtion-${Stage}
   #   Description: user status manage function
-
 Resources:
   GraphQLApi:
     Type: AWS::AppSync::GraphQLApi
@@ -58,8 +67,9 @@ Resources:
       #   Ref: graphQlSchemaS3DescriptionLocation
       Definition: |
         schema {
-            query: Query
-            mutation: Mutation
+          query: Query
+          mutation: Mutation
+          subscription: Subscription
         }
 
         enum Status {
@@ -84,27 +94,74 @@ Resources:
           messages(after: String, first: Int): MessageConnection
         }
 
+        type S3Object {
+          bucket: String!
+          key: String!
+          region: String!
+        }
 
+        input S3ObjectInput {
+          bucket: String!
+          key: String!
+          region: String!
+        }
 
         type Klub {
 
-          #  A unique identifier for the Klub.
-          id: ID!
-
           # The klub's name
-          name: String
+          klubname: String!
+
+          # avatar image for this klub
+          avatar: S3Object!
+
+          # description for this klub
+          description: String!
 
           # The creator of klub
-          owner: String
+          owner: String!
 
-          # the blockchain network i.e. Ethereum
-          network: String
+          # the blockchain network e.g. Ethereum
+          #TODO only starting with eth network
+          #network: String
 
           # the contract address 
-          contractAddress: String
+          contractAddress: String!
+
+          # the blockchain explorer
+          blockchainExplorer: String!
+
+          # token type e.g. ERC20, ETH or ERC721
+          tokenType: String!
+
+          # Website
+          website: String
+
+          # Social coinmarketcap
+          coinmarketcap: String
+
+          # Social coingecho
+          coingecho: String
+
+          # Social dextools
+          dextools: String
+
+          # Social telegram
+          telegram: String
+
+          # Social discord
+          discord: String
+
+          # Social twitter
+          twitter: String
+
+          # Social reddit
+          reddit: String
+
+          # Social instagram
+          instagram: String
 
           # the link where to buy.
-          linkToBuy: String
+          # linkToBuy: String
 
           # threshold for owning tokens to be a member of MAIN GROUP.
           minimumAmountForMainGroup: String
@@ -112,7 +169,7 @@ Resources:
           # threshold for owning tokens to be a member of WHALE GROUP.
           minimumAmountForWhaleGroup: String
 
-          #  The Conversation's timestamp.
+          #  The Klubs's timestamp.
           createdAt: String
          
           
@@ -134,15 +191,15 @@ Resources:
           # The original message for a replay messages.
           originalMessage: Message
 
-      
           #  The message timestamp.
           createdAt: String
+
           updatedAt: String
          
           #  Flag denoting if this message has been accepted by the server or not.
           isSent: Boolean
-          sender: String
 
+          sender: String
         }
 
         type MessageConnection {
@@ -151,6 +208,7 @@ Resources:
         }
 
         type User {
+          # This is partition key
           username: String!
           wallets: String
           #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
@@ -170,8 +228,10 @@ Resources:
 
           name: String
 
+          accepted: Boolean;
+
           # The other's UserConversationBrdige. This field has resolver.
-          associated: UserConversationBridge
+          associated: [UserConversationBridge]
 
           # The conversation related me. This field has resolver.
           conversation: Conversation
@@ -187,7 +247,7 @@ Resources:
           username: ID!
 
           # This is sort key
-          klubId: ID!
+          klubname: ID!
 
 
           # latest message id for main group which I has read
@@ -199,107 +259,131 @@ Resources:
           # latest message id for announcement which I has read
           readAnnouncement: String
 
-        }
+          #This is pointer to KlubConversationBridge for this Klub.
+          conversations: KlubConversationBridge
 
+        }
+        
         type KlubConversationBridge {
           
           # This is partition key
-          klubId: ID!
+          klubname: ID!
+
 
           # This is sort key
           announcementConversationId: ID!
 
+          # This is pointer to Conversation for above announcementConversationId
+          announcementConversatioin: Conversation
+
+
+
           # This is sort key
           mainGroupConversationId: ID!
 
+          # This is pointer to Conversation for above mainGroupConversationId
+          mainGroupConversation: Conversation
+
+
           # This is sort key
           whaleGroupConversationID: ID!
+
+          # This is pointer to Conversation for above whaleGroupConversationId
+          whaleGroupConversation: Conversation
 
         }
 
 
         type Query {
 
+          # get Me
+          getMe: User
+
+          #get user wallets
+          getUserWallets(username: String!): User
+
           heartbeat(username: ID!): Presence
 
-          status(username: ID!): Presence
+          #get all klubs
+          searchKlubs(klubname: String!): [Klub]
 
-          # get all users
-          getAllUsers: [User]
+          #Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
+          listMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+
+          #get all users
+          listUsers: [User]
 
           # get users whose username starts with _username
           searchUsers(username: String!): [User]
 
-          # get user wallets
-          getUserWallets(username: String!): User
+          status(username: ID!): Presence
 
-          # For now this is not used.
-          # Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-          # getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
+          #For now this is not used.
+          #Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
+          #getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
 
           #For now this is not being used.
-          # TODO what does this do
-          # getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
-
-          #  Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-          getAllMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
-
-          #get all klubs
-          getAllKlubs: [Klub]
-
-          # get Me
-          getMe: User
-          
+          #TODO what does this do
+          #getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
 
           test: User
         }
 
         type Mutation {
 
-          
+          # addUser(username: String!): User
+
           connect(username: ID!): Presence
-          
-          disconnect(username: ID!): Presence
-          
-          disconnected(username: ID!): Presence
 
-
-          #  Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
+          #Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
           createConversation: Conversation
 
-          # Delete the Conversation
-          removeConversation(conversationId: ID!): Conversation
+          #Create a klub
+          '''createKlub(klubname: ID!, avatar: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
+            website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String, 
+            coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
-          # Delete  UserConversationBridge
-          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
-
-          #  Create a message in a Conversation.
+          #Create a message in a Conversation.
           createMessage(content: String!, conversationId: ID!): Message
 
-          # Replay the message in a Conversation.
-          replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
+          #Create a user conversation.
+          createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
 
-          # edit message in Messages table
+          acceptConversation(conversationId: ID!): UserConversationBridge
+
+          disconnect(username: ID!): Presence
+
+          disconnected(username: ID!): Presence
+
+          #edit message in Messages table
           editMessage(conversationId: ID!, id: String!, content: String!): Message
 
-          # Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, username: ID!, name: String): UserConversationBridge
+          #Delete the Conversation
+          removeConversation(conversationId: ID!): Conversation
 
-          # addUser(username: String!): User
-          updateUser(username: String!,wallets: String!): User
-
-          # set message id which user read
-          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
-
-          # remove message in Messages table
+          #remove message in Messages table
           removeMessage(conversationId: ID!, id: String!): Message
 
-         
+          #Delete  UserConversationBridge
+          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
 
+          #add reply to the message in a Conversation.
+          replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
+
+          #set message id which user read
+          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
+
+          updateUser(username: String!,wallets: String!): User
         }
 
+
+
         type Subscription  {
-          #  Subscribes to all new messages in a given Conversation.
+
+          onStatus(id: ID!): Presence
+            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
+
+          #Subscribes to all new messages in a given Conversation.
           subscribeToNewMessage(conversationId: ID!): Message
             @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
 
@@ -309,17 +393,13 @@ Resources:
           subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
             @aws_subscribe(mutations: ["removeUserConversationBridge"])
 
-          # Subscribes to all removed messages in a given Conversation
+          #Subscribes to all removed messages in a given Conversation
           subscribeToRemovedMessage(conversationId: ID!): Message
             @aws_subscribe(mutations: ["removeMessage"]) 
           
-          # Subscribes to read message
+          #Subscribes to read message
           subscribeToReadMessage(conversationId: ID!): UserConversationBridge
             @aws_subscribe(mutations: ["setRead"])
-
-          onStatus(id: ID!): Presence
-            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
-
         }
 
   UserTableDataSource:
@@ -358,6 +438,34 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref UserConversationBridgeTableName
 
+  KlubConversationBridgeTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub KlubConversationBridgeDynamoDBTable_${Stage}
+      Description: The User Conversation DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref KlubConversationBridgeTableName
+
+
+  UserKlubBridgeTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub UserKlubBridgeDynamoDBTable_${Stage}
+      Description: The User Conversation DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref UserKlubBridgeTableName
+
+
+
+
   MessageTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
@@ -370,7 +478,7 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
 
-  KubTableDataSource:
+  KlubTableDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
@@ -504,7 +612,7 @@ Resources:
 
   # removeConversationMutationResolver:
   #   Type: "AWS::AppSync::Resolver"
-  #   DependsOn: Schema
+  #   DependsOn: Schema                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
   #   Properties:
   #     ApiId: !GetAtt GraphQLApi.ApiId
   #     TypeName: "Mutation"
@@ -563,7 +671,6 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-
   CreateUserConversationBridgeMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -583,7 +690,87 @@ Resources:
             "attributeValues" : {
                 "username": {  "S": "${context.arguments.username}" },
                 "conversationId": {  "S": "${context.arguments.conversationId}" },
-                "name": {  "S": "${context.arguments.name}" }
+                "name": #if(${context.arguments.name}) {  "S": "${context.arguments.name}" } #else {"S":""} #end,
+                "accepted": #if(${context.arguments.accepted}) {  "BOOL": ${context.arguments.accepted} } #else {"BOOL":false} #end
+            }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+
+  # CreateUserConversationBridgeMutationResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: "Mutation"
+  #     FieldName: "createUserConversationBridge"
+  #     DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+  #     RequestMappingTemplate: |
+  #       #set($conversation = {})
+  #       #set($conversationId = $util.autoId())
+  #       #set($createdAt = $util.time.nowEpochMilliSeconds())
+  #       $util.qr($conversation.put("conversationId", $util.dynamodb.toString($conversationId)))
+  #       $util.qr($conversation.put("createdAt", $util.dynamodb.toString($createdAt)))
+
+  #       #set($userConversationBridges = [])
+  #       #foreach($username in ${ctx.args.usernames})
+  #           #set($userConversation = {})
+  #           $util.qr($userConversation.put("username", $util.dynamodb.toString($username)))
+  #           $util.qr($userConversation.put("conversationId", $util.dynamodb.toString($conversationId)))
+  #           $util.qr($userConversation.put("name", ""))
+  #           $util.qr($userConversation.put("accepted", $util.dynamodb.toBoolean(false)))
+  #           $util.qr($userConversationBridges.add($util.dynamodb.toMapValues($userConversation)))
+  #       #end
+  #       #set($userConversation = {})
+  #       $util.qr($userConversation.put("username", $util.dynamodb.toString(${context.identity.username})))
+  #       $util.qr($userConversation.put("conversationId", $util.dynamodb.toString($conversationId)))
+  #       $util.qr($userConversation.put("name", ""))
+  #       $util.qr($userConversation.put("accepted", $util.dynamodb.toBoolean(true)))
+  #       $util.qr($userConversationBridges.add($util.dynamodb.toMapValues($userConversation)))
+        
+  #       {
+  #           "version" : "2017-02-28",
+  #           "operation" : "BatchPutItem",
+  #           "tables" : {
+  #               "${UserConversationBridgeTable}": $utils.toJson($userConversationBridges),
+  #               "${ConversationTable}": $utils.toJson([$util.dynamodb.toMapValues($conversation)])
+  #           }
+  #       }
+  #       {
+  #         UserConversationBridgeTable: !Ref UserConversationBridgeTableName,
+  #         ConversationTable: !Ref ConversationTableName
+  #       }
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result.data["${UserConversationBridgeTable}"])
+  #       { 
+  #         UserConversationBridgeTable: !Ref UserConversationBridgeTableName
+  #       }
+
+
+
+  AcceptConversationUserConversationBridgeMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "acceptConversation"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "UpdateItem",
+            "key" : {
+                "username" : {  "S": "${context.identity.username}" },
+                "conversationId" : {  "S": "${context.arguments.conversationId}" }
+            },
+            "update" : {
+                "expression" : "SET accepted = :accepted",
+                "expressionValues": {
+                    ":accepted" :  {  "BOOL": true }
+                }
             }
         }
       ResponseMappingTemplate: |
@@ -609,6 +796,52 @@ Resources:
             }
         }
       ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  CreateKlubMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createKlub"
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "PutItem",
+          "key" : {
+              "klubname" : { "S" : "${context.arguments.klubname}" }
+          },
+          "condition" : {
+            "expression": "attribute_not_exists(klubname)"
+          },
+          #set( $avatar = ${context.arguments.avatar} )
+          #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
+          "attributeValues" : {
+              "owner": {  "S": "${context.identity.username}" },
+              "avatar" : $util.toJson($avatar),
+              "description": {  "S": "${context.arguments.description}" },
+              "contractAddress": {  "S": "${context.arguments.contractAddress}" },
+              "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
+              "tokenType": {  "S": "${context.arguments.tokenType}" },
+              "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "S": "${context.arguments.minimumAmountForMainGroup}" } #else {"S":"0"} #end,
+              "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "S": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"S":"0"} #end,
+              "website": #if(${context.arguments.website}) {  "S": "${context.arguments.website}" } #else {"S":""} #end,
+              "coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
+              "coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
+              "dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
+              "telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
+              "discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
+              "twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
+              "reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
+              "instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end,
+              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
+          }
+        }
+      ResponseMappingTemplate: |
+        #set($avatar = $util.dynamodb.fromS3ObjectJson($context.result.avatar))
+        #set($context.result.avatar = $avatar)
         $utils.toJson($context.result)
 
   CreateMessageMutationResolver:
@@ -766,13 +999,13 @@ Resources:
 
 
 
-  GetAllUsersResolver:
+  ListUsersResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllUsers
+      FieldName: listUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -820,7 +1053,7 @@ Resources:
                   ":myname" : {"S": "${context.identity.username}"},
                   ":username" : {"S": "${context.arguments.username}"}
               }
-          },
+            },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
             ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
             ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
@@ -876,7 +1109,7 @@ Resources:
 
         
 
-  conversationsUserResolver:
+  ConversationsUserResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
@@ -902,6 +1135,60 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
     
+
+  KlubsUserResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "User"
+      FieldName: "klubs"
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "username = :username",
+              "expressionValues" : {
+                  ":username" : {
+                      "S" : "${context.identity.username}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": 1000
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+
+
+
+  ConversationsUserKlubBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "UserKlubBridge"
+      FieldName: "conversations"
+      DataSourceName: !GetAtt KlubConversationBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "Query",
+          "query" : {
+              "expression": "klubname = :klubname",
+              "expressionValues" : {
+                  ":klubname" : {
+                      "S" : "${context.source.klubname}"
+                  }
+              }
+          },
+          "scanIndexForward": false,
+          "limit": 1000
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
 
   # getAllMessagesResolver:
   #   Type: "AWS::AppSync::Resolver"
@@ -929,13 +1216,13 @@ Resources:
   #     ResponseMappingTemplate: |
   #       $utils.toJson($context.result.items)
 
-  getAllMessageConnectionsResolver:
+  ListMessageConnectionsResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllMessageConnections
+      FieldName: listMessageConnections
       DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplate: |
         {
@@ -959,27 +1246,27 @@ Resources:
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
 
-  GetAllUsersResolver:
+  SearchKlubsResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: getAllUsers
-      DataSourceName: !GetAtt UserTableDataSource.Name
+      FieldName: searchKlubs
+      DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
             "operation" : "Scan",
             "filter" : {
-              "expression" : "#name <> :name",
+              "expression" : "begins_with(#klubname, :klubname)",
               "expressionNames" : {
-                  "#name" : "name"
+                  "#klubname" : "klubname"
               },
               "expressionValues" : {
-                  ":name" : {"S": "${context.identity.name}"}
+                  ":klubname" : {"S": "${context.arguments.klubname}"}
               }
-          },
+            },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
             ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
             ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
@@ -1104,11 +1391,8 @@ Resources:
           "index": "conversationId-index"
         }
       ResponseMappingTemplate: |
-        #if($context.result.items.size() > 0) 
-          $util.toJson($context.result.items[0]) 
-        #else 
-          null
-        #end
+        $util.toJson($context.result.items) 
+   
 
 
   UpdateUserResolver:

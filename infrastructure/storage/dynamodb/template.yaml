@@ -133,26 +133,12 @@ Resources:
       AttributeDefinitions:
         - AttributeName: "klubname"
           AttributeType: "S"
-        - AttributeName: "conversationId"
-          AttributeType: "S"
       KeySchema:
         - AttributeName: "klubname"
           KeyType: "HASH"
-        - AttributeName: "conversationId"
-          KeyType: "RANGE"
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 3
-      GlobalSecondaryIndexes:
-        - IndexName: "conversationId-index"
-          KeySchema:
-            - AttributeName: "conversationId"
-              KeyType: "HASH"
-          Projection:
-            ProjectionType: "ALL"
-          ProvisionedThroughput:
-            ReadCapacityUnits: 5
-            WriteCapacityUnits: 3
 
 
 ### for landing page ###
@@ -211,6 +197,35 @@ Resources:
       Description: SSM Parameter for UserConversationBrdige table name
       Tags:
         Environment: !Ref Stage
+
+
+  UserKlubBridgeTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'userklubbridge-table-name-${Stage}'
+      Type: String
+      Value: !Ref UserKlubBridgeTable
+      Description: SSM Parameter for UserKlubBrdige table name
+      Tags:
+        Environment: !Ref Stage
+
+
+  
+  KlubConversationBridgeTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'klubconversationbridge-table-name-${Stage}'
+      Type: String
+      Value: !Ref UserKlubBridgeTable
+      Description: SSM Parameter for UserKlubBrdige table name
+      Tags:
+        Environment: !Ref Stage
+
+
+
+        
+
+
 
   KlubTableNameParam:
     Type: AWS::SSM::Parameter

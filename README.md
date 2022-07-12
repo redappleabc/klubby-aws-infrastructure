@@ -6,6 +6,22 @@ The following section goes through the major components of the AWS infrastructur
 
 ### Back-End CICD
 TODO need to add this section
+
+To deploy the Klubby AWS Infrastructure to a new a new account you need to simply deploy the be-cicd and the fe-cicd cloudformation stacks. The dev and prod stages have this deployed to their corresponding AWS accounts.
+
+To do so....
+blah
+
+made up of 2 codebuild projects:
+- General Deploy Project
+- Sam Deploy Project
+
+Components deployed by the be-cicd:
+- appsync
+- etc....
+
+Components not deployed by the be-cicd:
+
 ### Front-End CICD
 
 The FE-CICD infrasturcture is responsible for the deployment of the front-end of the Klubby Application on all device types. The following environments are currently supported:

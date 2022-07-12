@@ -100,7 +100,7 @@ Resources:
               Pattern: "PUSH, PULL_REQUEST_MERGED"
             - Type: FILE_PATH
               ExcludeMatchedPattern: False
-              Pattern: 'infrastructure/storage/.*|infrastructure/appsync/.*|infrastructure/authentication/.*'
+              Pattern: 'infrastructure/storage/.*|infrastructure/appsync/.*|infrastructure/authentication/.*|infrastructure/be-cicd/buildspec.yaml'
             - Type: HEAD_REF
               Pattern: !Sub "^refs/heads/${GitHubBranch}$"
 

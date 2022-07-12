@@ -10,8 +10,9 @@ phases:
       - cd ../../authentication
       - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
       - cd ../appsync
+      - ARTIFACTS_BUCKET=$(aws ssm get-parameter --name artifacts-bucket-name-dev --region us-east-1 --query Parameter.Value)
       - aws cloudformation deploy
-        --s3-bucket klubby-dev-artifacts-bucket
+        --s3-bucket $ARTIFACTS_BUCKET
         --stack-name klubby-appsync-$STAGE
         --template template.yaml
         --region us-east-1 

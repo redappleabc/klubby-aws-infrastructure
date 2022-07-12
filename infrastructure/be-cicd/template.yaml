@@ -47,19 +47,19 @@ Parameters:
   #   Default: personal-webpage-data-storage
   #   AllowedPattern: "[A-Za-z0-9-]+"
 
-Conditions:
-  IsProd: !Equals [!Ref GitHubBranch, main]
+# Conditions:
+#   IsProd: !Equals [!Ref GitHubBranch, main]
 
 Resources:
-  PipelineArtifactsBucket:
-    Type: AWS::S3::Bucket
-    Properties:
-      VersioningConfiguration:
-        Status: Enabled
+  # PipelineArtifactsBucket:
+  #   Type: AWS::S3::Bucket
+  #   Properties:
+  #     VersioningConfiguration:
+  #       Status: Enabled
 
   CodeBuildSourceCredential:
     Type: 'AWS::CodeBuild::SourceCredential'
-    Condition: IsProd
+    # Condition: IsProd
     Properties:
       # Token: '{{resolve:secretsmanager:github_enterprise:SecretString:token}}'
       Token: !Ref GitHubOAuthToken
@@ -70,6 +70,7 @@ Resources:
     Type: AWS::CodeBuild::Project
     # DependsOn: CodeBuildSourceCredential
     Properties:
+      Description: !Sub "General build project for ${GitHubBranch} branch"
       Artifacts:
         Type: NO_ARTIFACTS
       #   Type: CODEPIPELINE
@@ -106,6 +107,7 @@ Resources:
   SamDeployProject:
     Type: AWS::CodeBuild::Project
     Properties:
+      Description: !Sub "SAM build project for ${GitHubBranch} branch"
       Artifacts:
         Type: NO_ARTIFACTS
       Source:

@@ -3,12 +3,13 @@ version: 0.2
 phases:
   build:
     commands:
+      - ARTIFACTS_BUCKET=$(aws ssm get-parameter --name artifacts-bucket-name-$STAGE --region us-east-1 --query Parameter.Value --output text)
     #----Deploy add-new-user Function-------#
       - cd infrastructure/sam-backends/add-new-user
       - sam build
       - sam deploy
         --stack-name add-new-user-function-$STAGE
-        --s3-bucket klubby-$STAGE-artifacts-bucket
+        --s3-bucket $ARTIFACTS_BUCKET
         --capabilities CAPABILITY_IAM
         --region us-east-1
         --no-fail-on-empty-changeset
@@ -17,12 +18,13 @@ phases:
     #----Deploy landing-page Function-------#
       #not actually deploying this for now
 
+
     #----Deploy web3-queries Function-------#
       - cd ../web3-queries
       - sam build
       - sam deploy
         --stack-name klubby-$STAGE-web3-queries
-        --s3-bucket klubby-$STAGE-artifacts-bucket
+        --s3-bucket $ARTIFACTS_BUCKET
         --capabilities CAPABILITY_IAM
         --region us-east-1
         --no-fail-on-empty-changeset

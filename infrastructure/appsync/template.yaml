@@ -402,7 +402,11 @@ Resources:
           
           #Subscribes to read message
           subscribeToReadMessage(conversationId: ID!): UserConversationBridge
-            @aws_subscribe(mutations: ["setRead", "acceptConversation"])
+            @aws_subscribe(mutations: ["setRead"])
+
+          #Subscribes to accept conversation
+          subscribeToAcceptConversation(conversationId: ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["acceptConversation"])
         }
 
   UserTableDataSource:

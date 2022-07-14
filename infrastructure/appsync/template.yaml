@@ -778,6 +778,7 @@ Resources:
             "update" : {
                 "expression" : "SET accepted = :accepted",
                 "expressionValues": {
+                    "username" : {  "S": "${context.identity.username}" },
                     ":accepted" :  {  "BOOL": true }
                 }
             }

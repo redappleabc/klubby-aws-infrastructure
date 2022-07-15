@@ -354,7 +354,7 @@ Resources:
           #Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
 
-          acceptConversation(conversationId: ID!): UserConversationBridge
+          acceptConversation(conversationId: ID!, username: ID!): UserConversationBridge
 
           disconnect(username: ID!): Presence
 

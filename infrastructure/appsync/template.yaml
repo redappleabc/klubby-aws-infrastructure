@@ -788,7 +788,7 @@ Resources:
             }
         }
       ResponseMappingTemplate: |
-        #set($context.result.username = $util.dynamodb.toString(${context.identity.username}))
+        #set($context.result["username"] = $util.dynamodb.toString(${context.identity.username}))
         $utils.toJson($context.result)
 
 

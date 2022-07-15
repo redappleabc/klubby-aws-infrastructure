@@ -778,13 +778,17 @@ Resources:
                 "conversationId" : {  "S": "${context.arguments.conversationId}" }
             },
             "update" : {
-                "expression" : "SET accepted = :accepted",
+                "expression" : "SET #accepted = :accepted",
+                 "expressionNames": {
+                   "#accepted" : "accepted"
+                 },
                 "expressionValues": {
                     ":accepted" :  {  "BOOL": true }
                 }
             }
         }
       ResponseMappingTemplate: |
+        #set($context.result["username"] = $util.dynamodb.toString(${context.identity.username}))
         $utils.toJson($context.result)
 
 

@@ -305,7 +305,7 @@ Resources:
           #get user wallets
           getUserWallets(username: String!): User
 
-          getConversationById(conversationId: ID!): ID
+          getConversationById(conversationId: ID!): Conversation
 
           heartbeat(username: ID!): Presence
 

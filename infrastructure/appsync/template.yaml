@@ -28,6 +28,7 @@ Parameters:
     Description: user conversation table name
 
 
+
   KlubConversationBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: klubconversationbridge-table-name-${Stage}

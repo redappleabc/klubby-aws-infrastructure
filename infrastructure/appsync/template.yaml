@@ -764,7 +764,7 @@ Resources:
                 "expression" : "SET #accepted = :accepted, #acceptTime = :acceptTime",
                  "expressionNames": {
                    "#accepted" : "accepted",
-                   "#acceptTime: acceptTime"
+                   "#acceptTime" : "acceptTime"
                  },
                 "expressionValues": {
                     ":accepted" :  {  "BOOL": true },

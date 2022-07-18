@@ -233,6 +233,8 @@ Resources:
 
           accepted: Boolean;
 
+          acceptTime: String
+
           # The other's UserConversationBrdige. This field has resolver.
           associated: [UserConversationBridge]
 
@@ -354,7 +356,7 @@ Resources:
           #Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
 
-          acceptConversation(conversationId: ID!, username: ID!): UserConversationBridge
+          acceptConversation(conversationId: ID!, username: ID!, acceptTime: String ): UserConversationBridge
 
           disconnect(username: ID!): Presence
 
@@ -778,12 +780,14 @@ Resources:
                 "conversationId" : {  "S": "${context.arguments.conversationId}" }
             },
             "update" : {
-                "expression" : "SET #accepted = :accepted",
+                "expression" : "SET #accepted = :accepted, #acceptTime = :acceptTime",
                  "expressionNames": {
-                   "#accepted" : "accepted"
+                   "#accepted" : "accepted",
+                   "#acceptTime: acceptTime"
                  },
                 "expressionValues": {
-                    ":accepted" :  {  "BOOL": true }
+                    ":accepted" :  {  "BOOL": true },
+                    ":acceptTime": {  "S": "$util.time.nowEpochMilliSeconds()" }
                 }
             }
         }

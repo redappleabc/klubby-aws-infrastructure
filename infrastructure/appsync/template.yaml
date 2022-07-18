@@ -333,7 +333,6 @@ Resources:
           #TODO what does this do
           #getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
 
-          test: User
         }
 
         type Mutation {
@@ -578,25 +577,7 @@ Resources:
   #       $utils.toJson($context.result)
 
 
-  ### Resolvers ###
-  TestResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: test
-      DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key": {
-              "username": { "S" : "${context.identity.username}"}
-          }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+
 
   CreateConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"

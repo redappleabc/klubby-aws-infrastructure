@@ -59,6 +59,10 @@ Resources:
         AwsRegion: us-east-1
         DefaultAction: ALLOW
         # Ref: defaultAction
+      LogConfig:
+        CloudWatchLogsRoleArn: !GetAtt AppSyncCloudWatchRole.Arn
+        ExcludeVerboseContent: true
+        FieldLogLevel: ERROR
   Schema:
     Type: AWS::AppSync::GraphQLSchema
     Properties:
@@ -541,6 +545,25 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: lambda:InvokeFunction
+                Resource: '*'
+
+  AppSyncCloudWatchRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: appsync.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AppSyncCloudWatchaPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: logs:*
                 Resource: '*'
 
 

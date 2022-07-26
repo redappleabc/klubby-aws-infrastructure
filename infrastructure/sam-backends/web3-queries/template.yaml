@@ -31,7 +31,7 @@ Resources:
             Effect: Allow
             Action:
             - dynamodb:*
-            Resource: arn:aws:dynamodb:us-east-1:590503010210:table/*
+            Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
         - Statement:
           - Sid: SSMAccess
             Effect: Allow

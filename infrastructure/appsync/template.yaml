@@ -27,6 +27,8 @@ Parameters:
     Default: userconversationbridge-table-name-${Stage}
     Description: user conversation table name
 
+
+
   KlubConversationBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: klubconversationbridge-table-name-${Stage}
@@ -237,6 +239,8 @@ Resources:
 
           accepted: Boolean;
 
+          acceptTime: String
+
           # The other's UserConversationBrdige. This field has resolver.
           associated: [UserConversationBridge]
 
@@ -309,6 +313,8 @@ Resources:
           #get user wallets
           getUserWallets(username: String!): User
 
+          getConversationById(conversationId: ID!): Conversation
+
           heartbeat(username: ID!): Presence
 
           #get all klubs
@@ -333,7 +339,6 @@ Resources:
           #TODO what does this do
           #getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
 
-          test: User
         }
 
         type Mutation {
@@ -356,7 +361,7 @@ Resources:
           #Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
 
-          acceptConversation(conversationId: ID!): UserConversationBridge
+          acceptConversation(conversationId: ID!, username: ID!, acceptTime: String ): UserConversationBridge
 
           disconnect(username: ID!): Presence
 
@@ -407,6 +412,10 @@ Resources:
           #Subscribes to read message
           subscribeToReadMessage(conversationId: ID!): UserConversationBridge
             @aws_subscribe(mutations: ["setRead"])
+
+          #Subscribes to accept conversation
+          subscribeToAcceptConversation(conversationId: ID!): UserConversationBridge
+            @aws_subscribe(mutations: ["acceptConversation"])
         }
 
   UserTableDataSource:
@@ -593,25 +602,7 @@ Resources:
   #       $utils.toJson($context.result)
 
 
-  ### Resolvers ###
-  TestResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: test
-      DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key": {
-              "username": { "S" : "${context.identity.username}"}
-          }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+
 
   CreateConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
@@ -795,9 +786,14 @@ Resources:
                 "conversationId" : {  "S": "${context.arguments.conversationId}" }
             },
             "update" : {
-                "expression" : "SET accepted = :accepted",
+                "expression" : "SET #accepted = :accepted, #acceptTime = :acceptTime",
+                 "expressionNames": {
+                   "#accepted" : "accepted",
+                   "#acceptTime" : "acceptTime"
+                 },
                 "expressionValues": {
-                    ":accepted" :  {  "BOOL": true }
+                    ":accepted" :  {  "BOOL": true },
+                    ":acceptTime": {  "S": "$util.time.nowEpochMilliSeconds()" }
                 }
             }
         }
@@ -1385,6 +1381,26 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+  getConversationByIdQueryResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getConversationById
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.arguments.conversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
 
 
   associatedUserConversationBridgeResolver:

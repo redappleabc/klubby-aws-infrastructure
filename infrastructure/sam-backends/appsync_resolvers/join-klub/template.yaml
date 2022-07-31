@@ -5,6 +5,12 @@ Description: >
 
   Join a given klub for a given user
 
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
 Globals:
   Function:
     Timeout: 3

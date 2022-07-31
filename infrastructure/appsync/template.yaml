@@ -46,6 +46,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: klub-table-name-${Stage}
     Description: klub table name
+  JoinKlubFunctionArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: !Sub join-klub-function-arn-${Stage}
+    Description: join klub function arn
   # UserStatusManageFunction:
   #   Type: AWS::SSM::Parameter::Value<String>
   #   Default: user-status-manage-funtion-${Stage}
@@ -260,7 +264,6 @@ Resources:
           # This is sort key
           klubname: ID!
 
-
           # latest message id for main group which I has read
           readMainGroup: String
 
@@ -280,21 +283,17 @@ Resources:
           # This is partition key
           klubname: ID!
 
-
           # This is sort key
           announcementConversationId: ID!
 
           # This is pointer to Conversation for above announcementConversationId
           announcementConversatioin: Conversation
 
-
-
           # This is sort key
           mainGroupConversationId: ID!
 
           # This is pointer to Conversation for above mainGroupConversationId
           mainGroupConversation: Conversation
-
 
           # This is sort key
           whaleGroupConversationID: ID!

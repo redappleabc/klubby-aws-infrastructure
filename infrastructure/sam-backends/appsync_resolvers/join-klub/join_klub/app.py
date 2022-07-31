@@ -4,7 +4,9 @@ import json
 
 
 def lambda_handler(event, context):
-    
+    print('yoyoyo')
+
+    print(f'event {event}')
 
     return {
         "statusCode": 200,

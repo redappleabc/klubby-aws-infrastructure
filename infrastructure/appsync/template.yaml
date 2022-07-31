@@ -504,6 +504,16 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref KlubTableName
 
+  JoinKlubFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub JoinKlubFunction_${Stage}
+      Description: The lambda function to join a klub for given user
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref JoinKlubFunctionArn
 
   # UserStatusManageFunctionDataSource:
   #   Type: AWS::AppSync::DataSource

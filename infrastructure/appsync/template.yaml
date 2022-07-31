@@ -588,6 +588,26 @@ Resources:
   
 
   ### Lambda Resolvers ###
+  JoinKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: joinKlub
+      DataSourceName: !GetAtt JoinKlubFunctionDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version": "2017-02-28",
+          "operation": "Invoke",
+          "payload": {
+            "action": "join_klub",
+            "arguments":  $utils.toJson($ctx.arguments)
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
   # HeartbeatResolver:
   #   Type: "AWS::AppSync::Resolver"
   #   DependsOn: Schema
@@ -608,8 +628,6 @@ Resources:
   #       }
   #     ResponseMappingTemplate: |
   #       $utils.toJson($context.result)
-
-
 
 
   CreateConversationMutationResolver:

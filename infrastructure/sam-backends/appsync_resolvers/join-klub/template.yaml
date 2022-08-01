@@ -13,7 +13,7 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 10
 
 Resources:
   JoinKlubFunction:
@@ -24,6 +24,23 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: DynamoDBAccess
+            Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
 
 ### SSM PARAMS ###
   JoinKlubFunctionArn:

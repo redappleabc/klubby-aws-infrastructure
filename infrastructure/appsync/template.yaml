@@ -873,6 +873,7 @@ Resources:
           #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
           "attributeValues" : {
               "owner": {  "S": "${context.identity.username}" },
+              "assetSymbol" : {  "S": "${context.arguments.assetSymbol}" },
               "avatar" : $util.toJson($avatar),
               "description": {  "S": "${context.arguments.description}" },
               "contractAddress": {  "S": "${context.arguments.contractAddress}" },

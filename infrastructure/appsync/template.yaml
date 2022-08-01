@@ -120,6 +120,9 @@ Resources:
           # The klub's name
           klubname: String!
 
+          # symbol for this asset
+          assetSymbol: String
+
           # avatar image for this klub
           avatar: S3Object!
 
@@ -346,8 +349,8 @@ Resources:
           createConversation: Conversation
 
           #Create a klub
-          '''createKlub(klubname: ID!, avatar: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
-            website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String, 
+          '''createKlub(klubname: ID!, assetSymbol: String, avatar: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!,
+            website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
             coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
           #Create a message in a Conversation.

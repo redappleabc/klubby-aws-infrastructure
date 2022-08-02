@@ -369,8 +369,7 @@ Resources:
           editMessage(conversationId: ID!, id: String!, content: String!): Message
 
           #Try to join given klub for given user
-          joinKlub(klubname: ID!, username: ID!): Boolean
-          #TODO return userklub bridge
+          joinKlub(klubname: ID!, username: ID!): UserKlubBridge
 
           #Delete the Conversation
           removeConversation(conversationId: ID!): Conversation

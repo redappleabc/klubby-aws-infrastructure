@@ -60,7 +60,7 @@ def lambda_handler(event, context):
         table_name=response['Parameter']['Value']
 
         #add row to userKlubBridge Table to join
-        result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':username}})
+        result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':klubname}})
         print(f'result {result}')
 
         return {

@@ -55,11 +55,23 @@ def lambda_handler(event, context):
     if meetsRequirement:
         #TODO create user klub bridge
 
+        #get userKlubBridge table name from ssm
+        response = ssm_client.get_parameter(Name=f'userklubbridge-table-name-{Stage}')
+        table_name=response['Parameter']['Value']
+
+        #add row to userKlubBridge Table to join
+        result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':username}})
+        print(f'result {result}')
+
         return {
             "statusCode": 200,
             "body": json.dumps({
                 "message": f"{username} joined {klubname}",
-                "meetsRequirement": meetsRequirement
+                "meetsRequirement": meetsRequirement,
+                "UserKlubBridge": {
+                    "username": username,
+                    "klubname": klubname
+                }
             }),
         }
     else:

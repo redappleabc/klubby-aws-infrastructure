@@ -264,16 +264,16 @@ Resources:
           klubname: ID!
 
           # latest message id for main group which I has read
-          readMainGroup: String
+          # readMainGroup: String
 
           # latest message id for whale group which I has read
-          readWhaleGroup: String
+          # readWhaleGroup: String
 
           # latest message id for announcement which I has read
-          readAnnouncement: String
+          # readAnnouncement: String
 
           #This is pointer to KlubConversationBridge for this Klub.
-          conversations: KlubConversationBridge
+          # conversations: KlubConversationBridge
 
         }
         
@@ -320,6 +320,9 @@ Resources:
 
           #Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
           listMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+
+          #get all the klubs the user belongs to
+          listMyKlubs: [UserKlubBridge]
 
           #get all users
           listUsers: [User]
@@ -1050,8 +1053,34 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
+# "filter" : {
+#               "expression" : "#username <> :username",
+#               "expressionNames" : {
+#                   "#username" : "username"
+#               },
+#               "expressionValues" : {
+#                   ":username" : {"S": "${context.identity.username}"}
+#               }
 
 
+   ListMyKlubsResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: listMyKlubs
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Scan"
+        }
+      ResponseMappingTemplate: |
+        #**
+            Return a flat list of results from a Query or Scan operation.
+        *#
+        $util.toJson($ctx.result.items)
 
   ListUsersResolver:
     Type: AWS::AppSync::Resolver

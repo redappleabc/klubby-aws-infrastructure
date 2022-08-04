@@ -1274,13 +1274,9 @@ Resources:
             "operation" : "GetItem",
             "key" : {
               "klubname" : { "S" : "${context.source.klubname}"},
-            },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+            }
         }
       ResponseMappingTemplate: |
-
         $util.toJson($ctx.result)
 
 

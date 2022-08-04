@@ -1269,12 +1269,12 @@ Resources:
             "version" : "2017-02-28",
             "operation" : "Query",
             "query" : {
-              "expression" : "username = :username",
+              "expression" : "klubname = :klubname",
               "expressionNames" : {
-                  "#username" : "username"
+                  "#klubname" : "klubname"
               },
               "expressionValues" : {
-                  ":username" : {"S": "${context.identity.username}"}
+                  ":klubname" : {"S": "${context.source.klubname}"}
               }
             },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **

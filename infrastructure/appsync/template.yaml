@@ -1250,6 +1250,7 @@ Resources:
                   }
               }
           },
+          "index": username-index,
           "scanIndexForward": false,
           "limit": 1000
         }

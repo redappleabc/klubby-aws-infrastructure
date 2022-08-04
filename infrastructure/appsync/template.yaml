@@ -1271,15 +1271,9 @@ Resources:
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
-            "operation" : "Query",
-            "query" : {
-              "expression" : "#klubname = :klubname",
-              "expressionNames" : {
-                  "#klubname" : "klubname"
-              },
-              "expressionValues" : {
-                  ":klubname" : {"S": "${context.source.klubname}"}
-              }
+            "operation" : "GetItem",
+            "key" : {
+              "klubname" : { "S" : "${context.source.klubname}"},
             },
             ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
             ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),

@@ -1282,7 +1282,8 @@ Resources:
             ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
         }
       ResponseMappingTemplate: |
-        $util.toJson($ctx.result.items)
+
+        $util.toJson($ctx.result)
 
 
 

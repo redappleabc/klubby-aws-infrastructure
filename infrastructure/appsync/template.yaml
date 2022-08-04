@@ -263,6 +263,8 @@ Resources:
           # This is sort key
           klubname: ID!
 
+          klub: Klub
+
           # latest message id for main group which I has read
           # readMainGroup: String
 
@@ -1253,6 +1255,34 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
+
+  KlubUserKlubBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserKlubBridge
+      FieldName: klub
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+            "version" : "2017-02-28",
+            "operation" : "Query",
+            "query" : {
+              "expression" : "username = :username",
+              "expressionNames" : {
+                  "#username" : "username"
+              },
+              "expressionValues" : {
+                  ":username" : {"S": "${context.identity.username}"}
+              }
+            },
+            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
+            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
+            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
+        }
+      ResponseMappingTemplate: |
+        $util.toJson($ctx.result.items)
 
 
 

@@ -1074,7 +1074,16 @@ Resources:
       RequestMappingTemplate: |
         {
             "version" : "2017-02-28",
-            "operation" : "Scan"
+            "operation" : "Scan",
+            "filter" : {
+              "expression" : "#username <> :username",
+              "expressionNames" : {
+                  "#username" : "username"
+              },
+              "expressionValues" : {
+                  ":username" : {"S": "${context.identity.username}"}
+              }
+            },
         }
       ResponseMappingTemplate: |
         #**

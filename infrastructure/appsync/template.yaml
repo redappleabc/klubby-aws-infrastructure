@@ -1253,7 +1253,7 @@ Resources:
                   }
               }
           },
-          "index": username-index,
+          "index": "username-index",
           "scanIndexForward": false,
           "limit": 1000
         }

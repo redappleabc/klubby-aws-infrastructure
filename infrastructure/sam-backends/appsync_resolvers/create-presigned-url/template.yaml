@@ -19,7 +19,7 @@ Resources:
   CreatePresignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: join_klub/
+      CodeUri: create_presigned_url/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:

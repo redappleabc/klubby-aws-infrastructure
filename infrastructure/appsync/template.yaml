@@ -378,7 +378,7 @@ Resources:
 
           # Leave given klub for given user
           leaveKlub(klubname: ID!): UserKlubBridge
-          
+
 
           #Delete the Conversation
           removeConversation(conversationId: ID!): Conversation
@@ -625,7 +625,8 @@ Resources:
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: leaveKlub
+      TypeName: Mutation
+      FieldName: leaveKlub
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
       RequestMappingTemplate: |
         {

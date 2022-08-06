@@ -42,6 +42,7 @@ Resources:
         Variables:
           STAGE: !Ref Stage
 
+
 ### SSM PARAMS ###
   CreatePresignedUrlFunctionArn:
     Type: AWS::SSM::Parameter

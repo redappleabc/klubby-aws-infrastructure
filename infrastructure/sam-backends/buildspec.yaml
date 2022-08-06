@@ -30,8 +30,18 @@ phases:
         --region us-east-1
         --no-fail-on-empty-changeset
 
+  #----Deploy create-presigned-url Function-------#
+      - cd ../appsync_resolvers/create-presigned-url
+      - sam build
+      - sam deploy
+        --stack-name klubby-$STAGE-create-presigned-url
+        --s3-bucket $ARTIFACTS_BUCKET
+        --capabilities CAPABILITY_IAM
+        --region us-east-1
+        --no-fail-on-empty-changeset
+
   #----Deploy join-klub Function-------#
-      - cd ../appsync_resolvers/join-klub
+      - cd ../join-klub
       - sam build
       - sam deploy
         --stack-name klubby-$STAGE-join-klub

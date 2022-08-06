@@ -315,6 +315,8 @@ Resources:
 
           getConversationById(conversationId: ID!): Conversation
 
+          getKlubByKlubname(klubname: ID!): Klub
+
           heartbeat(username: ID!): Presence
 
           #get all klubs
@@ -1514,6 +1516,25 @@ Resources:
           "operation" : "GetItem",
           "key" : {
               "id" : { "S" : "${context.arguments.conversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+  
+  getKlubByKlubnameQueryResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: getKlubByKlubname
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.arguments.klubname}" }
           }
         }
       ResponseMappingTemplate: |

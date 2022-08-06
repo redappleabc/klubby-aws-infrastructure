@@ -376,6 +376,9 @@ Resources:
           #Try to join given klub for given user
           joinKlub(klubname: ID!, username: ID!): String
 
+          # Leave given klub for given user
+          leaveKlub(klubname: ID!): UserKlubBridge
+
           #Delete the Conversation
           removeConversation(conversationId: ID!): Conversation
 
@@ -615,6 +618,26 @@ Resources:
         }
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+  LeaveKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: leaveKlub
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "DeleteItem",
+          "key" : {
+            "klubname" : { "S" : "${context.arguments.klubname}" },
+            "username" : { "S" : "${context.identity.username}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
 
   # HeartbeatResolver:
   #   Type: "AWS::AppSync::Resolver"

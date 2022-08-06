@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  join-klub
+
+  Join a given klub for a given user
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  CreatePresignedUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: join_klub/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      # Policies:
+      # #TODO reduce perms
+      #   - Statement:
+      #     - Sid: DynamoDBAccess
+      #       Effect: Allow
+      #       Action:
+      #       - dynamodb:*
+      #       Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+      #   - Statement:
+      #     - Sid: SSMAccess
+      #       Effect: Allow
+      #       Action:
+      #       - ssm:*
+      #       Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+### SSM PARAMS ###
+  CreatePresignedUrlFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub create-presigned-url-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt CreatePresignedUrlFunction.Arn
+      Description: SSM Parameter for user ARN of create presigned url function
+      Tags:
+        Environment: !Ref Stage

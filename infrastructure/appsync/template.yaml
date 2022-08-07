@@ -985,9 +985,9 @@ Resources:
         {
           "version" : "2018-05-29",
           "operation" : "BatchPutItem",
-          "condition" : {
-              "expression": "attribute_not_exists(klubname)"
-          },
+          # "condition" : {
+          #     "expression": "attribute_not_exists(klubname)"
+          # },
           "tables" : {
             "${KlubTable}": $util.toJson($klubs),
             "${ConversationTable}": $util.toJson($conversations)

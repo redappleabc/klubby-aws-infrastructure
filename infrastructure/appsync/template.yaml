@@ -997,9 +997,10 @@ Resources:
           ConversationTable: !Ref ConversationTableName
         }
       ResponseMappingTemplate: |
-        #set($avatar = $util.dynamodb.fromS3ObjectJson($context.result.data["${KlubTable}"].avatar))
-        #set($context.result.data["${KlubTable}"].avatar = $avatar)
-        $utils.toJson($context.result.data["${KlubTable}"])
+        #set($klub = $context.result.data["${KlubTable}"].items[0])
+        #set($avatar = $util.dynamodb.fromS3ObjectJson($klub.avatar))
+        #set($klub.avatar = $avatar)
+        $utils.toJson($klub)
         {
           KlubTable: !Ref KlubTableName,
           ConversationTable: !Ref ConversationTableName

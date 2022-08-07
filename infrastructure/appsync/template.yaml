@@ -895,8 +895,8 @@ Resources:
         #set( $avatar = ${context.arguments.avatar} )
         #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
 
-        $set($klubs = [])
-        $set($klub = {})
+        #set($klubs = [])
+        #set($klub = {})
 
 
         $util.qr($klub.put("klubname", "${context.arguments.klubname}"))

@@ -894,6 +894,86 @@ Resources:
 
         #set( $avatar = ${context.arguments.avatar} )
         #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
+
+
+        $set($klub = {})
+        $util.qr($klub.put("klubname",  { "S" : "${context.arguments.klubname}" }))
+        $util.qr($klub.put("owner", {  "S": "${context.identity.username}" }))
+        $util.qr($klub.put("assetSymbol", {  "S": "${context.arguments.assetSymbol}" }))
+        $util.qr($klub.put("avatar", $util.toJson($avatar)))
+        $util.qr($klub.put("description", {  "S": "${context.arguments.description}" }))
+        $util.qr($klub.put("contractAddress", {  "S": "${context.arguments.contractAddress}" }))
+        $util.qr($klub.put("blockchainExplorer", {  "S": "${context.arguments.blockchainExplorer}" }))
+        $util.qr($klub.put("tokenType", {  "S": "${context.arguments.tokenType}" }))
+        
+        #if(${context.arguments.minimumAmountForMainGroup}) 
+          $util.qr($klub.put("minimumAmountForMainGroup", {  "N": "${context.arguments.minimumAmountForMainGroup}" } ))
+        #else 
+          $util.qr($klub.put("minimumAmountForMainGroup", {"N":"0"}  ))
+        #end
+
+        #if(${context.arguments.minimumAmountForWhaleGroup}) 
+          $util.qr($klub.put("minimumAmountForWhaleGroup", {  "N": "${context.arguments.minimumAmountForWhaleGroup}" } ))
+        #else 
+          $util.qr($klub.put("minimumAmountForWhaleGroup", {"N":"0"}  ))
+        #end
+
+        #if(${context.arguments.website})
+          $util.qr($klub.put("website", {  "S": "${context.arguments.website}" } ))
+        #else 
+          $util.qr($klub.put("website", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.coinmarketcap})
+          $util.qr($klub.put("coinmarketcap", {  "S": "${context.arguments.coinmarketcap}" } ))
+        #else 
+          $util.qr($klub.put("coinmarketcap", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.coingecho})
+          $util.qr($klub.put("coingecho", {  "S": "${context.arguments.coingecho}" } ))
+        #else 
+          $util.qr($klub.put("coingecho", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.dextools})
+          $util.qr($klub.put("dextools", {  "S": "${context.arguments.dextools}" } ))
+        #else 
+          $util.qr($klub.put("dextools", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.telegram})
+          $util.qr($klub.put("telegram", {  "S": "${context.arguments.telegram}" } ))
+        #else 
+          $util.qr($klub.put("telegram", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.discord})
+          $util.qr($klub.put("discord", {  "S": "${context.arguments.discord}" } ))
+        #else 
+          $util.qr($klub.put("discord", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.twitter})
+          $util.qr($klub.put("twitter", {  "S": "${context.arguments.twitter}" } ))
+        #else 
+          $util.qr($klub.put("twitter", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.reddit})
+          $util.qr($klub.put("reddit", {  "S": "${context.arguments.reddit}" } ))
+        #else 
+          $util.qr($klub.put("reddit", {"S":""}  ))
+        #end
+
+        #if(${context.arguments.instagram})
+          $util.qr($klub.put("instagram", {  "S": "${context.arguments.instagram}" } ))
+        #else 
+          $util.qr($klub.put("instagram", {"S":""}  ))
+        #end
+
+        $util.qr($klub.put("createdAt", $util.dynamodb.toString($createdAt) ))
+
         {
           "version" : "2017-02-28",
           "operation" : "BatchPutItem",
@@ -901,28 +981,7 @@ Resources:
               "expression": "attribute_not_exists(klubname)"
           },
           "tables" : {
-             "${KlubTable}": $util.toJson([$util.dynamodb.toMapValues({
-              "klubname" : { "S" : "${context.arguments.klubname}" },
-              "owner": {  "S": "${context.identity.username}" },
-              "assetSymbol" : {  "S": "${context.arguments.assetSymbol}" },
-              "avatar" : $util.toJson($avatar),
-              "description": {  "S": "${context.arguments.description}" },
-              "contractAddress": {  "S": "${context.arguments.contractAddress}" },
-              "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
-              "tokenType": {  "S": "${context.arguments.tokenType}" },
-              "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "N": "${context.arguments.minimumAmountForMainGroup}" } #else {"N":"0"} #end,
-              "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "N": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"N":"0"} #end,
-              "website": #if(${context.arguments.website}) {  "S": "${context.arguments.website}" } #else {"S":""} #end,
-              "coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
-              "coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
-              "dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
-              "telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
-              "discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
-              "twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
-              "reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
-              "instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end,
-              "createdAt": $util.dynamodb.toString($createdAt)
-            })]),
+            "${KlubTable}": $util.toJson([$util.dynamodb.toMapValues($klub)]),
             "${ConversationTable}": $util.toJson($conversations)
           }
           

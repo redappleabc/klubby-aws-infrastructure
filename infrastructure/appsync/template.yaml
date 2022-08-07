@@ -900,7 +900,7 @@ Resources:
         $util.qr($klub.put("klubname",  { "S" : "${context.arguments.klubname}" }))
         $util.qr($klub.put("owner", {  "S": "${context.identity.username}" }))
         $util.qr($klub.put("assetSymbol", {  "S": "${context.arguments.assetSymbol}" }))
-        $util.qr($klub.put("avatar", $util.toJson($avatar)))
+        $util.qr($klub.put("avatar", $avatar))
         $util.qr($klub.put("description", {  "S": "${context.arguments.description}" }))
         $util.qr($klub.put("contractAddress", {  "S": "${context.arguments.contractAddress}" }))
         $util.qr($klub.put("blockchainExplorer", {  "S": "${context.arguments.blockchainExplorer}" }))

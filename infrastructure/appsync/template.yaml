@@ -26,10 +26,6 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: userconversationbridge-table-name-dev
     Description: user conversation table name
-  KlubConversationBridgeTableName:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: klubconversationbridge-table-name-dev
-    Description: user conversation table name
   UserKlubBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: userklubbridge-table-name-dev
@@ -183,6 +179,23 @@ Resources:
 
           #  The Klubs's timestamp.
           createdAt: String
+
+
+
+          announcementConversationId: ID!
+
+          # This is pointer to Conversation for above announcementConversationId
+          announcementConversatioin: Conversation
+
+          mainGroupConversationId: ID!
+
+          # This is pointer to Conversation for above mainGroupConversationId
+          mainGroupConversation: Conversation
+
+          whaleGroupConversationID: ID!
+
+          # This is pointer to Conversation for above whaleGroupConversationId
+          whaleGroupConversation: Conversation
          
           
         }
@@ -274,35 +287,9 @@ Resources:
           # latest message id for announcement which I has read
           # readAnnouncement: String
 
-          #This is pointer to KlubConversationBridge for this Klub.
-          # conversations: KlubConversationBridge
-
         }
         
-        type KlubConversationBridge {
-          
-          # This is partition key
-          klubname: ID!
 
-          # This is sort key
-          announcementConversationId: ID!
-
-          # This is pointer to Conversation for above announcementConversationId
-          announcementConversatioin: Conversation
-
-          # This is sort key
-          mainGroupConversationId: ID!
-
-          # This is pointer to Conversation for above mainGroupConversationId
-          mainGroupConversation: Conversation
-
-          # This is sort key
-          whaleGroupConversationID: ID!
-
-          # This is pointer to Conversation for above whaleGroupConversationId
-          whaleGroupConversation: Conversation
-
-        }
 
 
         type Query {
@@ -466,17 +453,6 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref UserConversationBridgeTableName
 
-  KlubConversationBridgeTableDataSource:
-    Type: "AWS::AppSync::DataSource"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub KlubConversationBridgeDynamoDBTable_${Stage}
-      Description: The User Conversation DynamoDB table
-      Type: AMAZON_DYNAMODB
-      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
-      DynamoDBConfig:
-        AwsRegion: "us-east-1"
-        TableName: !Ref KlubConversationBridgeTableName
 
 
   UserKlubBridgeTableDataSource:
@@ -892,43 +868,81 @@ Resources:
       FieldName: "createKlub"
       DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: |
+        #set($announcementConversationId = $util.autoId())
+        #set($mainConversationId = $util.autoId())
+        #set($whaleConversationId = $util.autoId())
+        #set($createdAt = $util.time.nowEpochMilliSeconds)
+        #set($conversations = [])
+        #set($announcementConversation = {})
+        $util.qr($announcementConversation.put("id", $util.autoId()))
+        $util.qr($announcementConversation.put("creator", $util.dynamodb.toString(${context.identity.username})))
+        $util.qr($announcementConversation.put("createdAt", $util.dynamodb.toString($createdAt)))
+
+        #set($mainConversation = {})
+        $util.qr($mainConversation.put("id", $util.autoId()))
+        $util.qr($mainConversation.put("creator", $util.dynamodb.toString(${context.identity.username})))
+        $util.qr($mainConversation.put("createdAt", $util.dynamodb.toString($createdAt)))
+
+        #set($whaleConversation = {})
+        $util.qr($whaleConversation.put("id", $util.autoId()))
+        $util.qr($whaleConversation.put("creator", $util.dynamodb.toString(${context.identity.username})))
+        $util.qr($whaleConversation.put("createdAt", $util.dynamodb.toString($createdAt)))
+
+        $util.qr($conversations.add($util.dynamodb.toMapValues($announcementConversation)))
+        $util.qr($conversations.add($util.dynamodb.toMapValues($mainConversation)))
+        $util.qr($conversations.add($util.dynamodb.toMapValues($whaleConversation)))
+
+        #set( $avatar = ${context.arguments.avatar} )
+        #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
         {
           "version" : "2017-02-28",
-          "operation" : "PutItem",
-          "key" : {
-              "klubname" : { "S" : "${context.arguments.klubname}" }
-          },
-          "condition" : {
-            "expression": "attribute_not_exists(klubname)"
-          },
-          #set( $avatar = ${context.arguments.avatar} )
-          #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
-          "attributeValues" : {
-              "owner": {  "S": "${context.identity.username}" },
-              "assetSymbol" : {  "S": "${context.arguments.assetSymbol}" },
-              "avatar" : $util.toJson($avatar),
-              "description": {  "S": "${context.arguments.description}" },
-              "contractAddress": {  "S": "${context.arguments.contractAddress}" },
-              "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
-              "tokenType": {  "S": "${context.arguments.tokenType}" },
-              "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "N": "${context.arguments.minimumAmountForMainGroup}" } #else {"N":"0"} #end,
-              "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "N": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"N":"0"} #end,
-              "website": #if(${context.arguments.website}) {  "S": "${context.arguments.website}" } #else {"S":""} #end,
-              "coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
-              "coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
-              "dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
-              "telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
-              "discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
-              "twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
-              "reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
-              "instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end,
-              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
+          "operation" : "BatchPutItem",
+          "tables" : {
+            "${KlubTable}":{
+              "key" : {
+                "klubname" : { "S" : "${context.arguments.klubname}" }
+              },
+              "condition" : {
+                "expression": "attribute_not_exists(klubname)"
+              },
+              "attributeValues" : {
+                "owner": {  "S": "${context.identity.username}" },
+                "assetSymbol" : {  "S": "${context.arguments.assetSymbol}" },
+                "avatar" : $util.toJson($avatar),
+                "description": {  "S": "${context.arguments.description}" },
+                "contractAddress": {  "S": "${context.arguments.contractAddress}" },
+                "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
+                "tokenType": {  "S": "${context.arguments.tokenType}" },
+                "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "N": "${context.arguments.minimumAmountForMainGroup}" } #else {"N":"0"} #end,
+                "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "N": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"N":"0"} #end,
+                "website": #if(${context.arguments.website}) {  "S": "${context.arguments.website}" } #else {"S":""} #end,
+                "coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
+                "coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
+                "dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
+                "telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
+                "discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
+                "twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
+                "reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
+                "instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end,
+                "createdAt": $util.dynamodb.toString($createdAt)
+              }
+            },
+            "${ConversationTable}": $util.toJson($conversations)
           }
+          
+        }
+        {
+          KlubTable: !Ref KlubTableName,
+          ConversationTable: !Ref ConversationTableName
         }
       ResponseMappingTemplate: |
-        #set($avatar = $util.dynamodb.fromS3ObjectJson($context.result.avatar))
-        #set($context.result.avatar = $avatar)
-        $utils.toJson($context.result)
+        #set($avatar = $util.dynamodb.fromS3ObjectJson($context.result.data["${KlubTable}"].avatar))
+        #set($context.result.data["${KlubTable}"].avatar = $avatar)
+        $utils.toJson($context.result.data["${KlubTable}"])
+        {
+          KlubTable: !Ref KlubTableName,
+          ConversationTable: !Ref ConversationTableName
+        }
 
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
@@ -1307,32 +1321,6 @@ Resources:
         $util.toJson($ctx.result)
 
 
-
-  ConversationsUserKlubBridgeResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "UserKlubBridge"
-      FieldName: "conversations"
-      DataSourceName: !GetAtt KlubConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "klubname = :klubname",
-              "expressionValues" : {
-                  ":klubname" : {
-                      "S" : "${context.source.klubname}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": 1000
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
 
   # getAllMessagesResolver:
   #   Type: "AWS::AppSync::Resolver"

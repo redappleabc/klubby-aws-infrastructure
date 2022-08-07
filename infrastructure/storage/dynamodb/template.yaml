@@ -127,18 +127,6 @@ Resources:
             ReadCapacityUnits: 5
             WriteCapacityUnits: 3
 
-  KlubConversationBridgeTable:
-    Type: "AWS::DynamoDB::Table"
-    Properties:
-      AttributeDefinitions:
-        - AttributeName: "klubname"
-          AttributeType: "S"
-      KeySchema:
-        - AttributeName: "klubname"
-          KeyType: "HASH"
-      ProvisionedThroughput:
-        ReadCapacityUnits: 5
-        WriteCapacityUnits: 3
 
 
 ### for landing page ###
@@ -207,23 +195,7 @@ Resources:
       Value: !Ref UserKlubBridgeTable
       Description: SSM Parameter for UserKlubBrdige table name
       Tags:
-        Environment: !Ref Stage
-
-
-  
-  KlubConversationBridgeTableNameParam:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: !Sub 'klubconversationbridge-table-name-${Stage}'
-      Type: String
-      Value: !Ref UserKlubBridgeTable
-      Description: SSM Parameter for UserKlubBrdige table name
-      Tags:
-        Environment: !Ref Stage
-
-
-
-        
+        Environment: !Ref Stage        
 
 
 

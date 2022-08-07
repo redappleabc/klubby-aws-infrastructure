@@ -871,7 +871,7 @@ Resources:
         #set($announcementConversationId = $util.autoId())
         #set($mainConversationId = $util.autoId())
         #set($whaleConversationId = $util.autoId())
-        #set($createdAt = $util.time.nowEpochMilliSeconds)
+        #set($createdAt = $util.time.nowEpochMilliSeconds())
         #set($conversations = [])
         #set($announcementConversation = {})
         $util.qr($announcementConversation.put("id", $util.autoId()))
@@ -981,7 +981,7 @@ Resources:
               "expression": "attribute_not_exists(klubname)"
           },
           "tables" : {
-            "${KlubTable}": $util.toJson([$util.dynamodb.toMapValues($klub)]),
+            "${KlubTable}": [$klub],
             "${ConversationTable}": $util.toJson($conversations)
           }
           

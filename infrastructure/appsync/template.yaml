@@ -982,7 +982,7 @@ Resources:
 
         $util.qr($klub.put("createdAt",$createdAt ))
 
-        $util.qr($klubs.add($util.dynamodb.toMapValues($klub))
+        $util.qr($klubs.add($util.dynamodb.toMapValues($klub)))
 
 
         {

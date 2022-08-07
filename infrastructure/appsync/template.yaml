@@ -985,7 +985,7 @@ Resources:
               "expression": "attribute_not_exists(klubname)"
           },
           "tables" : {
-            "${KlubTable}": $util.toJson([$klub]),
+            "${KlubTable}": $util.toJson($klubs),
             "${ConversationTable}": $util.toJson($conversations)
           }
           

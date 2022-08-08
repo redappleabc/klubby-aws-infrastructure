@@ -893,15 +893,15 @@ Resources:
           $util.qr($conversations.add($util.dynamodb.toMapValues($mainConversation)))
           $util.qr($conversations.add($util.dynamodb.toMapValues($whaleConversation)))
 
-          #set( $avatar = $context.arguments.avatar )
-          #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
+          ##set( $avatar = $context.arguments.avatar )
+          ##set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
 
           #set($klubs = [])
           #set($klub = {})
           $util.qr($klub.put("klubname",  { "S" : "$context.arguments.klubname" }))
           $util.qr($klub.put("owner", {  "S": "$context.identity.username" }))
           $util.qr($klub.put("assetSymbol", {  "S": "$context.arguments.assetSymbol" }))
-          $util.qr($klub.put("avatar", $util.toJson($avatar)))
+          ##$util.qr($klub.put("avatar", $util.toJson($avatar)))
           $util.qr($klub.put("description", {  "S": "$ctx.args.description" }))
           $util.qr($klub.put("contractAddress", {  "S": "$context.arguments.contractAddress" }))
           $util.qr($klub.put("blockchainExplorer", {  "S": "$context.arguments.blockchainExplorer" }))
@@ -999,10 +999,11 @@ Resources:
           }
       ResponseMappingTemplate: !Sub
         - |
-          #set($klub = $context.result.data["${KlubTable}"].items[0])
-          #set($avatar = $util.dynamodb.fromS3ObjectJson($klub.avatar))
-          #set($klub.avatar = $avatar)
-          $utils.toJson($klub)
+          ##set($klub = $context.result.data["${KlubTable}"].items[0])
+          ##set($avatar = $util.dynamodb.fromS3ObjectJson($klub.avatar))
+          ##set($klub.avatar = $avatar)
+          ##$utils.toJson($klub)
+          $utils.toJson($context.result.data["${KlubTable}"].items[0])
         - {
             KlubTable: !Ref KlubTableName,
             ConversationTable: !Ref ConversationTableName

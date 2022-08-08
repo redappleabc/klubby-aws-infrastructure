@@ -120,7 +120,7 @@ Resources:
           assetSymbol: String
 
           # avatar image for this klub
-          avatar: S3Object!
+          avatar: S3Object
 
           # description for this klub
           description: String!
@@ -902,7 +902,7 @@ Resources:
         $util.qr($klub.put("klubname", "${context.arguments.klubname}"))
         $util.qr($klub.put("owner", "${context.identity.username}"))
         $util.qr($klub.put("assetSymbol", "${context.arguments.assetSymbol}"))
-        $util.qr($klub.put("avatar", $util.toJson($avatar)))
+
         $util.qr($klub.put("description", "${context.arguments.description}"))
         $util.qr($klub.put("contractAddress", "${context.arguments.contractAddress}"))
         $util.qr($klub.put("blockchainExplorer", "${context.arguments.blockchainExplorer}"))
@@ -931,13 +931,8 @@ Resources:
           KlubTable: !Ref KlubTableName
         }
       ResponseMappingTemplate: |
-        #set($klub = $context.result.data["${KlubTable}"].items[0])
-        #set($avatar = $util.dynamodb.fromS3ObjectJson($klub.avatar))
-        #set($klub.avatar = $avatar)
-        $utils.toJson($klub)
-        {
-          KlubTable: !Ref KlubTableName
-        }
+        $utils.toJson($context.result)
+       
 
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"

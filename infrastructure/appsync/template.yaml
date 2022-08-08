@@ -941,7 +941,7 @@ Resources:
             $util.qr($klub.put("coingecho", {"S":""}  ))
           #end
 
-          #if(${context.arguments.dextools})
+          #if($context.arguments.dextools)
             $util.qr($klub.put("dextools", {  "S": "$context.arguments.dextools" } ))
           #else 
             $util.qr($klub.put("dextools", {"S":""}  ))

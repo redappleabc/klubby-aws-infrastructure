@@ -875,17 +875,17 @@ Resources:
           #set($createdAt = "$util.time.nowEpochMilliSeconds()")
           #set($conversations = [])
           #set($announcementConversation = {})
-          $util.qr($announcementConversation.put("id", $util.autoId()))
+          $util.qr($announcementConversation.put("id", $announcementConversationId))
           $util.qr($announcementConversation.put("creator", $context.identity.username))
           $util.qr($announcementConversation.put("createdAt", $createdAt))
 
           #set($mainConversation = {})
-          $util.qr($mainConversation.put("id", $util.autoId()))
+          $util.qr($mainConversation.put("id", $mainConversationId))
           $util.qr($mainConversation.put("creator", $context.identity.username))
           $util.qr($mainConversation.put("createdAt", $createdAt))
 
           #set($whaleConversation = {})
-          $util.qr($whaleConversation.put("id", $util.autoId()))
+          $util.qr($whaleConversation.put("id", $whaleConversationId))
           $util.qr($whaleConversation.put("creator", $context.identity.username))
           $util.qr($whaleConversation.put("createdAt", $createdAt))
 

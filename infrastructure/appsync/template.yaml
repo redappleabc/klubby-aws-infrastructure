@@ -991,8 +991,7 @@ Resources:
           "tables" : {
             "${KlubTable}": $util.toJson($klubs),
             "${ConversationTable}": $util.toJson($conversations)
-          }
-          
+          }    
         }
         {
           KlubTable: !Ref KlubTableName,
@@ -1004,8 +1003,7 @@ Resources:
         #set($klub.avatar = $avatar)
         $utils.toJson($klub)
         {
-          KlubTable: !Ref KlubTableName,
-          ConversationTable: !Ref ConversationTableName
+          KlubTable: !Ref KlubTableName
         }
 
   CreateMessageMutationResolver:

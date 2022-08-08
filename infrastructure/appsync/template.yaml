@@ -993,19 +993,17 @@ Resources:
             }
             
           }
-        - |
-          {
+        - {
             KlubTable: !Ref KlubTableName,
             ConversationTable: !Ref ConversationTableName
           }
       ResponseMappingTemplate: !Sub
-       - |
+        - |
           #set($klub = $context.result.data["${KlubTable}"].items[0])
           #set($avatar = $util.dynamodb.fromS3ObjectJson($klub.avatar))
           #set($klub.avatar = $avatar)
           $utils.toJson($klub)
-       -  |
-          {
+        - {
             KlubTable: !Ref KlubTableName,
             ConversationTable: !Ref ConversationTableName
           }

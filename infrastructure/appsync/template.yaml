@@ -930,7 +930,7 @@ Resources:
           #end
 
           #if(${context.arguments.coinmarketcap})
-            $util.qr($klub.put("coinmarketcap", {  "S": "${context.arguments.coinmarketcap}" } ))
+            $util.qr($klub.put("coinmarketcap", {  "S": "${ctx.args.coinmarketcap}" } ))
           #else 
             $util.qr($klub.put("coinmarketcap", {"S":""}  ))
           #end

@@ -924,13 +924,11 @@ Resources:
           "version" : "2018-05-29",
           "operation" : "BatchPutItem",
           "tables" : {
-            "${KlubTable}": $util.toJson($klubs),
-            "${ConversationTable}": $util.toJson($conversations)
+            "${KlubTable}": $util.toJson($klubs)
           }    
         }
         {
-          KlubTable: !Ref KlubTableName,
-          ConversationTable: !Ref ConversationTableName
+          KlubTable: !Ref KlubTableName
         }
       ResponseMappingTemplate: |
         #set($klub = $context.result.data["${KlubTable}"].items[0])

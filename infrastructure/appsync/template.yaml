@@ -914,72 +914,7 @@ Resources:
 
 
         
-        #if(${context.arguments.minimumAmountForMainGroup}) 
-          $util.qr($klub.put("minimumAmountForMainGroup", "${context.arguments.minimumAmountForMainGroup}" ))
-        #else 
-          $util.qr($klub.put("minimumAmountForMainGroup", 0  ))
-        #end
-
-        #if(${context.arguments.minimumAmountForWhaleGroup}) 
-          $util.qr($klub.put("minimumAmountForWhaleGroup", "${context.arguments.minimumAmountForWhaleGroup}"))
-        #else 
-          $util.qr($klub.put("minimumAmountForWhaleGroup", 0  ))
-        #end
-
-        #if(${context.arguments.website})
-          $util.qr($klub.put("website", "${context.arguments.website}"))
-        #else 
-          $util.qr($klub.put("website", ""  ))
-        #end
-
-        #if(${context.arguments.coinmarketcap})
-          $util.qr($klub.put("coinmarketcap", "${context.arguments.coinmarketcap}"))
-        #else 
-          $util.qr($klub.put("coinmarketcap", ""  ))
-        #end
-
-        #if(${context.arguments.coingecho})
-          $util.qr($klub.put("coingecho", "${context.arguments.coingecho}" ))
-        #else 
-          $util.qr($klub.put("coingecho", "" ))
-        #end
-
-        #if(${context.arguments.dextools})
-          $util.qr($klub.put("dextools", "${context.arguments.dextools}" ))
-        #else 
-          $util.qr($klub.put("dextools", ""  ))
-        #end
-
-        #if(${context.arguments.telegram})
-          $util.qr($klub.put("telegram", "${context.arguments.telegram}"))
-        #else 
-          $util.qr($klub.put("telegram", ""  ))
-        #end
-
-        #if(${context.arguments.discord})
-          $util.qr($klub.put("discord", "${context.arguments.discord}"))
-        #else 
-          $util.qr($klub.put("discord", ""  ))
-        #end
-
-        #if(${context.arguments.twitter})
-          $util.qr($klub.put("twitter", "${context.arguments.twitter}" ))
-        #else 
-          $util.qr($klub.put("twitter", ""  ))
-        #end
-
-        #if(${context.arguments.reddit})
-          $util.qr($klub.put("reddit", "${context.arguments.reddit}" ))
-        #else 
-          $util.qr($klub.put("reddit", ""  ))
-        #end
-
-        #if(${context.arguments.instagram})
-          $util.qr($klub.put("instagram", "${context.arguments.instagram}" ))
-        #else 
-          $util.qr($klub.put("instagram", ""  ))
-        #end
-
+       
         $util.qr($klub.put("createdAt",$createdAt ))
 
         $util.qr($klubs.add($util.dynamodb.toMapValues($klub)))

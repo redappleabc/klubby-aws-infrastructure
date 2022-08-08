@@ -893,86 +893,86 @@ Resources:
           $util.qr($conversations.add($util.dynamodb.toMapValues($mainConversation)))
           $util.qr($conversations.add($util.dynamodb.toMapValues($whaleConversation)))
 
-          #set( $avatar = ${ctx.args.avatar} )
+          #set( $avatar = $context.arguments.avatar )
           #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
 
           #set($klubs = [])
           #set($klub = {})
-          $util.qr($klub.put("klubname",  { "S" : "${ctx.args.klubname}" }))
-          $util.qr($klub.put("owner", {  "S": "${context.identity.username}" }))
-          $util.qr($klub.put("assetSymbol", {  "S": "${ctx.args.assetSymbol}" }))
+          $util.qr($klub.put("klubname",  { "S" : "$context.arguments.klubname" }))
+          $util.qr($klub.put("owner", {  "S": "$context.identity.username" }))
+          $util.qr($klub.put("assetSymbol", {  "S": "$context.arguments.assetSymbol" }))
           $util.qr($klub.put("avatar", $util.toJson($avatar)))
-          $util.qr($klub.put("description", {  "S": "${ctx.args.description}" }))
-          $util.qr($klub.put("contractAddress", {  "S": "${ctx.args.contractAddress}" }))
-          $util.qr($klub.put("blockchainExplorer", {  "S": "${ctx.args.blockchainExplorer}" }))
-          $util.qr($klub.put("tokenType", {  "S": "${ctx.args.tokenType}" }))
+          $util.qr($klub.put("description", {  "S": "$ctx.args.description" }))
+          $util.qr($klub.put("contractAddress", {  "S": "$context.arguments.contractAddress" }))
+          $util.qr($klub.put("blockchainExplorer", {  "S": "$context.arguments.blockchainExplorer" }))
+          $util.qr($klub.put("tokenType", {  "S": "$context.arguments.tokenType" }))
           $util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
           $util.qr($klub.put("mainGroupConversationId", {  "S": "$mainConversationId" }))
           $util.qr($klub.put("whaleGroupConversationID", {  "S": "$whaleConversationId" }))
           
 
-          #if(${ctx.args.minimumAmountForMainGroup}) 
-            $util.qr($klub.put("minimumAmountForMainGroup", {  "N": "${ctx.args.minimumAmountForMainGroup}" } ))
+          #if($context.arguments.minimumAmountForMainGroup) 
+            $util.qr($klub.put("minimumAmountForMainGroup", {  "N": "$context.arguments.minimumAmountForMainGroup" } ))
           #else 
             $util.qr($klub.put("minimumAmountForMainGroup", {"N":"0"}  ))
           #end
 
-          #if(${ctx.args.minimumAmountForWhaleGroup}) 
-            $util.qr($klub.put("minimumAmountForWhaleGroup", {  "N": "${ctx.args.minimumAmountForWhaleGroup}" } ))
+          #if($context.arguments.minimumAmountForWhaleGroup) 
+            $util.qr($klub.put("minimumAmountForWhaleGroup", {  "N": "$context.arguments.minimumAmountForWhaleGroup" } ))
           #else 
             $util.qr($klub.put("minimumAmountForWhaleGroup", {"N":"0"}  ))
           #end
 
-          #if(${ctx.args.website})
-            $util.qr($klub.put("website", {  "S": "${ctx.args.website}" } ))
+          #if($context.arguments.website)
+            $util.qr($klub.put("website", {  "S": "$context.arguments.website" } ))
           #else 
             $util.qr($klub.put("website", {"S":""}  ))
           #end
 
-          #if(${ctx.args.coinmarketcap})
-            $util.qr($klub.put("coinmarketcap", {  "S": "${ctx.args.coinmarketcap}" } ))
+          #if($context.arguments.coinmarketcap)
+            $util.qr($klub.put("coinmarketcap", {  "S": "$context.arguments.coinmarketcap" } ))
           #else 
             $util.qr($klub.put("coinmarketcap", {"S":""}  ))
           #end
 
-          #if(${ctx.args.coingecho})
-            $util.qr($klub.put("coingecho", {  "S": "${ctx.args.coingecho}" } ))
+          #if($context.arguments.coingecho)
+            $util.qr($klub.put("coingecho", {  "S": "$context.arguments.coingecho" } ))
           #else 
             $util.qr($klub.put("coingecho", {"S":""}  ))
           #end
 
-          #if(${ctx.args.dextools})
-            $util.qr($klub.put("dextools", {  "S": "${ctx.args.dextools}" } ))
+          #if(${context.arguments.dextools})
+            $util.qr($klub.put("dextools", {  "S": "$context.arguments.dextools" } ))
           #else 
             $util.qr($klub.put("dextools", {"S":""}  ))
           #end
 
-          #if(${ctx.args.telegram})
-            $util.qr($klub.put("telegram", {  "S": "${ctx.args.telegram}" } ))
+          #if($context.arguments.telegram)
+            $util.qr($klub.put("telegram", {  "S": "$context.arguments.telegram" } ))
           #else 
             $util.qr($klub.put("telegram", {"S":""}  ))
           #end
 
-          #if(${ctx.args.discord})
-            $util.qr($klub.put("discord", {  "S": "${ctx.args.discord}" } ))
+          #if($context.arguments.discord)
+            $util.qr($klub.put("discord", {  "S": "$context.arguments.discord" } ))
           #else 
             $util.qr($klub.put("discord", {"S":""}  ))
           #end
 
-          #if(${ctx.args.twitter})
-            $util.qr($klub.put("twitter", {  "S": "${ctx.args.twitter}" } ))
+          #if($context.arguments.twitter)
+            $util.qr($klub.put("twitter", {  "S": "$context.arguments.twitter" } ))
           #else 
             $util.qr($klub.put("twitter", {"S":""}  ))
           #end
 
-          #if(${ctx.args.reddit})
-            $util.qr($klub.put("reddit", {  "S": "${ctx.args.reddit}" } ))
+          #if($context.arguments.reddit)
+            $util.qr($klub.put("reddit", {  "S": "$context.arguments.reddit" } ))
           #else 
             $util.qr($klub.put("reddit", {"S":""}  ))
           #end
 
-          #if(${ctx.args.instagram})
-            $util.qr($klub.put("instagram", {  "S": "${ctx.args.instagram}" } ))
+          #if($context.arguments.instagram)
+            $util.qr($klub.put("instagram", {  "S": "$context.arguments.instagram" } ))
           #else 
             $util.qr($klub.put("instagram", {"S":""}  ))
           #end

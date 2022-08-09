@@ -32,12 +32,12 @@ def lambda_handler(event, context):
             }) + "\"",
         }
 
-    return {
+    return json.dumps({
         "statusCode": 200,
         "body": json.dumps({
             "url_info": "yo"
         })
-    }
+    })
 
     # return {
     #     "statusCode": 200,

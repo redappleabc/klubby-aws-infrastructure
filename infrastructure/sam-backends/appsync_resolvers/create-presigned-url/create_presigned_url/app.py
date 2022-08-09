@@ -34,9 +34,9 @@ def lambda_handler(event, context):
 
     return json.dumps({
         "statusCode": 200,
-        "body": json.dumps({
+        "body": {
             "url_info": "yo"
-        })
+        }
     })
 
     # return {

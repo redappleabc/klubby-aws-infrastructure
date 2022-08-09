@@ -355,7 +355,7 @@ Resources:
           createMessage(content: String!, conversationId: ID!): Message
 
           #creates a presigned url that can be used to upload avatar image
-          createPresignedUrl: String
+          createPresignedUrl(key: String!): String
 
           #Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge

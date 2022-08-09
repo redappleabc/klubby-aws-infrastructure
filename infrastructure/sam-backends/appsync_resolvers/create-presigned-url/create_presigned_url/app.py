@@ -2,18 +2,39 @@ import json
 import boto3
 import os
 
-# dynamodb = boto3.client('dynamodb')
-# ssm_client = boto3.client('ssm')
+s3_client = boto3.client('s3')
+ssm_client = boto3.client('ssm')
+
 
 #get stage from env var
 Stage = os.getenv('STAGE')
 
 def lambda_handler(event, context):
-    print(f'event {event}')
+    try:
+        print(f'event {event}')
+
+        #get klub table name from ssm
+        response = ssm_client.get_parameter(Name=f'klub-avatar-bucket-name-{Stage}')
+        bucket_name=response['Parameter']['Value']
+
+        # bucket="klubby-prod-artifacts-bucketInfo"
+        key="/brenden-test/brenden-test"
+
+        result = s3_client.generate_presigned_post(Bucket=bucket_name,Key=key)
+
+        print(result)
+
+    except Exception as e:
+        return {
+            "statusCode": 502,
+            "body": json.dumps({
+                "err": f"{e}",
+            }),
+        }
 
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": "yoooooo",
+            "url_info": f"{result}",
         }),
     }

@@ -49,40 +49,40 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
-      CorsConfiguration:
-        CorsRules:
-          - AllowedHeaders:
-              - '*'
-            AllowedMethods:
-              - GET
-              - POST
-              - PUT
-              - DELETE
-            AllowedOrigins:
-              - '*'
-            ExposedHeaders:
-              - x-amz-server-side-encryption
-              - x-amz-request-id
-              - x-amz-id-2
-              - ETag
-            MaxAge: 3600
+      # CorsConfiguration:
+      #   CorsRules:
+      #     - AllowedHeaders:
+      #         - '*'
+      #       AllowedMethods:
+      #         - GET
+      #         - POST
+      #         - PUT
+      #         - DELETE
+      #       AllowedOrigins:
+      #         - '*'
+      #       ExposedHeaders:
+      #         - x-amz-server-side-encryption
+      #         - x-amz-request-id
+      #         - x-amz-id-2
+      #         - ETag
+      #       MaxAge: 3600
     
-  KlubAvatarBucketPolicy:
-    Type: AWS::S3::BucketPolicy
-    Properties:
-      Bucket: !Ref KlubAvatarBucket
-      PolicyDocument:
-        Statement:
-          -
-            Action:
-              - s3:*
-            Effect: Allow
-            Resource:
-              - !Sub arn:aws:s3:::${KlubAvatarBucket}
-              - !Sub arn:aws:s3:::${KlubAvatarBucket}/*
-            Principal:
-              AWS:
-                - '*'
+  # KlubAvatarBucketPolicy:
+  #   Type: AWS::S3::BucketPolicy
+  #   Properties:
+  #     Bucket: !Ref KlubAvatarBucket
+  #     PolicyDocument:
+  #       Statement:
+  #         -
+  #           Action:
+  #             - s3:*
+  #           Effect: Allow
+  #           Resource:
+  #             - !Sub arn:aws:s3:::${KlubAvatarBucket}
+  #             - !Sub arn:aws:s3:::${KlubAvatarBucket}/*
+  #           Principal:
+  #             AWS:
+  #               - '*'
 
 
 ### SSM PARAMS ###
@@ -93,5 +93,14 @@ Resources:
       Type: String
       Value: !Ref ArtifactsBucket
       Description: SSM Parameter for artifacts bucket name
+      Tags:
+        Environment: !Ref Stage
+  KlubAvatarBuckettName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub klub-avatar-bucket-name-${Stage}
+      Type: String
+      Value: !Ref KlubAvatarBucket
+      Description: SSM Parameter for klub avatar bucket name
       Tags:
         Environment: !Ref Stage

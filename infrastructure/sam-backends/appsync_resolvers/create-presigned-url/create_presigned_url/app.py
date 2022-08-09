@@ -11,6 +11,7 @@ Stage = os.getenv('STAGE')
 def lambda_handler(event, context):
     try:
         print(f'event {event}')
+
         #Format object_key from event info
         klubname = event['arguments']['key']
         object_key=f"klub-avatars/{klubname}"
@@ -31,7 +32,7 @@ def lambda_handler(event, context):
         return json.dumps({
             "statusCode": 500,
             "body": {
-                "error": f"{e}"
+                "error": e
             }
         })
 

@@ -20,7 +20,10 @@ def lambda_handler(event, context):
         # bucket="klubby-prod-artifacts-bucketInfo"
         key="/brenden-test/brenden-test"
 
-        result = s3_client.generate_presigned_post(Bucket=bucket_name,Key=key)
+        params = {"Bucket": bucket_name,"Key": key}
+
+        # result = s3_client.generate_presigned_post(Bucket=bucket_name,Key=key)
+        result = s3_client.generate_presigned_url(ClientMethod="put_object",Params=params)
 
         print(result)
 

@@ -27,14 +27,21 @@ def lambda_handler(event, context):
     except Exception as e:
         return {
             "statusCode": 500,
-            "body": json.dumps({
+            "body": "\"" + json.dumps({
                 "error": f"{e}",
-            }),
+            }) + "\"",
         }
 
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "url_info": f"{result}",
-        }),
+            "url_info": "yo"
+        })
     }
+
+    # return {
+    #     "statusCode": 200,
+    #     "body": "\"" + json.dumps({
+    #         "url_info": "yo",
+    #     }) + "\"",
+    # }

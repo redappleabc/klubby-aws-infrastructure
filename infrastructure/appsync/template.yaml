@@ -503,7 +503,7 @@ Resources:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub CrestePresignedUrl_${Stage}
+      Name: !Sub CreatePresignedUrl_${Stage}
       Description: The lambda function to create a presigned url for image upload
       Type: AWS_LAMBDA
       ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn

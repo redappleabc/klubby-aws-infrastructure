@@ -21,7 +21,7 @@ def lambda_handler(event, context):
         response = ssm_client.get_parameter(Name=f'klub-avatar-bucket-name-{Stage}')
         bucket_name=response['Parameter']['Value']
 
-        params = {"Bucket": bucket_name,"Key": object_key,"ContentType": 'text/plain;charset=UTF-8'}
+        params = {"Bucket": bucket_name,"Key": object_key,"ContentType": 'text/plain;charset=UTF-8',"ACL": "public-read"}
 
         # result = s3_client.generate_presigned_post(Bucket=bucket_name,Key=key)
         result = s3_client.generate_presigned_url(ClientMethod="put_object",Params=params)
@@ -32,7 +32,7 @@ def lambda_handler(event, context):
         return json.dumps({
             "statusCode": 500,
             "body": {
-                "error": e
+                "error": f'{e}'
             }
         })
 

@@ -103,18 +103,6 @@ Resources:
           messages(after: String, first: Int): MessageConnection
         }
 
-        type S3Object {
-          bucket: String!
-          key: String!
-          region: String!
-        }
-
-        input S3ObjectInput {
-          bucket: String!
-          key: String!
-          region: String!
-        }
-
         type Klub {
 
           # The klub's name
@@ -124,7 +112,7 @@ Resources:
           assetSymbol: String
 
           # avatar image for this klub
-          avatar: S3Object!
+          avatar_url: String!
 
           # description for this klub
           description: String!
@@ -347,7 +335,7 @@ Resources:
           createConversation: Conversation
 
           #Create a klub
-          '''createKlub(klubname: ID!, assetSymbol: String, avatar: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!,
+          '''createKlub(klubname: ID!, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!,
             website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
             coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 

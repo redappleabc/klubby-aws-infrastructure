@@ -1579,6 +1579,66 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+
+  announcementConversatioinKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "announcementConversatioin"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.source.announcementConversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  mainGroupConversationKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "mainGroupConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.source.mainGroupConversationId}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  whaleGroupConversationKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "whaleGroupConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplate: |
+        {
+          "version" : "2017-02-28",
+          "operation" : "GetItem",
+          "key" : {
+              "id" : { "S" : "${context.source.whaleGroupConversationID}" }
+          }
+        }
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
   getConversationByIdQueryResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema

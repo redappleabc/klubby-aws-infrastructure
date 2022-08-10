@@ -271,13 +271,13 @@ Resources:
           klub: Klub
 
           # latest message id for main group which I has read
-          # readMainGroup: String
+          readMainGroup: String
 
           # latest message id for whale group which I has read
-          # readWhaleGroup: String
+          readWhaleGroup: String
 
           # latest message id for announcement which I has read
-          # readAnnouncement: String
+          readAnnouncement: String
 
         }
         

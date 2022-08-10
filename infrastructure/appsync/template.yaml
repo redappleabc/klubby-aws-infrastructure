@@ -38,9 +38,9 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: klub-table-name-dev
     Description: klub table name
-  CreatePresignedUrlFunctionArn:
+  CreateKlubAvatarPresignedUrlFunctionArn:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: create-presigned-url-function-arn-dev
+    Default: create-klub-avatar-presigned-url-function-arn-dev
     Description: create presigned url function arn
   JoinKlubFunctionArn:
     Type: AWS::SSM::Parameter::Value<String>
@@ -343,7 +343,7 @@ Resources:
           createMessage(content: String!, conversationId: ID!): Message
 
           #creates a presigned url that can be used to upload avatar image
-          createPresignedUrl(key: String!): String
+          createKlubAvatarPresignedUrl(klubname: String!): String
 
           #Create a user conversation.
           createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
@@ -487,16 +487,16 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref KlubTableName
 
-  CreatePresignedUrlFunctionDataSource:
+  CreateKlubAvatarPresignedUrlFunctionDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub CreatePresignedUrl_${Stage}
+      Name: !Sub CreateKlubAvatarPresignedUrl_${Stage}
       Description: The lambda function to create a presigned url for image upload
       Type: AWS_LAMBDA
       ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
       LambdaConfig:
-        LambdaFunctionArn: !Ref CreatePresignedUrlFunctionArn
+        LambdaFunctionArn: !Ref CreateKlubAvatarPresignedUrlFunctionArn
 
   JoinKlubFunctionDataSource:
     Type: "AWS::AppSync::DataSource"
@@ -582,14 +582,14 @@ Resources:
   
 
   ### Lambda Resolvers ###
-  CreatePresignedUrlResolver:
+  CreateKlubAvatarPresignedUrlResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation
-      FieldName: createPresignedUrl
-      DataSourceName: !GetAtt CreatePresignedUrlFunctionDataSource.Name
+      FieldName: createKlubAvatarPresignedUrl
+      DataSourceName: !GetAtt CreateKlubAvatarPresignedUrlFunctionDataSource.Name
       RequestMappingTemplate: |
         {
           "version": "2017-02-28",

@@ -16,7 +16,7 @@ Globals:
     Timeout: 10
 
 Resources:
-  CreatePresignedUrlFunction:
+  CreateKlubAvatarPresignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: create_presigned_url/
@@ -44,12 +44,12 @@ Resources:
 
 
 ### SSM PARAMS ###
-  CreatePresignedUrlFunctionArn:
+  CreateKlubAvatarPresignedUrlFunctionArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub create-presigned-url-function-arn-${Stage}
+      Name: !Sub create-klub-avatar-presigned-url-function-arn-${Stage}
       Type: String
-      Value: !GetAtt CreatePresignedUrlFunction.Arn
+      Value: !GetAtt CreateKlubAvatarPresignedUrlFunction.Arn
       Description: SSM Parameter for user ARN of create presigned url function
       Tags:
         Environment: !Ref Stage

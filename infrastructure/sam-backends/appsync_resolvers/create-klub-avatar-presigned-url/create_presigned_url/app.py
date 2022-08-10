@@ -13,7 +13,7 @@ def lambda_handler(event, context):
         print(f'event {event}')
 
         #Format object_key from event info
-        klubname = event['arguments']['key']
+        klubname = event['arguments']['klubname']
         object_key=f"klub-avatars/{klubname}"
 
 

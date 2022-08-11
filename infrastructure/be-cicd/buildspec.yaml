@@ -27,7 +27,7 @@ phases:
           MessageTableName=message-table-name-$STAGE
           KlubTableName=klub-table-name-$STAGE
           UserPoolId=userpool-id-$STAGE
-          CreatePresignedUrlFunctionArn=create-presigned-url-function-arn-$STAGE
+          CreateKlubAvatarPresignedUrlFunctionArn=create-klub-avatar-presigned-url-function-arn-$STAGE
           JoinKlubFunctionArn=join-klub-function-arn-$STAGE
 
       # - cd ../managed-blockchain

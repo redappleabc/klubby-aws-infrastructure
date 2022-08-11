@@ -184,7 +184,7 @@ Resources:
           # This is pointer to Conversation for above mainGroupConversationId
           mainGroupConversation: Conversation
 
-          whaleGroupConversationID: ID!
+          whaleGroupConversationId: ID!
 
           # This is pointer to Conversation for above whaleGroupConversationId
           whaleGroupConversation: Conversation
@@ -932,7 +932,7 @@ Resources:
           $util.qr($klub.put("tokenType", {  "S": "$context.arguments.tokenType" }))
           $util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
           $util.qr($klub.put("mainGroupConversationId", {  "S": "$mainConversationId" }))
-          $util.qr($klub.put("whaleGroupConversationID", {  "S": "$whaleConversationId" }))
+          $util.qr($klub.put("whaleGroupConversationId", {  "S": "$whaleConversationId" }))
           
 
           #if($context.arguments.minimumAmountForMainGroup) 
@@ -1633,7 +1633,7 @@ Resources:
           "version" : "2017-02-28",
           "operation" : "GetItem",
           "key" : {
-              "id" : { "S" : "${context.source.whaleGroupConversationID}" }
+              "id" : { "S" : "${context.source.whaleGroupConversationId}" }
           }
         }
       ResponseMappingTemplate: |

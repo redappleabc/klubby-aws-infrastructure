@@ -31,7 +31,7 @@ phases:
         --no-fail-on-empty-changeset
 
   #----Deploy create-presigned-url Function-------#
-      - cd ../appsync_resolvers/create-presigned-url
+      - cd ../appsync_resolvers/create-klub-avatar-presigned-url
       - sam build
       - sam deploy
         --stack-name klubby-$STAGE-create-presigned-url

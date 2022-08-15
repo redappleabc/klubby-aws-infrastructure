@@ -18,7 +18,7 @@ phases:
       - aws cloudformation deploy
         --s3-bucket $ARTIFACTS_BUCKET
         --stack-name klubby-appsync-$STAGE
-        --template template.yaml
+        --template template.package.yaml
         --region us-east-1 
         --capabilities CAPABILITY_IAM
         --parameter-override

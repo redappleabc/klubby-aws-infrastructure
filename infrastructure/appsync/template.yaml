@@ -249,15 +249,7 @@ Resources:
       TypeName: Mutation
       FieldName: createKlubAvatarPresignedUrl
       DataSourceName: !GetAtt CreateKlubAvatarPresignedUrlFunctionDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version": "2017-02-28",
-          "operation": "Invoke",
-          "payload": {
-            "action": "create_presigned_url",
-            "arguments":  $utils.toJson($ctx.arguments)
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/createKlubAvatarPresignedUrl.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

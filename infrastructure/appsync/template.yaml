@@ -430,29 +430,29 @@ Resources:
   #         UserConversationBridgeTable: !Ref UserConversationBridgeTableName
   #       }
 
-  AcceptConversationResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Mutation"
-      FieldName: "acceptConversation"
-      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/acceptConversation.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+  # AcceptConversationResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: "Mutation"
+  #     FieldName: "acceptConversation"
+  #     DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+  #     RequestMappingTemplate: resolver-mappings/acceptConversation.request.vtl
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
   
-  RemoveUserConversationBridgeResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Mutation"
-      FieldName: "removeUserConversationBridge"
-      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/removeUserConversationBridge.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+  # RemoveUserConversationBridgeResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: "Mutation"
+  #     FieldName: "removeUserConversationBridge"
+  #     DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+  #     RequestMappingTemplate: resolver-mappings/removeUserConversationBridge.request.vtl
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
 
   CreateKlubMutationResolver:
     Type: "AWS::AppSync::Resolver"

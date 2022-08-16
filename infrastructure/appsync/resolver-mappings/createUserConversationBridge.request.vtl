@@ -1,0 +1,14 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key": {
+        "username": { "S" : "${context.arguments.username}"},
+        "conversationId": { "S" : "${context.arguments.conversationId}"}
+    },
+    "attributeValues" : {
+        "username": {  "S": "${context.arguments.username}" },
+        "conversationId": {  "S": "${context.arguments.conversationId}" },
+        "name": #if(${context.arguments.name}) {  "S": "${context.arguments.name}" } #else {"S":""} #end,
+        "accepted": #if(${context.arguments.accepted}) {  "BOOL": ${context.arguments.accepted} } #else {"BOOL":false} #end
+    }
+}

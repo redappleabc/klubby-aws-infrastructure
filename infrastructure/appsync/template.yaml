@@ -261,15 +261,7 @@ Resources:
       TypeName: Mutation
       FieldName: joinKlub
       DataSourceName: !GetAtt JoinKlubFunctionDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version": "2017-02-28",
-          "operation": "Invoke",
-          "payload": {
-            "action": "join_klub",
-            "arguments":  $utils.toJson($ctx.arguments)
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/joinKlub.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -281,15 +273,7 @@ Resources:
       TypeName: Mutation
       FieldName: leaveKlub
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "DeleteItem",
-          "key" : {
-            "klubname" : { "S" : "${context.arguments.klubname}" },
-            "username" : { "S" : "${context.identity.username}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/leaveKlub.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -324,19 +308,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "createConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "PutItem",
-          "key": {
-              "id": { "S" : "$util.autoId()"}
-          },
-          "attributeValues" : {
-             "id": {  "S": "$util.autoId()" },
-             "creator": {  "S": "${context.identity.username}" },
-             "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/createConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -391,14 +363,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "DeleteItem",
-          "key" : {
-            "id" : { "S" : "${context.arguments.conversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/removeConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -410,21 +375,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "createUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "PutItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "attributeValues" : {
-                "username": {  "S": "${context.arguments.username}" },
-                "conversationId": {  "S": "${context.arguments.conversationId}" },
-                "name": #if(${context.arguments.name}) {  "S": "${context.arguments.name}" } #else {"S":""} #end,
-                "accepted": #if(${context.arguments.accepted}) {  "BOOL": ${context.arguments.accepted} } #else {"BOOL":false} #end
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/createUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -479,9 +430,7 @@ Resources:
   #         UserConversationBridgeTable: !Ref UserConversationBridgeTableName
   #       }
 
-
-
-  AcceptConversationUserConversationBridgeMutationResolver:
+  AcceptConversationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
@@ -489,32 +438,11 @@ Resources:
       TypeName: "Mutation"
       FieldName: "acceptConversation"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key" : {
-                "username" : {  "S": "${context.identity.username}" },
-                "conversationId" : {  "S": "${context.arguments.conversationId}" }
-            },
-            "update" : {
-                "expression" : "SET #accepted = :accepted, #acceptTime = :acceptTime",
-                 "expressionNames": {
-                   "#accepted" : "accepted",
-                   "#acceptTime" : "acceptTime"
-                 },
-                "expressionValues": {
-                    ":accepted" :  {  "BOOL": true },
-                    ":acceptTime": {  "S": "$util.time.nowEpochMilliSeconds()" }
-                }
-            }
-        }
+      RequestMappingTemplate: resolver-mappings/acceptConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-
   
-  RemoveUserConversationBridgeMutationResolver:
+  RemoveUserConversationBridgeResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
@@ -522,15 +450,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "DeleteItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            }
-        }
+      RequestMappingTemplate: resolver-mappings/removeUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

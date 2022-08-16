@@ -1179,17 +1179,9 @@ Resources:
       TypeName: Klub
       FieldName: "mainGroupConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.source.mainGroupConversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/mainGroupConversationKlub.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
 
   whaleGroupConversationKlubResolver:
     Type: "AWS::AppSync::Resolver"
@@ -1199,14 +1191,7 @@ Resources:
       TypeName: Klub
       FieldName: "whaleGroupConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.source.whaleGroupConversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/whaleGroupConversationKlub.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -1218,14 +1203,7 @@ Resources:
       TypeName: Query
       FieldName: getConversationById
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.arguments.conversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/getConversationById.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
   
@@ -1237,18 +1215,9 @@ Resources:
       TypeName: Query
       FieldName: getKlubByKlubname
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "klubname" : { "S" : "${context.arguments.klubname}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/getKlubByKlubname.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-
 
   associatedUserConversationBridgeResolver:
     Type: "AWS::AppSync::Resolver"
@@ -1258,33 +1227,9 @@ Resources:
       TypeName: UserConversationBridge
       FieldName: associated
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2018-05-29",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :conversationId",
-              "expressionValues" : {
-                  ":conversationId" : {
-                      "S" : "${context.source.conversationId}"
-                  }
-              }
-          },
-          "filter" : {
-              "expression" : "#username <> :username",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":username" : {"S": "${context.identity.username}"}
-              }
-          },
-          "index": "conversationId-index"
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/associatedUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $util.toJson($context.result.items) 
-   
-
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver
@@ -1294,27 +1239,10 @@ Resources:
       TypeName: Mutation
       FieldName: updateUser
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key" : {
-                "username" : $util.dynamodb.toDynamoDBJson($context.arguments.username)
-            },
-            "update" : {
-                "expression" : "SET wallets = :wallets",
-                ## "expressionNames": {
-                ##     "#url" : "url"
-                ## },
-                "expressionValues": {
-                    ":wallets" : $util.dynamodb.toDynamoDBJson($context.arguments.wallets)
-                }
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/updateUser.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
-
 
   SetReadResolver:
     Type: AWS::AppSync::Resolver
@@ -1324,24 +1252,7 @@ Resources:
       TypeName: Mutation
       FieldName: setRead
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "update" : {
-                "expression" : "SET #read = :messageId",
-                "expressionNames" : {
-                  "#read" : "read"
-                },
-                "expressionValues": {
-                    ":messageId" : $util.dynamodb.toDynamoDBJson($context.arguments.messageId)
-                }
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/setRead.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)

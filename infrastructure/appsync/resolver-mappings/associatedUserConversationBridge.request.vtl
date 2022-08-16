@@ -1,0 +1,22 @@
+{
+    "version" : "2018-05-29",
+    "operation" : "Query",
+    "query" : {
+        "expression": "conversationId = :conversationId",
+        "expressionValues" : {
+            ":conversationId" : {
+                "S" : "${context.source.conversationId}"
+            }
+        }
+    },
+    "filter" : {
+        "expression" : "#username <> :username",
+        "expressionNames" : {
+            "#username" : "username"
+        },
+        "expressionValues" : {
+            ":username" : {"S": "${context.identity.username}"}
+        }
+    },
+    "index": "conversationId-index"
+}

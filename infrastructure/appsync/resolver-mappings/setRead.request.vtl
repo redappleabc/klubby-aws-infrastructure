@@ -1,0 +1,17 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key": {
+        "username": { "S" : "${context.arguments.username}"},
+        "conversationId": { "S" : "${context.arguments.conversationId}"}
+    },
+    "update" : {
+        "expression" : "SET #read = :messageId",
+        "expressionNames" : {
+            "#read" : "read"
+        },
+        "expressionValues": {
+            ":messageId" : $util.dynamodb.toDynamoDBJson($context.arguments.messageId)
+        }
+    }
+}

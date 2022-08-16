@@ -632,7 +632,6 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-
   ReplyMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -670,28 +669,10 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeMessage"
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "DeleteItem",
-          "key" : {
-            "id" : { "S" : "${context.arguments.id}" },
-            "conversationId": {"S" : "${context.arguments.conversationId}"}
-          },
-          "condition" : {
-              "expression" : "#sender = :sender",
-              "expressionNames" : {
-                  "#sender" : "sender"
-              },
-              "expressionValues" : {
-                  ":sender" : {"S": "${context.identity.username}"}
-              }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/removeMessage.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  
   EditMessageMutationResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
@@ -700,40 +681,10 @@ Resources:
       TypeName: Mutation
       FieldName: editMessage
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key" : {
-              "id" : { "S" : "${context.arguments.id}" },
-              "conversationId": {"S" : "${context.arguments.conversationId}"}
-            },
-            "condition" : {
-              "expression" : "#sender = :sender",
-              "expressionNames" : {
-                  "#sender" : "sender"
-              },
-              "expressionValues" : {
-                  ":sender" : {"S": "${context.identity.username}"}
-              }
-            },
-            "update" : {
-                "expression" : "SET #content = :content, #updatedAt = :updatedAt",
-                "expressionNames": {
-                   "#content" : "content",
-                   "#updatedAt" : "updatedAt"
-                 },
-                "expressionValues": {
-                    ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content) ,
-                    ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
-                }
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/editMessage.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
-
-
 
   OriginalMessageMutationResolver:
     Type: AWS::AppSync::Resolver
@@ -743,15 +694,7 @@ Resources:
       TypeName: Message
       FieldName: originalMessage
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "GetItem",
-            "key" : {
-              "id" : { "S" : "${context.source.originalId}" },
-              "conversationId": {"S" : "${context.source.conversationId}"}
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/getOriginalMessage.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
@@ -764,8 +707,6 @@ Resources:
 #               "expressionValues" : {
 #                   ":username" : {"S": "${context.identity.username}"}
 #               }
-
-
   ListMyKlubsResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
@@ -774,20 +715,7 @@ Resources:
       TypeName: Query
       FieldName: listMyKlubs
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "#username = :username",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":username" : {"S": "${context.identity.username}"}
-              }
-            },
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/listMyKlubs.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
@@ -802,30 +730,12 @@ Resources:
       TypeName: Query
       FieldName: listUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "#username <> :username",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":username" : {"S": "${context.identity.username}"}
-              }
-          },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/listUsers.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
         *#
         $util.toJson($ctx.result.items)
-
-
 
   SearchUsersResolver:
     Type: AWS::AppSync::Resolver
@@ -835,32 +745,12 @@ Resources:
       TypeName: Query
       FieldName: searchUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "#username <> :myname and begins_with(#username, :username)",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":myname" : {"S": "${context.identity.username}"},
-                  ":username" : {"S": "${context.arguments.username}"}
-              }
-            },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/searchUsers.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
         *#
         $util.toJson($ctx.result.items)
-
-
-
 
   GetUserWalletsResolver:
     Type: AWS::AppSync::Resolver
@@ -870,7 +760,7 @@ Resources:
       TypeName: Query
       FieldName: getUserWallets
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/getUserWallets.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/getUserWallets.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
@@ -883,7 +773,7 @@ Resources:
       TypeName: Query
       FieldName: getMe
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/getMe.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/getMe.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -895,7 +785,7 @@ Resources:
       TypeName: "User"
       FieldName: "conversations"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/conversationsUser.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/conversationsUser.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
 
@@ -907,7 +797,7 @@ Resources:
       TypeName: "User"
       FieldName: "klubs"
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/klubUser.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/klubUser.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
 
@@ -919,7 +809,7 @@ Resources:
       TypeName: UserKlubBridge
       FieldName: klub
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/klubUserKlubBridge.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/klubUserKlubBridge.request.vtl
       ResponseMappingTemplate: |
         $util.toJson($ctx.result)
 
@@ -957,7 +847,7 @@ Resources:
       TypeName: Query
       FieldName: listMessageConnections
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/listMessageConnections.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/listMessageConnections.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
@@ -972,7 +862,7 @@ Resources:
       TypeName: Query
       FieldName: searchKlubs
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/searchKlub.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/searchKlub.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
@@ -1017,7 +907,7 @@ Resources:
       TypeName: "Conversation"
       FieldName: "messages"
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/messagesConversation.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/messagesConversation.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),

@@ -1,0 +1,28 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "id" : { "S" : "${context.arguments.id}" },
+        "conversationId": {"S" : "${context.arguments.conversationId}"}
+    },
+    "condition" : {
+        "expression" : "#sender = :sender",
+        "expressionNames" : {
+            "#sender" : "sender"
+        },
+        "expressionValues" : {
+            ":sender" : {"S": "${context.identity.username}"}
+        }
+    },
+    "update" : {
+        "expression" : "SET #content = :content, #updatedAt = :updatedAt",
+        "expressionNames": {
+            "#content" : "content",
+            "#updatedAt" : "updatedAt"
+            },
+        "expressionValues": {
+            ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content) ,
+            ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
+        }
+    }
+}

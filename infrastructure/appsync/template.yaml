@@ -1044,7 +1044,7 @@ Resources:
       TypeName: Klub
       FieldName: "announcementConversatioin"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/announcementConversatioinKlub.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/announcementConversationKlub.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

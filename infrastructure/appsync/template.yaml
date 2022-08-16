@@ -870,14 +870,7 @@ Resources:
       TypeName: Query
       FieldName: getUserWallets
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version": "2017-02-28",
-            "operation": "GetItem",
-            "key": {
-                "username": $util.dynamodb.toDynamoDBJson($ctx.args.username),
-            }
-        }
+      RequestMappingTemplate: resolver-mappings/getUserWallets.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
@@ -890,19 +883,9 @@ Resources:
       TypeName: Query
       FieldName: getMe
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key": {
-              "username": { "S" : "${context.identity.username}"}
-          }
-        }
+      RequestMappingTemplate: resolver-mappings/getMe.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-
-        
 
   ConversationsUserResolver:
     Type: "AWS::AppSync::Resolver"
@@ -912,24 +895,9 @@ Resources:
       TypeName: "User"
       FieldName: "conversations"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "username = :username",
-              "expressionValues" : {
-                  ":username" : {
-                      "S" : "${context.identity.username}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": 1000
-        }
+      RequestMappingTemplate: resolver-mappings/conversationsUser.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
-    
 
   KlubsUserResolver:
     Type: "AWS::AppSync::Resolver"
@@ -939,25 +907,7 @@ Resources:
       TypeName: "User"
       FieldName: "klubs"
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "#username = :username",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":username" : {
-                      "S" : "${context.identity.username}"
-                  }
-              }
-          },
-          "index": "username-index",
-          "scanIndexForward": false,
-          "limit": 1000
-        }
+      RequestMappingTemplate: resolver-mappings/klubUser.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
 
@@ -969,18 +919,9 @@ Resources:
       TypeName: UserKlubBridge
       FieldName: klub
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "GetItem",
-            "key" : {
-              "klubname" : { "S" : "${context.source.klubname}"},
-            }
-        }
+      RequestMappingTemplate: resolver-mappings/klubUserKlubBridge.request.vtl
       ResponseMappingTemplate: |
         $util.toJson($ctx.result)
-
-
 
   # getAllMessagesResolver:
   #   Type: "AWS::AppSync::Resolver"
@@ -1016,22 +957,7 @@ Resources:
       TypeName: Query
       FieldName: listMessageConnections
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :conversationId",
-              "expressionValues" : {
-                  ":conversationId" : {
-                      "S" : "${context.arguments.conversationId}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
+      RequestMappingTemplate: resolver-mappings/listMessageConnections.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
@@ -1046,23 +972,7 @@ Resources:
       TypeName: Query
       FieldName: searchKlubs
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "begins_with(#klubname, :klubname)",
-              "expressionNames" : {
-                  "#klubname" : "klubname"
-              },
-              "expressionValues" : {
-                  ":klubname" : {"S": "${context.arguments.klubname}"}
-              }
-            },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
-        }
+      RequestMappingTemplate: resolver-mappings/searchKlub.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
@@ -1099,8 +1009,6 @@ Resources:
   #     ResponseMappingTemplate: |
   #       $utils.toJson($context.result.items)
 
-  
-
   MessagesConversationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -1109,22 +1017,7 @@ Resources:
       TypeName: "Conversation"
       FieldName: "messages"
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :id",
-              "expressionValues" : {
-                  ":id" : {
-                      "S" : "${context.source.id}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
+      RequestMappingTemplate: resolver-mappings/messagesConversation.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
@@ -1139,17 +1032,9 @@ Resources:
       TypeName: UserConversationBridge
       FieldName: "conversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.source.conversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/conversationUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
 
   announcementConversatioinKlubResolver:
     Type: "AWS::AppSync::Resolver"
@@ -1159,17 +1044,9 @@ Resources:
       TypeName: Klub
       FieldName: "announcementConversatioin"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.source.announcementConversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/announcementConversatioinKlub.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
 
   mainGroupConversationKlubResolver:
     Type: "AWS::AppSync::Resolver"

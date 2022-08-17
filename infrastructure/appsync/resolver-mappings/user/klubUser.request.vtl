@@ -1,0 +1,18 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "Query",
+    "query" : {
+        "expression": "#username = :username",
+        "expressionNames" : {
+            "#username" : "username"
+        },
+        "expressionValues" : {
+            ":username" : {
+                "S" : "${context.identity.username}"
+            }
+        }
+    },
+    "index": "username-index",
+    "scanIndexForward": false,
+    "limit": 1000
+}

@@ -12,40 +12,40 @@ Parameters:
     Description: Stage of build
   UserPoolId:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userpool-id-${Stage}
+    Default: userpool-id-dev
     Description: user pool id from SSM
   UserTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: user-table-name-${Stage}
+    Default: user-table-name-dev
     Description: user table name
   ConversationTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: conversation-table-name-${Stage}
+    Default: conversation-table-name-dev
     Description: conversation table name
   UserConversationBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userconversationbridge-table-name-${Stage}
+    Default: userconversationbridge-table-name-dev
     Description: user conversation table name
-
-
-
-  KlubConversationBridgeTableName:
-    Type: AWS::SSM::Parameter::Value<String>
-    Default: klubconversationbridge-table-name-${Stage}
-    Description: user conversation table name
-
   UserKlubBridgeTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: userklubbridge-table-name-${Stage}
+    Default: userklubbridge-table-name-dev
     Description: user conversation table name
   MessageTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: message-table-name-${Stage}
+    Default: message-table-name-dev
     Description: message table name
   KlubTableName:
     Type: AWS::SSM::Parameter::Value<String>
-    Default: klub-table-name-${Stage}
+    Default: klub-table-name-dev
     Description: klub table name
+  CreateKlubAvatarPresignedUrlFunctionArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: create-klub-avatar-presigned-url-function-arn-dev
+    Description: create presigned url function arn
+  JoinKlubFunctionArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: join-klub-function-arn-dev
+    Description: join klub function arn
   # UserStatusManageFunction:
   #   Type: AWS::SSM::Parameter::Value<String>
   #   Default: user-status-manage-funtion-${Stage}
@@ -69,354 +69,7 @@ Resources:
     Type: AWS::AppSync::GraphQLSchema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      # DefinitionS3Location:
-      #   Ref: graphQlSchemaS3DescriptionLocation
-      Definition: |
-        schema {
-          query: Query
-          mutation: Mutation
-          subscription: Subscription
-        }
-
-        enum Status {
-          online
-          offline
-        }
-
-        type Presence {
-          username: ID!
-          status: Status!
-        }
-
-        type Conversation {
-
-          #  A unique identifier for the Conversation.
-          id: ID!
-
-          # The Conversation's creator
-          creator: String
-
-          #  The Conversation's timestamp.
-          createdAt: String
-          
-          #  The Conversation's messages.
-          messages(after: String, first: Int): MessageConnection
-        }
-
-        type S3Object {
-          bucket: String!
-          key: String!
-          region: String!
-        }
-
-        input S3ObjectInput {
-          bucket: String!
-          key: String!
-          region: String!
-        }
-
-        type Klub {
-
-          # The klub's name
-          klubname: String!
-
-          # avatar image for this klub
-          avatar: S3Object!
-
-          # description for this klub
-          description: String!
-
-          # The creator of klub
-          owner: String!
-
-          # the blockchain network e.g. Ethereum
-          #TODO only starting with eth network
-          #network: String
-
-          # the contract address 
-          contractAddress: String!
-
-          # the blockchain explorer
-          blockchainExplorer: String!
-
-          # token type e.g. ERC20, ETH or ERC721
-          tokenType: String!
-
-          # Website
-          website: String
-
-          # Social coinmarketcap
-          coinmarketcap: String
-
-          # Social coingecho
-          coingecho: String
-
-          # Social dextools
-          dextools: String
-
-          # Social telegram
-          telegram: String
-
-          # Social discord
-          discord: String
-
-          # Social twitter
-          twitter: String
-
-          # Social reddit
-          reddit: String
-
-          # Social instagram
-          instagram: String
-
-          # the link where to buy.
-          # linkToBuy: String
-
-          # threshold for owning tokens to be a member of MAIN GROUP.
-          minimumAmountForMainGroup: String
-
-          # threshold for owning tokens to be a member of WHALE GROUP.
-          minimumAmountForWhaleGroup: String
-
-          #  The Klubs's timestamp.
-          createdAt: String
-         
-          
-        }
-
-        type Message {
-          #  Generated id for a message -- read-only
-          id: ID!
-
-          #  The id of the Conversation this message belongs to. This is the table primary key.
-          conversationId: ID!
-
-          #  The message content.
-          content: String!
-
-          # The original id for a replay messages.
-          originalId: ID
-
-          # The original message for a replay messages.
-          originalMessage: Message
-
-          #  The message timestamp.
-          createdAt: String
-
-          updatedAt: String
-         
-          #  Flag denoting if this message has been accepted by the server or not.
-          isSent: Boolean
-
-          sender: String
-        }
-
-        type MessageConnection {
-          messages: [Message]
-          nextToken: String
-        }
-
-        type User {
-          # This is partition key
-          username: String!
-          wallets: String
-          #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
-          conversations: [UserConversationBridge]
-          klubs: [UserKlubBridge]
-        }
-
-        type UserConversationBridge {
-
-          # This is partition key
-          username: ID!
-
-          # This is sort key
-          conversationId: ID!
-          
-          # The conversation name
-
-          name: String
-
-          accepted: Boolean;
-
-          acceptTime: String
-
-          # The other's UserConversationBrdige. This field has resolver.
-          associated: [UserConversationBridge]
-
-          # The conversation related me. This field has resolver.
-          conversation: Conversation
-
-          # latest message id  which I has read
-          read: String
-
-        }
-
-        type UserKlubBridge {
-
-          # This is partition key
-          username: ID!
-
-          # This is sort key
-          klubname: ID!
-
-
-          # latest message id for main group which I has read
-          readMainGroup: String
-
-          # latest message id for whale group which I has read
-          readWhaleGroup: String
-
-          # latest message id for announcement which I has read
-          readAnnouncement: String
-
-          #This is pointer to KlubConversationBridge for this Klub.
-          conversations: KlubConversationBridge
-
-        }
-        
-        type KlubConversationBridge {
-          
-          # This is partition key
-          klubname: ID!
-
-
-          # This is sort key
-          announcementConversationId: ID!
-
-          # This is pointer to Conversation for above announcementConversationId
-          announcementConversatioin: Conversation
-
-
-
-          # This is sort key
-          mainGroupConversationId: ID!
-
-          # This is pointer to Conversation for above mainGroupConversationId
-          mainGroupConversation: Conversation
-
-
-          # This is sort key
-          whaleGroupConversationID: ID!
-
-          # This is pointer to Conversation for above whaleGroupConversationId
-          whaleGroupConversation: Conversation
-
-        }
-
-
-        type Query {
-
-          # get Me
-          getMe: User
-
-          #get user wallets
-          getUserWallets(username: String!): User
-
-          getConversationById(conversationId: ID!): Conversation
-
-          heartbeat(username: ID!): Presence
-
-          #get all klubs
-          searchKlubs(klubname: String!): [Klub]
-
-          #Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-          listMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
-
-          #get all users
-          listUsers: [User]
-
-          # get users whose username starts with _username
-          searchUsers(username: String!): [User]
-
-          status(username: ID!): Presence
-
-          #For now this is not used.
-          #Scan through all values of type 'Message'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnection' result to fetch pages.
-          #getAllMessages(after: String, conversationId: ID!, first: Int): [Message]
-
-          #For now this is not being used.
-          #TODO what does this do
-          #getAllMessagesFrom(after: String, conversationId: ID!, first: Int, sender: String!): [Message] 
-
-        }
-
-        type Mutation {
-
-          # addUser(username: String!): User
-
-          connect(username: ID!): Presence
-
-          #Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
-          createConversation: Conversation
-
-          #Create a klub
-          '''createKlub(klubname: ID!, avatar: S3ObjectInput!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!, 
-            website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String, 
-            coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
-
-          #Create a message in a Conversation.
-          createMessage(content: String!, conversationId: ID!): Message
-
-          #Create a user conversation.
-          createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
-
-          acceptConversation(conversationId: ID!, username: ID!, acceptTime: String ): UserConversationBridge
-
-          disconnect(username: ID!): Presence
-
-          disconnected(username: ID!): Presence
-
-          #edit message in Messages table
-          editMessage(conversationId: ID!, id: String!, content: String!): Message
-
-          #Delete the Conversation
-          removeConversation(conversationId: ID!): Conversation
-
-          #remove message in Messages table
-          removeMessage(conversationId: ID!, id: String!): Message
-
-          #Delete  UserConversationBridge
-          removeUserConversationBridge(username: ID!, conversationId: ID!): UserConversationBridge
-
-          #add reply to the message in a Conversation.
-          replyMessage(content: String!, conversationId: ID!, originalId: ID!): Message
-
-          #set message id which user read
-          setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
-
-          updateUser(username: String!,wallets: String!): User
-        }
-
-
-
-        type Subscription  {
-
-          onStatus(id: ID!): Presence
-            @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
-
-          #Subscribes to all new messages in a given Conversation.
-          subscribeToNewMessage(conversationId: ID!): Message
-            @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
-
-          subscribeToNewUserConversationBridge(username:ID!): UserConversationBridge
-            @aws_subscribe(mutations: ["createUserConversationBridge"])
-
-          subscribeToRemovedUserConversationBridge(username:ID!): UserConversationBridge
-            @aws_subscribe(mutations: ["removeUserConversationBridge"])
-
-          #Subscribes to all removed messages in a given Conversation
-          subscribeToRemovedMessage(conversationId: ID!): Message
-            @aws_subscribe(mutations: ["removeMessage"]) 
-          
-          #Subscribes to read message
-          subscribeToReadMessage(conversationId: ID!): UserConversationBridge
-            @aws_subscribe(mutations: ["setRead"])
-
-          #Subscribes to accept conversation
-          subscribeToAcceptConversation(conversationId: ID!): UserConversationBridge
-            @aws_subscribe(mutations: ["acceptConversation"])
-        }
+      DefinitionS3Location: schema.graphql
 
   UserTableDataSource:
     Type: "AWS::AppSync::DataSource"
@@ -453,19 +106,6 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref UserConversationBridgeTableName
-
-  KlubConversationBridgeTableDataSource:
-    Type: "AWS::AppSync::DataSource"
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      Name: !Sub KlubConversationBridgeDynamoDBTable_${Stage}
-      Description: The User Conversation DynamoDB table
-      Type: AMAZON_DYNAMODB
-      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
-      DynamoDBConfig:
-        AwsRegion: "us-east-1"
-        TableName: !Ref KlubConversationBridgeTableName
-
 
   UserKlubBridgeTableDataSource:
     Type: "AWS::AppSync::DataSource"
@@ -506,6 +146,27 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref KlubTableName
 
+  CreateKlubAvatarPresignedUrlFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub CreateKlubAvatarPresignedUrl_${Stage}
+      Description: The lambda function to create a presigned url for image upload
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref CreateKlubAvatarPresignedUrlFunctionArn
+
+  JoinKlubFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub JoinKlubFunction_${Stage}
+      Description: The lambda function to join a klub for given user
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref JoinKlubFunctionArn
 
   # UserStatusManageFunctionDataSource:
   #   Type: AWS::AppSync::DataSource
@@ -580,6 +241,43 @@ Resources:
   
 
   ### Lambda Resolvers ###
+  CreateKlubAvatarPresignedUrlResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: createKlubAvatarPresignedUrl
+      DataSourceName: !GetAtt CreateKlubAvatarPresignedUrlFunctionDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/createKlubAvatarPresignedUrl.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  JoinKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: joinKlub
+      DataSourceName: !GetAtt JoinKlubFunctionDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/joinKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  LeaveKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: leaveKlub
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/leaveKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
   # HeartbeatResolver:
   #   Type: "AWS::AppSync::Resolver"
   #   DependsOn: Schema
@@ -602,8 +300,6 @@ Resources:
   #       $utils.toJson($context.result)
 
 
-
-
   CreateConversationMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -612,26 +308,14 @@ Resources:
       TypeName: "Mutation"
       FieldName: "createConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "PutItem",
-          "key": {
-              "id": { "S" : "$util.autoId()"}
-          },
-          "attributeValues" : {
-             "id": {  "S": "$util.autoId()" },
-             "creator": {  "S": "${context.identity.username}" },
-             "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/createConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
 
   # removeConversationMutationResolver:
   #   Type: "AWS::AppSync::Resolver"
-  #   DependsOn: Schema                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
+  #   DependsOn: Schema
   #   Properties:
   #     ApiId: !GetAtt GraphQLApi.ApiId
   #     TypeName: "Mutation"
@@ -679,14 +363,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeConversation"
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "DeleteItem",
-          "key" : {
-            "id" : { "S" : "${context.arguments.conversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/removeConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -698,21 +375,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "createUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "PutItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "attributeValues" : {
-                "username": {  "S": "${context.arguments.username}" },
-                "conversationId": {  "S": "${context.arguments.conversationId}" },
-                "name": #if(${context.arguments.name}) {  "S": "${context.arguments.name}" } #else {"S":""} #end,
-                "accepted": #if(${context.arguments.accepted}) {  "BOOL": ${context.arguments.accepted} } #else {"BOOL":false} #end
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/createUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -767,9 +430,7 @@ Resources:
   #         UserConversationBridgeTable: !Ref UserConversationBridgeTableName
   #       }
 
-
-
-  AcceptConversationUserConversationBridgeMutationResolver:
+  AcceptConversationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
@@ -777,32 +438,11 @@ Resources:
       TypeName: "Mutation"
       FieldName: "acceptConversation"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key" : {
-                "username" : {  "S": "${context.identity.username}" },
-                "conversationId" : {  "S": "${context.arguments.conversationId}" }
-            },
-            "update" : {
-                "expression" : "SET #accepted = :accepted, #acceptTime = :acceptTime",
-                 "expressionNames": {
-                   "#accepted" : "accepted",
-                   "#acceptTime" : "acceptTime"
-                 },
-                "expressionValues": {
-                    ":accepted" :  {  "BOOL": true },
-                    ":acceptTime": {  "S": "$util.time.nowEpochMilliSeconds()" }
-                }
-            }
-        }
+      RequestMappingTemplate: resolver-mappings/acceptConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-
   
-  RemoveUserConversationBridgeMutationResolver:
+  RemoveUserConversationBridgeResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
@@ -810,15 +450,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "DeleteItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            }
-        }
+      RequestMappingTemplate: resolver-mappings/removeUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -830,43 +462,147 @@ Resources:
       TypeName: "Mutation"
       FieldName: "createKlub"
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "PutItem",
-          "key" : {
-              "klubname" : { "S" : "${context.arguments.klubname}" }
-          },
-          "condition" : {
-            "expression": "attribute_not_exists(klubname)"
-          },
-          #set( $avatar = ${context.arguments.avatar} )
-          #set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
-          "attributeValues" : {
-              "owner": {  "S": "${context.identity.username}" },
-              "avatar" : $util.toJson($avatar),
-              "description": {  "S": "${context.arguments.description}" },
-              "contractAddress": {  "S": "${context.arguments.contractAddress}" },
-              "blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
-              "tokenType": {  "S": "${context.arguments.tokenType}" },
-              "minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "S": "${context.arguments.minimumAmountForMainGroup}" } #else {"S":"0"} #end,
-              "minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "S": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"S":"0"} #end,
-              "website": #if(${context.arguments.website}) {  "S": "${context.arguments.website}" } #else {"S":""} #end,
-              "coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
-              "coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
-              "dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
-              "telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
-              "discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
-              "twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
-              "reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
-              "instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end,
-              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" }
+      RequestMappingTemplate: !Sub 
+        - |
+          #set($announcementConversationId = $util.autoId())
+          #set($mainConversationId = $util.autoId())
+          #set($whaleConversationId = $util.autoId())
+          #set($createdAt = "$util.time.nowEpochMilliSeconds()")
+          #set($conversations = [])
+          #set($announcementConversation = {})
+          $util.qr($announcementConversation.put("id", $announcementConversationId))
+          $util.qr($announcementConversation.put("creator", $context.identity.username))
+          $util.qr($announcementConversation.put("createdAt", $createdAt))
+
+          #set($mainConversation = {})
+          $util.qr($mainConversation.put("id", $mainConversationId))
+          $util.qr($mainConversation.put("creator", $context.identity.username))
+          $util.qr($mainConversation.put("createdAt", $createdAt))
+
+          #set($whaleConversation = {})
+          $util.qr($whaleConversation.put("id", $whaleConversationId))
+          $util.qr($whaleConversation.put("creator", $context.identity.username))
+          $util.qr($whaleConversation.put("createdAt", $createdAt))
+
+          $util.qr($conversations.add($util.dynamodb.toMapValues($announcementConversation)))
+          $util.qr($conversations.add($util.dynamodb.toMapValues($mainConversation)))
+          $util.qr($conversations.add($util.dynamodb.toMapValues($whaleConversation)))
+
+          ##set( $avatar = $context.arguments.avatar )
+          ##set( $avatar = $util.dynamodb.toS3Object($avatar.key, $avatar.bucket, $avatar.region) )
+
+          #set($klubs = [])
+          #set($klub = {})
+          $util.qr($klub.put("klubname",  { "S" : "$context.arguments.klubname" }))
+          $util.qr($klub.put("owner", {  "S": "$context.identity.username" }))
+          $util.qr($klub.put("assetSymbol", {  "S": "$context.arguments.assetSymbol" }))
+          $util.qr($klub.put("description", {  "S": "$ctx.args.description" }))
+          $util.qr($klub.put("avatar_url", {  "S": "$ctx.args.avatar_url" }))
+          $util.qr($klub.put("contractAddress", {  "S": "$context.arguments.contractAddress" }))
+          $util.qr($klub.put("blockchainExplorer", {  "S": "$context.arguments.blockchainExplorer" }))
+          $util.qr($klub.put("tokenType", {  "S": "$context.arguments.tokenType" }))
+          $util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
+          $util.qr($klub.put("mainGroupConversationId", {  "S": "$mainConversationId" }))
+          $util.qr($klub.put("whaleGroupConversationId", {  "S": "$whaleConversationId" }))
+          
+
+          #if($context.arguments.minimumAmountForMainGroup) 
+            $util.qr($klub.put("minimumAmountForMainGroup", {  "N": "$context.arguments.minimumAmountForMainGroup" } ))
+          #else 
+            $util.qr($klub.put("minimumAmountForMainGroup", {"N":"0"}  ))
+          #end
+
+          #if($context.arguments.minimumAmountForWhaleGroup) 
+            $util.qr($klub.put("minimumAmountForWhaleGroup", {  "N": "$context.arguments.minimumAmountForWhaleGroup" } ))
+          #else 
+            $util.qr($klub.put("minimumAmountForWhaleGroup", {"N":"0"}  ))
+          #end
+
+          #if($context.arguments.website)
+            $util.qr($klub.put("website", {  "S": "$context.arguments.website" } ))
+          #else 
+            $util.qr($klub.put("website", {"S":""}  ))
+          #end
+
+          #if($context.arguments.coinmarketcap)
+            $util.qr($klub.put("coinmarketcap", {  "S": "$context.arguments.coinmarketcap" } ))
+          #else 
+            $util.qr($klub.put("coinmarketcap", {"S":""}  ))
+          #end
+
+          #if($context.arguments.coingecho)
+            $util.qr($klub.put("coingecho", {  "S": "$context.arguments.coingecho" } ))
+          #else 
+            $util.qr($klub.put("coingecho", {"S":""}  ))
+          #end
+
+          #if($context.arguments.dextools)
+            $util.qr($klub.put("dextools", {  "S": "$context.arguments.dextools" } ))
+          #else 
+            $util.qr($klub.put("dextools", {"S":""}  ))
+          #end
+
+          #if($context.arguments.telegram)
+            $util.qr($klub.put("telegram", {  "S": "$context.arguments.telegram" } ))
+          #else 
+            $util.qr($klub.put("telegram", {"S":""}  ))
+          #end
+
+          #if($context.arguments.discord)
+            $util.qr($klub.put("discord", {  "S": "$context.arguments.discord" } ))
+          #else 
+            $util.qr($klub.put("discord", {"S":""}  ))
+          #end
+
+          #if($context.arguments.twitter)
+            $util.qr($klub.put("twitter", {  "S": "$context.arguments.twitter" } ))
+          #else 
+            $util.qr($klub.put("twitter", {"S":""}  ))
+          #end
+
+          #if($context.arguments.reddit)
+            $util.qr($klub.put("reddit", {  "S": "$context.arguments.reddit" } ))
+          #else 
+            $util.qr($klub.put("reddit", {"S":""}  ))
+          #end
+
+          #if($context.arguments.instagram)
+            $util.qr($klub.put("instagram", {  "S": "$context.arguments.instagram" } ))
+          #else 
+            $util.qr($klub.put("instagram", {"S":""}  ))
+          #end
+
+          $util.qr($klub.put("createdAt", $util.dynamodb.toString($createdAt) ))
+
+
+          $util.qr($klubs.add($klub))
+
+
+          {
+            "version" : "2018-05-29",
+            "operation" : "BatchPutItem",
+
+            "tables" : {
+              "${KlubTable}": $util.toJson($klubs),
+              "${ConversationTable}": $util.toJson($conversations)
+            }
+            
           }
-        }
-      ResponseMappingTemplate: |
-        #set($avatar = $util.dynamodb.fromS3ObjectJson($context.result.avatar))
-        #set($context.result.avatar = $avatar)
-        $utils.toJson($context.result)
+        - {
+            KlubTable: !Ref KlubTableName,
+            ConversationTable: !Ref ConversationTableName
+          }
+      ResponseMappingTemplate: !Sub
+        - |
+          ##set($klub = $context.result.data["${KlubTable}"].items[0])
+          ##set($avatar = $util.dynamodb.fromS3ObjectJson($klub.avatar))
+          ##set($klub.avatar = $avatar)
+          ##$utils.toJson($klub)
+          $utils.toJson($context.result.data["${KlubTable}"].items[0])
+        - {
+            KlubTable: !Ref KlubTableName,
+            ConversationTable: !Ref ConversationTableName
+          }
 
   CreateMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
@@ -876,26 +612,9 @@ Resources:
       TypeName: "Mutation"
       FieldName: "createMessage"
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "PutItem",
-          "key" : {
-              "conversationId" : { "S" : "${context.arguments.conversationId}" }
-          },
-          "attributeValues" : {
-              "conversationId": {  "S": "${context.arguments.conversationId}" },
-              "content": {  "S": "${context.arguments.content}" },
-              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
-              "sender": {  "S": "${context.identity.username}" },
-              "isSent": {  "BOOL": true },
-              "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" }
-          }
-        }
-
+      RequestMappingTemplateS3Location: resolver-mappings/createMessage.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
 
   ReplyMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
@@ -905,24 +624,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "replyMessage"
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "PutItem",
-          "key" : {
-              "conversationId" : { "S" : "${context.arguments.conversationId}" }
-          },
-          "attributeValues" : {
-              "conversationId": {  "S": "${context.arguments.conversationId}" },
-              "content": {  "S": "${context.arguments.content}" },
-              "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
-              "sender": {  "S": "${context.identity.username}" },
-              "isSent": {  "BOOL": true },
-              "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" },
-              "originalId": { "S": "${context.arguments.originalId}" }
-          }
-        }
-
+      RequestMappingTemplateS3Location: resolver-mappings/replyMessage.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -934,28 +636,10 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeMessage"
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "DeleteItem",
-          "key" : {
-            "id" : { "S" : "${context.arguments.id}" },
-            "conversationId": {"S" : "${context.arguments.conversationId}"}
-          },
-          "condition" : {
-              "expression" : "#sender = :sender",
-              "expressionNames" : {
-                  "#sender" : "sender"
-              },
-              "expressionValues" : {
-                  ":sender" : {"S": "${context.identity.username}"}
-              }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/removeMessage.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  
   EditMessageMutationResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
@@ -964,64 +648,33 @@ Resources:
       TypeName: Mutation
       FieldName: editMessage
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key" : {
-              "id" : { "S" : "${context.arguments.id}" },
-              "conversationId": {"S" : "${context.arguments.conversationId}"}
-            },
-            "condition" : {
-              "expression" : "#sender = :sender",
-              "expressionNames" : {
-                  "#sender" : "sender"
-              },
-              "expressionValues" : {
-                  ":sender" : {"S": "${context.identity.username}"}
-              }
-            },
-            "update" : {
-                "expression" : "SET #content = :content, #updatedAt = :updatedAt",
-                "expressionNames": {
-                   "#content" : "content",
-                   "#updatedAt" : "updatedAt"
-                 },
-                "expressionValues": {
-                    ":content" : $util.dynamodb.toDynamoDBJson($context.arguments.content) ,
-                    ":updatedAt" : {  "S": "$util.time.nowEpochMilliSeconds()" }
-                }
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/editMessage.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
-
-
-  OriginalMessageMutationResolver:
+# "filter" : {
+#               "expression" : "#username <> :username",
+#               "expressionNames" : {
+#                   "#username" : "username"
+#               },
+#               "expressionValues" : {
+#                   ":username" : {"S": "${context.identity.username}"}
+#               }
+  ListMyKlubsResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Message
-      FieldName: originalMessage
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "GetItem",
-            "key" : {
-              "id" : { "S" : "${context.source.originalId}" },
-              "conversationId": {"S" : "${context.source.conversationId}"}
-            }
-        }
+      TypeName: Query
+      FieldName: listMyKlubs
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/listMyKlubs.request.vtl
       ResponseMappingTemplate: |
-        ## Pass back the result from DynamoDB. **
-        $util.toJson($ctx.result)
-
-
-
+        #**
+            Return a flat list of results from a Query or Scan operation.
+        *#
+        $util.toJson($ctx.result.items)
 
   ListUsersResolver:
     Type: AWS::AppSync::Resolver
@@ -1031,30 +684,12 @@ Resources:
       TypeName: Query
       FieldName: listUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "#username <> :username",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":username" : {"S": "${context.identity.username}"}
-              }
-          },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/listUsers.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
         *#
         $util.toJson($ctx.result.items)
-
-
 
   SearchUsersResolver:
     Type: AWS::AppSync::Resolver
@@ -1064,32 +699,12 @@ Resources:
       TypeName: Query
       FieldName: searchUsers
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "#username <> :myname and begins_with(#username, :username)",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":myname" : {"S": "${context.identity.username}"},
-                  ":username" : {"S": "${context.arguments.username}"}
-              }
-            },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/searchUsers.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
         *#
         $util.toJson($ctx.result.items)
-
-
-
 
   GetUserWalletsResolver:
     Type: AWS::AppSync::Resolver
@@ -1099,14 +714,7 @@ Resources:
       TypeName: Query
       FieldName: getUserWallets
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version": "2017-02-28",
-            "operation": "GetItem",
-            "key": {
-                "username": $util.dynamodb.toDynamoDBJson($ctx.args.username),
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/getUserWallets.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
@@ -1119,100 +727,13 @@ Resources:
       TypeName: Query
       FieldName: getMe
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key": {
-              "username": { "S" : "${context.identity.username}"}
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/getMe.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
 
-        
-
-  ConversationsUserResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "User"
-      FieldName: "conversations"
-      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "username = :username",
-              "expressionValues" : {
-                  ":username" : {
-                      "S" : "${context.identity.username}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": 1000
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
-    
-
-  KlubsUserResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "User"
-      FieldName: "klubs"
-      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "username = :username",
-              "expressionValues" : {
-                  ":username" : {
-                      "S" : "${context.identity.username}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": 1000
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
 
 
-
-  ConversationsUserKlubBridgeResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "UserKlubBridge"
-      FieldName: "conversations"
-      DataSourceName: !GetAtt KlubConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "klubname = :klubname",
-              "expressionValues" : {
-                  ":klubname" : {
-                      "S" : "${context.source.klubname}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": 1000
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items)
 
   # getAllMessagesResolver:
   #   Type: "AWS::AppSync::Resolver"
@@ -1248,22 +769,7 @@ Resources:
       TypeName: Query
       FieldName: listMessageConnections
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :conversationId",
-              "expressionValues" : {
-                  ":conversationId" : {
-                      "S" : "${context.arguments.conversationId}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/listMessageConnections.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
@@ -1278,23 +784,7 @@ Resources:
       TypeName: Query
       FieldName: searchKlubs
       DataSourceName: !GetAtt KlubTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "Scan",
-            "filter" : {
-              "expression" : "begins_with(#klubname, :klubname)",
-              "expressionNames" : {
-                  "#klubname" : "klubname"
-              },
-              "expressionValues" : {
-                  ":klubname" : {"S": "${context.arguments.klubname}"}
-              }
-            },
-            ## Add 'limit' and 'nextToken' arguments to this field in your schema to implement pagination. **
-            ## "limit": $util.defaultIfNull(${ctx.args.limit}, 20),
-            ## "nextToken": $util.toJson($util.defaultIfNullOrBlank($ctx.args.nextToken, null))
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/searchKlub.request.vtl
       ResponseMappingTemplate: |
         #**
             Return a flat list of results from a Query or Scan operation.
@@ -1331,56 +821,6 @@ Resources:
   #     ResponseMappingTemplate: |
   #       $utils.toJson($context.result.items)
 
-  
-
-  MessagesConversationResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Conversation"
-      FieldName: "messages"
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :id",
-              "expressionValues" : {
-                  ":id" : {
-                      "S" : "${context.source.id}"
-                  }
-              }
-          },
-          "scanIndexForward": false,
-          "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-          "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
-        }
-      ResponseMappingTemplate: |
-        {
-          "messages": $utils.toJson($context.result.items),
-          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
-        }
-
-  conversationUserConversationBridgeResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: UserConversationBridge
-      FieldName: "conversation"
-      DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.source.conversationId}" }
-          }
-        }
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
 
   getConversationByIdQueryResolver:
     Type: "AWS::AppSync::Resolver"
@@ -1390,54 +830,21 @@ Resources:
       TypeName: Query
       FieldName: getConversationById
       DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2017-02-28",
-          "operation" : "GetItem",
-          "key" : {
-              "id" : { "S" : "${context.arguments.conversationId}" }
-          }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/getConversationById.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-
-
-  associatedUserConversationBridgeResolver:
+  
+  getKlubByKlubnameQueryResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: UserConversationBridge
-      FieldName: associated
-      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-          "version" : "2018-05-29",
-          "operation" : "Query",
-          "query" : {
-              "expression": "conversationId = :conversationId",
-              "expressionValues" : {
-                  ":conversationId" : {
-                      "S" : "${context.source.conversationId}"
-                  }
-              }
-          },
-          "filter" : {
-              "expression" : "#username <> :username",
-              "expressionNames" : {
-                  "#username" : "username"
-              },
-              "expressionValues" : {
-                  ":username" : {"S": "${context.identity.username}"}
-              }
-          },
-          "index": "conversationId-index"
-        }
+      TypeName: Query
+      FieldName: getKlubByKlubname
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/getKlubByKlubname.request.vtl
       ResponseMappingTemplate: |
-        $util.toJson($context.result.items) 
-   
-
+        $utils.toJson($context.result)
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver
@@ -1447,27 +854,10 @@ Resources:
       TypeName: Mutation
       FieldName: updateUser
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key" : {
-                "username" : $util.dynamodb.toDynamoDBJson($context.arguments.username)
-            },
-            "update" : {
-                "expression" : "SET wallets = :wallets",
-                ## "expressionNames": {
-                ##     "#url" : "url"
-                ## },
-                "expressionValues": {
-                    ":wallets" : $util.dynamodb.toDynamoDBJson($context.arguments.wallets)
-                }
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/updateUser.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
-
 
   SetReadResolver:
     Type: AWS::AppSync::Resolver
@@ -1477,24 +867,143 @@ Resources:
       TypeName: Mutation
       FieldName: setRead
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: |
-        {
-            "version" : "2017-02-28",
-            "operation" : "UpdateItem",
-            "key": {
-                "username": { "S" : "${context.arguments.username}"},
-                "conversationId": { "S" : "${context.arguments.conversationId}"}
-            },
-            "update" : {
-                "expression" : "SET #read = :messageId",
-                "expressionNames" : {
-                  "#read" : "read"
-                },
-                "expressionValues": {
-                    ":messageId" : $util.dynamodb.toDynamoDBJson($context.arguments.messageId)
-                }
-            }
-        }
+      RequestMappingTemplateS3Location: resolver-mappings/setRead.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
+
+  # -- User Type Resolvers ---- #
+
+  ConversationsUserResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "User"
+      FieldName: "conversations"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/user/conversationsUser.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+
+  KlubsUserResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "User"
+      FieldName: "klubs"
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/user/klubUser.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+
+  # -- Klub Type Resolvers ---- #
+
+  announcementConversatioinKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "announcementConversatioin"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/announcementConversationKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  mainGroupConversationKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "mainGroupConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/mainGroupConversationKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  whaleGroupConversationKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "whaleGroupConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/whaleGroupConversationKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+# -- Message Type Resolvers ---- #
+
+  OriginalMessageMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Message
+      FieldName: originalMessage
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/message/getOriginalMessage.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+# -- Conversation Type Resolvers ---- #
+
+  MessagesConversationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Conversation"
+      FieldName: "messages"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/conversation/messagesConversation.request.vtl
+      ResponseMappingTemplate: |
+        {
+          "messages": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
+
+  # -- UserKlubBridge Type Resolvers ---- #
+
+  KlubUserKlubBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserKlubBridge
+      FieldName: klub
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/userKlubBridge/klubUserKlubBridge.request.vtl
+      ResponseMappingTemplate: |
+        $util.toJson($ctx.result)
+
+  # -- UserConversationBridge Type Resolvers ---- #
+
+  associatedUserConversationBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversationBridge
+      FieldName: associated
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/userConversationBridge/associatedField.request.vtl
+      ResponseMappingTemplate: |
+        $util.toJson($context.result.items)
+
+  conversationUserConversationBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversationBridge
+      FieldName: "conversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/userConversationBridge/conversationUserConversationBridge.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)

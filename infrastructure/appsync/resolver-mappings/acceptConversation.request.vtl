@@ -1,0 +1,19 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "username" : {  "S": "${context.identity.username}" },
+        "conversationId" : {  "S": "${context.arguments.conversationId}" }
+    },
+    "update" : {
+        "expression" : "SET #accepted = :accepted, #acceptTime = :acceptTime",
+            "expressionNames": {
+            "#accepted" : "accepted",
+            "#acceptTime" : "acceptTime"
+            },
+        "expressionValues": {
+            ":accepted" :  {  "BOOL": true },
+            ":acceptTime": {  "S": "$util.time.nowEpochMilliSeconds()" }
+        }
+    }
+}

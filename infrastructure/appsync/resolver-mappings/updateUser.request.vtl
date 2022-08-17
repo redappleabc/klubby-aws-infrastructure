@@ -1,0 +1,16 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "username" : $util.dynamodb.toDynamoDBJson($context.arguments.username)
+    },
+    "update" : {
+        "expression" : "SET wallets = :wallets",
+        ## "expressionNames": {
+        ##     "#url" : "url"
+        ## },
+        "expressionValues": {
+            ":wallets" : $util.dynamodb.toDynamoDBJson($context.arguments.wallets)
+        }
+    }
+}

@@ -893,42 +893,6 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  announcementConversatioinKlubResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Klub
-      FieldName: "announcementConversatioin"
-      DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/announcementConversationKlub.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
-
-  mainGroupConversationKlubResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Klub
-      FieldName: "mainGroupConversation"
-      DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/mainGroupConversationKlub.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
-
-  whaleGroupConversationKlubResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Klub
-      FieldName: "whaleGroupConversation"
-      DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/whaleGroupConversationKlub.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
-
   getConversationByIdQueryResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -952,18 +916,6 @@ Resources:
       RequestMappingTemplateS3Location: resolver-mappings/getKlubByKlubname.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
-
-  associatedUserConversationBridgeResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: UserConversationBridge
-      FieldName: associated
-      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/associatedUserConversationBridge.request.vtl
-      ResponseMappingTemplate: |
-        $util.toJson($context.result.items) 
 
   UpdateUserResolver:
     Type: AWS::AppSync::Resolver
@@ -990,3 +942,55 @@ Resources:
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
+
+  # -- Klub Type Resolvers ---- #
+
+  announcementConversatioinKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "announcementConversatioin"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/announcementConversationKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  mainGroupConversationKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "mainGroupConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/mainGroupConversationKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  whaleGroupConversationKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: "whaleGroupConversation"
+      DataSourceName: !GetAtt ConversationTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/whaleGroupConversationKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  # -- UserConversationBridge Type Resolvers ---- #
+
+  associatedUserConversationBridgeResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversationBridge
+      FieldName: associated
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/userConversationBridge/associatedField.request.vtl
+      ResponseMappingTemplate: |
+        $util.toJson($context.result.items)

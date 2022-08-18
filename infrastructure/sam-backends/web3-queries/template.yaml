@@ -4,7 +4,13 @@ Description: >
   web3-queries
 
   Sample SAM Template for web3-queries
-  
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
 Globals:
   Function:
     Timeout: 30
@@ -38,3 +44,6 @@ Resources:
             Action:
             - ssm:*
             Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage

@@ -3,7 +3,8 @@ let response;
 const AWS = require('aws-sdk');
 const Web3 = require('web3')
 
-const TABLE_NAME = "klubby-storage-dynamodb-dev-UserTable-IM4YXWAHTLAF"
+const USER_TABLE_SSM_NAME = `user-table-name-${process.env.STAGE}`
+
 const RPC_URL="http://18.206.231.219:8545"
 
 KINSHU_ADDRESS = "0xA2b4C0Af19cC16a6CfAcCe81F192B024d625817D"
@@ -29,6 +30,18 @@ const minABI = [
     }
   ];
   
+
+async function get_ssm_param(ssm_param_name){
+    const ssm = new AWS.SSM();
+    const response = await ssm.getParameter({
+        Name: ssm_param_name
+    }).promise();
+
+    console.log(response.Parameter.Value)
+    console.log(typeof response.Parameter.Value)
+
+    return response.Parameter.Value
+}
 
 //funuction to get eth balance
 async function getEthBalance(web3,walletAddress){
@@ -60,11 +73,14 @@ exports.lambdaHandler = async (event, context) => {
         //conect to GETH node
         const web3 = new Web3(RPC_URL)
 
+        //get user table name from ssm
+        const table_name = await get_ssm_param(USER_TABLE_SSM_NAME)
+
         //get users from dynamo
         var dynamodb = new AWS.DynamoDB()
 
         const params = {
-            TableName: TABLE_NAME,
+            TableName: table_name,
         }
         let result = await dynamodb.scan(params).promise()
 
@@ -83,7 +99,7 @@ exports.lambdaHandler = async (event, context) => {
 
 
                 const params = {
-                    TableName: TABLE_NAME,
+                    TableName: table_name,
                     Key: {
                         "username": element.username
                     },

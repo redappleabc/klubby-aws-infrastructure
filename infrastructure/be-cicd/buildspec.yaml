@@ -3,12 +3,15 @@ version: 0.2
 phases:
   build:
     commands:
+      #--- Deploy Storage Infrastructure ---#
       - cd infrastructure/storage/s3
       - aws cloudformation deploy --stack-name klubby-storage-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
       - cd ../dynamodb
       - aws cloudformation deploy --stack-name klubby-storage-dynamodb-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE
+      #--- Deploy Authentication Infrastructure ---#
       - cd ../../authentication
       - aws cloudformation deploy --stack-name klubby-authentication-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-overrides Stage=$STAGE NewUserFunction=add-new-user-funtion-$STAGE
+      #--- Deploy Appsync Infrastructure ---#
       - cd ../appsync
       - ARTIFACTS_BUCKET=$(aws ssm get-parameter --name artifacts-bucket-name-$STAGE --region us-east-1 --query Parameter.Value --output text)
       - aws cloudformation package
@@ -33,6 +36,10 @@ phases:
           UserPoolId=userpool-id-$STAGE
           CreateKlubAvatarPresignedUrlFunctionArn=create-klub-avatar-presigned-url-function-arn-$STAGE
           JoinKlubFunctionArn=join-klub-function-arn-$STAGE
+      #--- Deploy EC2 Infrastructure ---#
+      - cd ../ec2
+      - aws cloudformation deploy --stack-name klubby-ec2-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --no-execute-changeset --parameter-override Stage=$STAGE
+
 
       # - cd ../managed-blockchain
       # - aws cloudformation deploy --stack-name klubby-managed-blockchain-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --parameter-override Stage=$STAGE

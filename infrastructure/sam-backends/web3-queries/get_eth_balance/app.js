@@ -9,6 +9,7 @@ const RPC_URL="http://18.206.231.219:8545"
 
 KINSHU_ADDRESS = "0xA2b4C0Af19cC16a6CfAcCe81F192B024d625817D"
 SANSHU_ADDRESS = "0xc73c167e7a4ba109e4052f70d5466d0c312a344d"
+RAKU_ADDRESS = "0x714599f7604144a3fE1737c440a70fc0fD6503ea"
 
 // The minimum ABI to get ERC20 Token balance
 const minABI = [
@@ -68,6 +69,15 @@ async function getSanshuBalance(web3,walletAddress){
     return balance
 }
 
+//funuction to get raku coin balance
+async function getRakuBalance(web3,walletAddress){
+    const contract = new web3.eth.Contract(minABI,RAKU_ADDRESS);
+
+    const balance = await contract.methods.balanceOf(walletAddress).call();
+
+    return balance
+}
+
 exports.lambdaHandler = async (event, context) => {
     try {
         //conect to GETH node
@@ -96,6 +106,7 @@ exports.lambdaHandler = async (event, context) => {
                 const ethBalance = await getEthBalance(web3,walletAddress)
                 const kishuBalance = await getKishuBalance(web3,walletAddress)
                 const sanshuBalance = await getSanshuBalance(web3,walletAddress)
+                const rakuBalance = await getRakuBalance(web3,walletAddress)
 
 
                 const params = {
@@ -103,11 +114,12 @@ exports.lambdaHandler = async (event, context) => {
                     Key: {
                         "username": element.username
                     },
-                    UpdateExpression: "set balance_eth = :x, balance_kishu = :kishu, balance_sanshu = :sanshu",
+                    UpdateExpression: "set balance_eth = :x, balance_kishu = :kishu, balance_sanshu = :sanshu, balance_raku = :raku",
                     ExpressionAttributeValues: {
                         ":x": {'S':ethBalance},
                         ":kishu": {'S':kishuBalance},
-                        ":sanshu": {'S':sanshuBalance}
+                        ":sanshu": {'S':sanshuBalance},
+                        ":raku": {'S':rakuBalance}
                     }
                 }
 

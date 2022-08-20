@@ -1,0 +1,49 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  web3-queries
+
+  Sample SAM Template for web3-queries
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  GetEthBalance:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: validate_address/
+      Handler: app.lambdaHandler
+      Runtime: nodejs14.x
+      Architectures:
+        - x86_64
+      # Events:
+      #   CloudWatchEvent:
+      #     Type: Schedule
+      #     Properties:
+      #       Schedule: rate(5 minutes)
+            # Schedule: cron(0 * * * ? *)
+      # Policies:
+      # #TODO reduce perms
+      #   - Statement:
+      #     - Sid: DynamoDBAccess
+      #       Effect: Allow
+      #       Action:
+      #       - dynamodb:*
+      #       Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+      #   - Statement:
+      #     - Sid: SSMAccess
+      #       Effect: Allow
+      #       Action:
+      #       - ssm:*
+      #       Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage

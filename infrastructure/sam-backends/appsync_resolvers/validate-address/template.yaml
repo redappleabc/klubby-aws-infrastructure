@@ -47,3 +47,14 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+
+### SSM PARAMS ###
+  ValidateAddressFunctionArnParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub validate-address-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt ValidateAddressFunction.Arn
+      Description: SSM Parameter for user ARN of user status management function
+      Tags:
+        Environment: !Ref Stage

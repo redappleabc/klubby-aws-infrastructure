@@ -299,7 +299,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation
       FieldName: validateAddress
-      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
+      DataSourceName: !GetAtt ValidateAddressFunctionDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/validateAddress.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)

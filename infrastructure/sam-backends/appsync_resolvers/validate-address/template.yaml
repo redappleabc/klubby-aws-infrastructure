@@ -16,7 +16,7 @@ Globals:
     Timeout: 30
 
 Resources:
-  GetEthBalance:
+  ValidateAddressFunction:
     Type: AWS::Serverless::Function
     Properties:
       CodeUri: validate_address/

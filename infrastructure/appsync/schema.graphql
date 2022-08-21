@@ -306,6 +306,8 @@ type Mutation {
     setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
 
     updateUser(username: String!,wallets: String!): User
+
+    validateAddress(address: String!,contractType String!): String
 }
 
 

@@ -261,9 +261,9 @@ exports.lambdaHandler = async (event, context) => {
             console.log(totalSupply,name,symbol)
 
 
-            return {
+            return JSON.stringify({
                 'statusCode': 200,
-                'body': JSON.stringify({
+                'body': {
                     validAddress: true,
                     contractInfo: {
                         name,
@@ -271,18 +271,18 @@ exports.lambdaHandler = async (event, context) => {
                         totalSupply,
                     }
 
-                })
-            }
+                }
+            })
         }
 
         catch (err) {
-            return {
+            return JSON.stringify({
                 'statusCode': 200,
-                'body': JSON.stringify({
+                'body': {
                     err: err,
                     validAddress: false
-                })
-            }
+                }
+            })
         }
 
     } catch (err) {

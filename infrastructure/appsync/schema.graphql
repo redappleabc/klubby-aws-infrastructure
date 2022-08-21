@@ -307,7 +307,7 @@ type Mutation {
 
     updateUser(username: String!,wallets: String!): User
 
-    validateAddress(address: String!,contractType String!): String
+    validateAddress(address: String!,contractType: String!): String
 }
 
 

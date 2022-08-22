@@ -5,6 +5,8 @@ const Web3 = require('web3')
 
 const RPC_URL="http://18.206.231.219:8545"
 
+const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
+
 // The minimum ABI to get ERC20 Token balance
 const minABI = [
     {
@@ -248,31 +250,17 @@ exports.lambdaHandler = async (event, context) => {
         const web3 = new Web3(RPC_URL)
 
         let address = event.arguments.address
-        let assetType = event.arguments.assetType
+        let contractType = event.arguments.contractType
 
         try{
             const contract = new web3.eth.Contract(minABI,address);
             console.log(contract)
 
-            const totalSupply = await contract.methods.totalSupply().call();
-            const name = await contract.methods.name().call();
-            const symbol = await contract.methods.symbol().call();
+            var totalSupply = await contract.methods.totalSupply().call();
+            var name = await contract.methods.name().call();
+            var symbol = await contract.methods.symbol().call();
 
             console.log(totalSupply,name,symbol)
-
-
-            return JSON.stringify({
-                'statusCode': 200,
-                'body': {
-                    validAddress: true,
-                    contractInfo: {
-                        name,
-                        symbol,
-                        totalSupply,
-                    }
-
-                }
-            })
         }
 
         catch (err) {
@@ -284,6 +272,51 @@ exports.lambdaHandler = async (event, context) => {
                 }
             })
         }
+
+        try{
+            //get contract table name from ssm
+            const table_name = await get_ssm_param(CONTRACT_TABLE_SSM_NAME)
+
+            console.log(table_name)
+
+            //write address to contract table if not already there
+            var params = {
+                ConditionExpression: 'attribute_not_exists(address)',
+                TableName: table_name,
+                Item: {
+                    'address' : {S: address},
+                    'contractType' : {S: contractType},
+                    'name': {S: name}
+                }
+            };
+
+            var dynamodb = new AWS.DynamoDB()
+            let res = await dynamodb.putItem(params).promise()
+            console.log(res)
+        }
+        catch(err){
+            if (err.message === "The conditional request failed") {
+                console.log("Contract already exists in contract table");
+            }
+            else{
+                console.log(err);
+                return err;
+            }
+        }
+
+
+        return JSON.stringify({
+            'statusCode': 200,
+            'body': {
+                validAddress: true,
+                contractInfo: {
+                    name,
+                    symbol,
+                    totalSupply,
+                }
+
+            }
+        })
 
     } catch (err) {
         console.log(err);

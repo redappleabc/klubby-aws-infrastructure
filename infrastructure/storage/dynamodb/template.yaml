@@ -92,13 +92,9 @@ Resources:
         KeyType: HASH
       - AttributeName: id
         KeyType: RANGE
-
       ProvisionedThroughput:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 3
-      
-
-      
 
   UserConversationBridgeTable:
     Type: "AWS::DynamoDB::Table"
@@ -127,6 +123,19 @@ Resources:
             ReadCapacityUnits: 5
             WriteCapacityUnits: 3
 
+  ContractTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      # TableName: !Sub 'user-table-${Stage}'
+      AttributeDefinitions:
+      - AttributeName: address
+        AttributeType: S
+      KeySchema:
+      - AttributeName: address
+        KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
 
 
 ### for landing page ###
@@ -206,5 +215,15 @@ Resources:
       Type: String
       Value: !Ref KlubTable
       Description: SSM Parameter for klub table name
+      Tags:
+        Environment: !Ref Stage
+
+  ContractTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'contract-table-name-${Stage}'
+      Type: String
+      Value: !Ref ContractTable
+      Description: SSM Parameter for contract table name
       Tags:
         Environment: !Ref Stage

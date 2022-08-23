@@ -699,7 +699,8 @@ exports.lambdaHandler = async (event, context) => {
                 Item: {
                     'address' : {S: address},
                     'contractType' : {S: contractType},
-                    'name': {S: name}
+                    'name': {S: name},
+                    'symbol': {S: symbol}
                 }
             };
 

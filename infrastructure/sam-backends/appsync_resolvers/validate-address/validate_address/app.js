@@ -252,25 +252,30 @@ exports.lambdaHandler = async (event, context) => {
         let address = event.arguments.address
         let contractType = event.arguments.contractType
 
-        try{
-            const contract = new web3.eth.Contract(minABI,address);
-            console.log(contract)
+        if(contractType === "erc20"){
+            try{
+                const contract = new web3.eth.Contract(minABI,address);
+                console.log(contract)
 
-            var totalSupply = await contract.methods.totalSupply().call();
-            var name = await contract.methods.name().call();
-            var symbol = await contract.methods.symbol().call();
+                var totalSupply = await contract.methods.totalSupply().call();
+                var name = await contract.methods.name().call();
+                var symbol = await contract.methods.symbol().call();
 
-            console.log(totalSupply,name,symbol)
+                console.log(totalSupply,name,symbol)
+            }
+
+            catch (err) {
+                return JSON.stringify({
+                    'statusCode': 200,
+                    'body': {
+                        err: err,
+                        validAddress: false
+                    }
+                })
+            }
         }
-
-        catch (err) {
-            return JSON.stringify({
-                'statusCode': 200,
-                'body': {
-                    err: err,
-                    validAddress: false
-                }
-            })
+        else if(contractType === "erc721"){
+            return
         }
 
         try{

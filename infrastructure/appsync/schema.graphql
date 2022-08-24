@@ -54,7 +54,7 @@ type Klub {
     contractAddress: String!
 
     # # the blockchain explorer
-    # blockchainExplorer: String!
+    blockchainExplorer: String!
 
     # token type e.g. ERC20, ETH or ERC721
     tokenType: String!
@@ -261,7 +261,7 @@ type Mutation {
     createConversation: Conversation
 
     #Create a klub
-    '''createKlub(klubname: ID!, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!,
+    '''createKlub(klubname: ID!, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
     website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 

@@ -525,7 +525,6 @@ Resources:
           $util.qr($klub.put("description", {  "S": "$ctx.args.description" }))
           $util.qr($klub.put("avatar_url", {  "S": "$ctx.args.avatar_url" }))
           $util.qr($klub.put("contractAddress", {  "S": "$context.arguments.contractAddress" }))
-          $util.qr($klub.put("blockchainExplorer", {  "S": "$context.arguments.blockchainExplorer" }))
           $util.qr($klub.put("tokenType", {  "S": "$context.arguments.tokenType" }))
           $util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
           $util.qr($klub.put("mainGroupConversationId", {  "S": "$mainConversationId" }))

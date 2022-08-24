@@ -44,6 +44,27 @@ exports.lambdaHandler = async (event, context) => {
 				//TODO check all functions in ABI
 				await contract.methods.decimals().call();
 
+				//ensure not erc721 by calling functions
+				let erc_721_failed = true
+				try{
+					const contract2 = new web3.eth.Contract(erc721ABI,address);
+					let res = await contract2.methods.supportsInterface('0x80ac58cd').call();
+					erc_721_failed = false
+				}
+				catch (err){
+					console.log('ERC721 test failed as expected')
+				}
+
+				if(!erc_721_failed){
+					return JSON.stringify({
+						'statusCode': 200,
+						'body': {
+							err: err,
+							validAddress: false
+						}
+					})
+				}
+
                 console.log(totalSupply,name,symbol)
             }
 

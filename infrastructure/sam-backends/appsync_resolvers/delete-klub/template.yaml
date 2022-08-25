@@ -1,0 +1,54 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  delete-klub
+
+  delete a given klub for a given klubname
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  DeleteKlubFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: delete_klub/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: DynamoDBAccess
+            Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+### SSM PARAMS ###
+  DeleteKlubFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub delete-klub-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt DeleteKlubFunction.Arn
+      Description: SSM Parameter for user ARN of delete klub function
+      Tags:
+        Environment: !Ref Stage

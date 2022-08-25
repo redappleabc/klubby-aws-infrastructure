@@ -54,7 +54,7 @@ type Klub {
     contractAddress: String!
 
     # # the blockchain explorer
-    blockchainExplorer: String!
+    blockchainExplorer: String
 
     # token type e.g. ERC20, ETH or ERC721
     tokenType: String!

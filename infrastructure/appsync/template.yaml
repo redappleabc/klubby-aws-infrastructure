@@ -46,6 +46,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: join-klub-function-arn-dev
     Description: join klub function arn
+  ValidateAddressFunctionArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: validate-addreess-function-arn-dev
+    Description: validate address function arn
   # UserStatusManageFunction:
   #   Type: AWS::SSM::Parameter::Value<String>
   #   Default: user-status-manage-funtion-${Stage}
@@ -168,6 +172,17 @@ Resources:
       LambdaConfig:
         LambdaFunctionArn: !Ref JoinKlubFunctionArn
 
+  ValidateAddressFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub ValidateAddressFunction_${Stage}
+      Description: The lambda function to validate an address
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref ValidateAddressFunctionArn
+
   # UserStatusManageFunctionDataSource:
   #   Type: AWS::AppSync::DataSource
   #   Properties:
@@ -277,6 +292,17 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+  ValidateAddressResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: validateAddress
+      DataSourceName: !GetAtt ValidateAddressFunctionDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/validateAddress.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
 
   # HeartbeatResolver:
   #   Type: "AWS::AppSync::Resolver"
@@ -438,7 +464,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "acceptConversation"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/acceptConversation.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/acceptConversation.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
   
@@ -450,7 +476,7 @@ Resources:
       TypeName: "Mutation"
       FieldName: "removeUserConversationBridge"
       DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
-      RequestMappingTemplate: resolver-mappings/removeUserConversationBridge.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/removeUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -499,7 +525,6 @@ Resources:
           $util.qr($klub.put("description", {  "S": "$ctx.args.description" }))
           $util.qr($klub.put("avatar_url", {  "S": "$ctx.args.avatar_url" }))
           $util.qr($klub.put("contractAddress", {  "S": "$context.arguments.contractAddress" }))
-          $util.qr($klub.put("blockchainExplorer", {  "S": "$context.arguments.blockchainExplorer" }))
           $util.qr($klub.put("tokenType", {  "S": "$context.arguments.tokenType" }))
           $util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
           $util.qr($klub.put("mainGroupConversationId", {  "S": "$mainConversationId" }))

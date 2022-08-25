@@ -44,11 +44,36 @@ phases:
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
 
+
+  #----Deploy delete-klub Function-------#
+      - cd ../delete-klub
+      - sam build
+      - sam deploy
+        --stack-name klubby-$STAGE-delete-klub
+        --s3-bucket $ARTIFACTS_BUCKET
+        --capabilities CAPABILITY_IAM
+        --region us-east-1
+        --no-fail-on-empty-changeset
+        --parameter-overrides
+          ParameterKey=Stage,ParameterValue=$STAGE
+
   #----Deploy join-klub Function-------#
       - cd ../join-klub
       - sam build
       - sam deploy
         --stack-name klubby-$STAGE-join-klub
+        --s3-bucket $ARTIFACTS_BUCKET
+        --capabilities CAPABILITY_IAM
+        --region us-east-1
+        --no-fail-on-empty-changeset
+        --parameter-overrides
+          ParameterKey=Stage,ParameterValue=$STAGE
+
+  #----Deploy validate-address Function-------#
+      - cd ../validate-address
+      - sam build
+      - sam deploy
+        --stack-name klubby-$STAGE-validate-address
         --s3-bucket $ARTIFACTS_BUCKET
         --capabilities CAPABILITY_IAM
         --region us-east-1

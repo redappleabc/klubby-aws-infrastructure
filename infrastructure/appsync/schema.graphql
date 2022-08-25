@@ -53,8 +53,8 @@ type Klub {
     # the contract address 
     contractAddress: String!
 
-    # the blockchain explorer
-    blockchainExplorer: String!
+    # # the blockchain explorer
+    blockchainExplorer: String
 
     # token type e.g. ERC20, ETH or ERC721
     tokenType: String!
@@ -261,7 +261,7 @@ type Mutation {
     createConversation: Conversation
 
     #Create a klub
-    '''createKlub(klubname: ID!, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, blockchainExplorer: String!, tokenType: String!,
+    '''createKlub(klubname: ID!, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
     website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
@@ -306,6 +306,8 @@ type Mutation {
     setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
 
     updateUser(username: String!,wallets: String!): User
+
+    validateAddress(address: String!,contractType: String!): String
 }
 
 

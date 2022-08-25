@@ -88,7 +88,7 @@ Resources:
       InstanceType: t3.large
       SubnetId: !Ref PublicSubnet
       KeyName: brenden-klubby
-      PrivateIpAddress: 10.0.0.1
+      PrivateIpAddress: 10.0.0.4
       SecurityGroupIds:
         - !Ref OpenSecurityGroup
       Tags:

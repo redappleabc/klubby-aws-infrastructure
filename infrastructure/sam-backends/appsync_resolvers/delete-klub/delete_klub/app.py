@@ -19,6 +19,14 @@ def lambda_handler(event, context):
     response = ssm_client.get_parameter(Name=f'klub-table-name-{Stage}')
     klub_table_name=response['Parameter']['Value']
 
+    #get conversation table name from ssm
+    response = ssm_client.get_parameter(Name=f'conversation-table-name-{Stage}')
+    conversation_table_name=response['Parameter']['Value']
+
+    #get message table name from ssm
+    response = ssm_client.get_parameter(Name=f'message-table-name-{Stage}')
+    message_table_name=response['Parameter']['Value']
+
     #get klub info
     result = dynamodb.get_item(TableName=klub_table_name, Key={'klubname':{'S':klubname}})
     klub_info = result['Item']
@@ -38,22 +46,33 @@ def lambda_handler(event, context):
         Key=f'klub-avatars/{object_name}'
     )
 
-    #get conversation table name from ssm
-    response = ssm_client.get_parameter(Name=f'conversation-table-name-{Stage}')
-    conversation_table_name=response['Parameter']['Value']
 
-    #delete mainGroupConversation
+    # ---- delete mainGroupConversation --- 
     result = dynamodb.delete_item(TableName=conversation_table_name, Key={'id':{'S':mainGroupConversationId}})
 
-    #TODO delete messages associate with conversation?
+    #delete messages associate with conversation
+    result = dynamodb.scan(TableName=message_table_name,FilterExpression=f'conversationId = :mainGroupConversationId',ExpressionAttributeValues={':mainGroupConversationId': {'S': mainGroupConversationId}})
 
-    #delete whaleGroupConversation
+    for message in result['Items']:
+        result = dynamodb.delete_item(TableName=message_table_name, Key={'id': message['id'],'conversationId': message['conversationId'],})
+
+    # ---- delete whaleGroupConversation ----
     result = dynamodb.delete_item(TableName=conversation_table_name, Key={'id':{'S':whaleGroupConversationId}})
 
+    #delete messages associate with conversation
+    result = dynamodb.scan(TableName=message_table_name,FilterExpression=f'conversationId = :whaleGroupConversationId',ExpressionAttributeValues={':whaleGroupConversationId': {'S': whaleGroupConversationId}})
 
-    #delete announcementConversation
+    for message in result['Items']:
+        result = dynamodb.delete_item(TableName=message_table_name, Key={'id': message['id'],'conversationId': message['conversationId'],})
+
+    # ---- delete announcementConversation ----
     result = dynamodb.delete_item(TableName=conversation_table_name, Key={'id':{'S':announcementConversationId}})
 
+    #delete messages associate with conversation
+    result = dynamodb.scan(TableName=message_table_name,FilterExpression=f'conversationId = :announcementConversationId',ExpressionAttributeValues={':announcementConversationId': {'S': announcementConversationId}})
+
+    for message in result['Items']:
+        result = dynamodb.delete_item(TableName=message_table_name, Key={'id': message['id'],'conversationId': message['conversationId'],})
 
     #delete klub
     result = dynamodb.delete_item(TableName=klub_table_name, Key={'klubname':{'S':klubname}})
@@ -62,46 +81,3 @@ def lambda_handler(event, context):
             "statusCode": 200,
             "body": "yo"
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    # if meetsRequirement:
-    #     #TODO create user klub bridge
-
-    #     #get userKlubBridge table name from ssm
-    #     response = ssm_client.get_parameter(Name=f'userklubbridge-table-name-{Stage}')
-    #     table_name=response['Parameter']['Value']
-
-    #     #add row to userKlubBridge Table to join
-    #     result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':klubname}})
-    #     print(f'result {result}')
-
-    #     return {
-    #         "statusCode": 200,
-    #         "body": json.dumps({
-    #             "message": f"{username} joined {klubname}",
-    #             "meetsRequirement": meetsRequirement,
-    #             "UserKlubBridge": {
-    #                 "username": username,
-    #                 "klubname": klubname
-    #             }
-    #         }),
-    #     }
-    # else:
-    #     return {
-    #             "statusCode": 200,
-    #             "body": json.dumps({
-    #                 "message": f"{userName} can not join {klubname}. Does not meet the minimum asset requirement",
-    #                 "meetsRequirement": meetsRequirement
-    #             }),
-    #         }

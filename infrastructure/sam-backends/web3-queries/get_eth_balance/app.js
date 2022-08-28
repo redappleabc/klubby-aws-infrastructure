@@ -137,9 +137,13 @@ exports.lambdaHandler = async (event, context) => {
 
                 //get eth balance
                 const ethBalance = await getEthBalance(web3,walletAddress)
-                let updateExpression  = 'set balance_eth = :eth'
-                let expressionValueObj = {":eth": {'N':ethBalance}}
+
+                // let updateExpression  = 'set balance_eth = :eth'
+                // let expressionValueObj = {":eth": {'N':ethBalance}}
                 let assetObj = {}
+                if(ethBalance > 0){
+                    assetObj['eth'] = {'N':ethBalance}
+                }
 
                 //get balance for each asset
                 for(asset of result.Items){

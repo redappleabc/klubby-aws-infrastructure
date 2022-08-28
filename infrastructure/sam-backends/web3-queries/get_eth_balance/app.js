@@ -139,18 +139,24 @@ exports.lambdaHandler = async (event, context) => {
                 const ethBalance = await getEthBalance(web3,walletAddress)
                 let updateExpression  = 'set balance_eth = :eth'
                 let expressionValueObj = {":eth": {'N':ethBalance}}
-
+                let assetObj = {}
 
                 //get balance for each asset
                 for(asset of result.Items){
                     let balance = await getAssetBalance(asset,walletAddress)
                     let asset_address = asset.address.S
                     //TODO will break with colliding symbols
-                    expressionValueObj[`:${asset_address}`] = {'N':balance}
-                    updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
+                    if(balance > 0){
+                        assetObj[asset_address] = {'N':balance}
+                    }
+                    // updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
+
                 }
+                expressionValueObj = {':asset_obj': {'M': assetObj}}
+                updateExpression = 'set assets = :asset_obj'
                 console.log(updateExpression)
                 console.log(expressionValueObj)
+
  
                 // const kishuBalance = await getKishuBalance(web3,walletAddress)
                 // const sanshuBalance = await getSanshuBalance(web3,walletAddress)

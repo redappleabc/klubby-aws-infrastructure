@@ -149,7 +149,7 @@ exports.lambdaHandler = async (event, context) => {
                 //get balance for each asset
                 for(asset of result.Items){
                     let balance = await getAssetBalance(asset,walletAddress)
-                    let asset_address = asset.address.S
+                    let asset_address = asset.address.S.toLowerCase()
                     //TODO will break with colliding symbols
                     if(balance > 0){
                         assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}}}

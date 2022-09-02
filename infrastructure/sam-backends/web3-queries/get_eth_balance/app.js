@@ -142,7 +142,7 @@ exports.lambdaHandler = async (event, context) => {
                 // let expressionValueObj = {":eth": {'N':ethBalance}}
                 let assetObj = {}
                 if(ethBalance > 0){
-                    assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}}}
+                    assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
                     // assetObj['eth'] = {'balance': ethBalance,'symbol': 'ETH','name': 'ethereum'}
                 }
 
@@ -152,7 +152,7 @@ exports.lambdaHandler = async (event, context) => {
                     let asset_address = asset.address.S.toLowerCase()
                     //TODO will break with colliding symbols
                     if(balance > 0){
-                        assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}}}
+                        assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
                         // assetObj[asset_address] = {'balance':balance,'symbol': asset.symbol.S,'name': asset.name.S}
 
                     }

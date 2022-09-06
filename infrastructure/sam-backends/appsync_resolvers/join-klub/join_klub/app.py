@@ -83,22 +83,22 @@ def lambda_handler(event, context):
         result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':klubname}})
         print(f'result {result}')
 
-        return {
+        return json.dumps({
             "statusCode": 200,
-            "body": json.dumps({
+            "body": {
                 "message": f"{username} joined {klubname}",
                 "meetsRequirement": meetsRequirement,
                 "UserKlubBridge": {
                     "username": username,
                     "klubname": klubname
                 }
-            }),
-        }
+            },
+        })
     else:
-        return {
+        return json.dumps({
                 "statusCode": 501,
-                "body": json.dumps({
+                "body": {
                     "message": f"{username} can not join {klubname}. Does not meet the minimum asset requirement",
                     "meetsRequirement": meetsRequirement
-                }),
-            }
+                },
+            })

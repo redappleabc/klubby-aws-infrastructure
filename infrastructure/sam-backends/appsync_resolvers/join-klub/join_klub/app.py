@@ -22,7 +22,6 @@ def query_klub_table(klubname):
     assetSymbol = results['Item']['assetSymbol']['S'].lower()
     address = results['Item']['contractAddress']['S'].lower()
 
-
     #get min asset requirement to join klub from results
     minimumAmountForMainGroup = results['Item']['minimumAmountForMainGroup']['N']
 
@@ -54,11 +53,14 @@ def checkMinAssetRequirement(username,klubname):
 
     print(f'assets {assets}')
     print(f'amountOwned {amountOwned}')
+    print(float(minimumAmountForMainGroup))
 
     #compare amountOwned to min requirement
     if amountOwned >= float(minimumAmountForMainGroup):
+        print('owns enough')
         return True
     else:
+        print('doesnt own enough')
         return False
 
 def lambda_handler(event, context):

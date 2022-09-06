@@ -957,7 +957,7 @@ Resources:
       TypeName: Klub
       FieldName: members
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/getNumberKlubMembers.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/klub/numberOfMembers.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items.size())
 

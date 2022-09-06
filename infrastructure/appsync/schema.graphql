@@ -223,8 +223,6 @@ type Query {
 
     getKlubByKlubname(klubname: ID!): Klub
 
-    getNumberKlubMembers(klubname: String!): String
-
     heartbeat(username: ID!): Presence
 
     #get all klubs

@@ -96,7 +96,7 @@ def lambda_handler(event, context):
         }
     else:
         return {
-                "statusCode": 200,
+                "statusCode": 501,
                 "body": json.dumps({
                     "message": f"{username} can not join {klubname}. Does not meet the minimum asset requirement",
                     "meetsRequirement": meetsRequirement

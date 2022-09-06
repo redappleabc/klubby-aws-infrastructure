@@ -766,7 +766,7 @@ Resources:
       DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/getNumberKlubMembers.request.vtl
       ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+        $utils.toJson($context.result.items.size())
 
 
 

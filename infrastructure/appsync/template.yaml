@@ -756,18 +756,6 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  GetNumberKlubMembersResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Query
-      FieldName: getNumberKlubMembers
-      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/getNumberKlubMembers.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result.items.size())
-
 
 
 

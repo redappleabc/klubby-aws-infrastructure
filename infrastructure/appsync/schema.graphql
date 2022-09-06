@@ -98,7 +98,7 @@ type Klub {
     #  The Klubs's timestamp.
     createdAt: String
 
-
+    members: String
 
     announcementConversationId: ID!
 

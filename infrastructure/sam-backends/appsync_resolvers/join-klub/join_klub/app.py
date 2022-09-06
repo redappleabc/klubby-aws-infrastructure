@@ -22,7 +22,6 @@ def query_klub_table(klubname):
     assetSymbol = results['Item']['assetSymbol']['S'].lower()
     address = results['Item']['contractAddress']['S'].lower()
 
-
     #get min asset requirement to join klub from results
     minimumAmountForMainGroup = results['Item']['minimumAmountForMainGroup']['N']
 
@@ -54,11 +53,14 @@ def checkMinAssetRequirement(username,klubname):
 
     print(f'assets {assets}')
     print(f'amountOwned {amountOwned}')
+    print(float(minimumAmountForMainGroup))
 
     #compare amountOwned to min requirement
     if amountOwned >= float(minimumAmountForMainGroup):
+        print('owns enough')
         return True
     else:
+        print('doesnt own enough')
         return False
 
 def lambda_handler(event, context):
@@ -81,22 +83,22 @@ def lambda_handler(event, context):
         result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':klubname}})
         print(f'result {result}')
 
-        return {
+        return json.dumps({
             "statusCode": 200,
-            "body": json.dumps({
+            "body": {
                 "message": f"{username} joined {klubname}",
                 "meetsRequirement": meetsRequirement,
                 "UserKlubBridge": {
                     "username": username,
                     "klubname": klubname
                 }
-            }),
-        }
+            },
+        })
     else:
-        return {
-                "statusCode": 200,
-                "body": json.dumps({
+        return json.dumps({
+                "statusCode": 501,
+                "body": {
                     "message": f"{username} can not join {klubname}. Does not meet the minimum asset requirement",
                     "meetsRequirement": meetsRequirement
-                }),
-            }
+                },
+            })

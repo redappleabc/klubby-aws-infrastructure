@@ -209,6 +209,7 @@ type UserKlubBridge {
 }
 
 type ownedAsset{
+    address: String!
     symbol: String!
     balance: String!
     contractType: String!

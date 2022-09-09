@@ -34,7 +34,10 @@ type Klub {
     # The klub's name
     klubname: String!
 
-    # symbol for this asset
+    # name for the associated asset
+    assetName: String
+
+    # symbol for the associated asset
     assetSymbol: String
 
     # avatar image for this klub

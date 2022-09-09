@@ -27,6 +27,10 @@ def lambda_handler(event, context):
     response = ssm_client.get_parameter(Name=f'message-table-name-{Stage}')
     message_table_name=response['Parameter']['Value']
 
+    #get UserKlubBridge table name from ssm
+    response = ssm_client.get_parameter(Name=f'userklubbridge-table-name-{Stage}')
+    userklubbridge_table_name=response['Parameter']['Value']
+
     #get klub info
     result = dynamodb.get_item(TableName=klub_table_name, Key={'klubname':{'S':klubname}})
     klub_info = result['Item']
@@ -36,7 +40,8 @@ def lambda_handler(event, context):
     whaleGroupConversationId = klub_info['whaleGroupConversationId']['S']
     announcementConversationId = klub_info['announcementConversationId']['S']
 
-    #delete avatar_url
+
+    # ---- delete avatar_url ----
     #parse url into bucket name and object key
     bucket_name = avatar_url.split("/")[2][:-17]
     object_name = avatar_url.split("/")[-1]
@@ -46,11 +51,10 @@ def lambda_handler(event, context):
         Key=f'klub-avatars/{object_name}'
     )
 
-
-    # ---- delete mainGroupConversation --- 
+    # ---- delete mainGroupConversation ----
     result = dynamodb.delete_item(TableName=conversation_table_name, Key={'id':{'S':mainGroupConversationId}})
 
-    #delete messages associate with conversation
+    #delete messages associated with conversation
     result = dynamodb.scan(TableName=message_table_name,FilterExpression=f'conversationId = :mainGroupConversationId',ExpressionAttributeValues={':mainGroupConversationId': {'S': mainGroupConversationId}})
 
     for message in result['Items']:
@@ -59,7 +63,7 @@ def lambda_handler(event, context):
     # ---- delete whaleGroupConversation ----
     result = dynamodb.delete_item(TableName=conversation_table_name, Key={'id':{'S':whaleGroupConversationId}})
 
-    #delete messages associate with conversation
+    #delete messages associated with conversation
     result = dynamodb.scan(TableName=message_table_name,FilterExpression=f'conversationId = :whaleGroupConversationId',ExpressionAttributeValues={':whaleGroupConversationId': {'S': whaleGroupConversationId}})
 
     for message in result['Items']:
@@ -68,13 +72,20 @@ def lambda_handler(event, context):
     # ---- delete announcementConversation ----
     result = dynamodb.delete_item(TableName=conversation_table_name, Key={'id':{'S':announcementConversationId}})
 
-    #delete messages associate with conversation
+    #delete messages associated with conversation
     result = dynamodb.scan(TableName=message_table_name,FilterExpression=f'conversationId = :announcementConversationId',ExpressionAttributeValues={':announcementConversationId': {'S': announcementConversationId}})
 
     for message in result['Items']:
         result = dynamodb.delete_item(TableName=message_table_name, Key={'id': message['id'],'conversationId': message['conversationId'],})
 
-    #delete klub
+    # ---- delete User Klub associations in UserKlubBridge Table ----
+    #delete user klub associations that have this klub
+    result = dynamodb.scan(TableName=userklubbridge_table_name,FilterExpression=f'klubname = :klubname',ExpressionAttributeValues={':klubname': {'S': klubname}})
+    for klub_member in result['Items']:
+        result = dynamodb.delete_item(TableName=userklubbridge_table_name, Key={'klubname': klub_member['klubname'],'username': klub_member['username'],})
+    print(result)
+
+    # --- delete klub ---
     result = dynamodb.delete_item(TableName=klub_table_name, Key={'klubname':{'S':klubname}})
 
     return {

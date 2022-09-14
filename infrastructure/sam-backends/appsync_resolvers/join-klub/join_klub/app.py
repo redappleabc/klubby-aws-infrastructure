@@ -29,6 +29,10 @@ def query_klub_table(klubname):
 
 def checkMinAssetRequirement(username,klubname):
     assetSymbol,address,minimumAmountForMainGroup = query_klub_table(klubname)
+
+    #if klub is public return true
+    if minimumAmountForMainGroup == 0:
+        return True
     
     #get user table name from ssm
     response = ssm_client.get_parameter(Name=f'user-table-name-{Stage}')

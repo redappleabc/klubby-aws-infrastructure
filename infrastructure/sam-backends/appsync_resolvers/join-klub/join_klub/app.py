@@ -85,7 +85,7 @@ def lambda_handler(event, context):
         if meetsWhaleRequirement:
             putItem = {'username':{'S':username},'klubname':{'S':klubname},'whale':{'BOOL':True}}
         else:
-            putItem = {'username':{'S':username},'klubname':{'S':klubname}}
+            putItem = {'username':{'S':username},'klubname':{'S':klubname},'whale':{'BOOL':False}}
 
         #add row to userKlubBridge Table to join
         result = dynamodb.put_item(TableName=table_name, Item=putItem)

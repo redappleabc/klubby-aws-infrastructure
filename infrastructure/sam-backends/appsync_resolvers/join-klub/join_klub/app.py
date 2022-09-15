@@ -31,7 +31,7 @@ def checkMinAssetRequirement(username,klubname):
     assetSymbol,address,minimumAmountForMainGroup = query_klub_table(klubname)
 
     #if klub is public return true
-    if minimumAmountForMainGroup == 0:
+    if minimumAmountForMainGroup == '0':
         return True
     
     #get user table name from ssm

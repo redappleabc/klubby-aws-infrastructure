@@ -175,7 +175,7 @@ type UserConversationBridge {
 
     name: String
 
-    accepted: Boolean;
+    accepted: Boolean
 
     acceptTime: String
 
@@ -197,6 +197,8 @@ type UserKlubBridge {
 
     # This is sort key
     klubname: ID!
+
+    whale: Boolean
 
     klub: Klub
 

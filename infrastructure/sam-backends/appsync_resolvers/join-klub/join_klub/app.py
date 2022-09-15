@@ -83,7 +83,7 @@ def lambda_handler(event, context):
 
         #dynamically add field if the meet whale requirement
         if meetsWhaleRequirement:
-            putItem = {'username':{'S':username},'klubname':{'S':klubname},'whale':{'B':'true'}}
+            putItem = {'username':{'S':username},'klubname':{'S':klubname},'whale':{'BOOL':True}}
         else:
             putItem = {'username':{'S':username},'klubname':{'S':klubname}}
 

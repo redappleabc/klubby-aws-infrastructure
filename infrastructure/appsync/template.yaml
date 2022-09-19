@@ -480,6 +480,18 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+  EditKlubMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "editKlub"
+      DataSourceName: !GetAtt KlubTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/editKlub.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
   CreateKlubMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema

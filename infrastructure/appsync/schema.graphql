@@ -278,6 +278,11 @@ type Mutation {
     website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
+    #Edit a klub
+    '''EditKlub(klubname: ID!, assetName: String, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
+    website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
+    coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
+
     #Create a message in a Conversation.
     createMessage(content: String!, conversationId: ID!): Message
 

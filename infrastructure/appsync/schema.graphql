@@ -34,7 +34,10 @@ type Klub {
     # The klub's name
     klubname: String!
 
-    # symbol for this asset
+    # name for the associated asset
+    assetName: String
+
+    # symbol for the associated asset
     assetSymbol: String
 
     # avatar image for this klub
@@ -153,7 +156,7 @@ type MessageConnection {
 type User {
     # This is partition key
     username: String!
-    assets: String
+    assets: [ownedAsset]
     wallets: String
     #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
     conversations: [UserConversationBridge]
@@ -172,7 +175,7 @@ type UserConversationBridge {
 
     name: String
 
-    accepted: Boolean;
+    accepted: Boolean
 
     acceptTime: String
 
@@ -195,6 +198,8 @@ type UserKlubBridge {
     # This is sort key
     klubname: ID!
 
+    whale: Boolean
+
     klub: Klub
 
     # latest message id for main group which I has read
@@ -208,6 +213,13 @@ type UserKlubBridge {
 
 }
 
+type ownedAsset{
+    address: String!
+    symbol: String!
+    balance: String!
+    contractType: String!
+    name: String!
+}
 
 
 
@@ -262,7 +274,13 @@ type Mutation {
     createConversation: Conversation
 
     #Create a klub
-    '''createKlub(klubname: ID!, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
+    '''createKlub(klubname: ID!, assetName: String, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
+    website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
+    coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
+
+
+    #Edit a klub
+    '''editKlub(klubname: ID!, assetName: String, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
     website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 

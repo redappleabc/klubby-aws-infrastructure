@@ -24,24 +24,27 @@ def query_klub_table(klubname):
 
     #get min asset requirement to join klub from results
     minimumAmountForMainGroup = results['Item']['minimumAmountForMainGroup']['N']
+    minimumAmountForWhaleGroup = results['Item']['minimumAmountForWhaleGroup']['N']
 
-    return (assetSymbol,address,minimumAmountForMainGroup)
+    return (assetSymbol,address,minimumAmountForMainGroup,minimumAmountForWhaleGroup)
 
 def checkMinAssetRequirement(username,klubname):
-    assetSymbol,address,minimumAmountForMainGroup = query_klub_table(klubname)
-    
+    assetSymbol,address,minimumAmountForMainGroup,minimumAmountForWhaleGroup = query_klub_table(klubname)
+
     #get user table name from ssm
     response = ssm_client.get_parameter(Name=f'user-table-name-{Stage}')
     table_name=response['Parameter']['Value']
 
+    #get users amount of asset
+    res = dynamodb.get_item(TableName=table_name, Key={'username':{'S':username}})
+
+    #if klub is public return and user doesnt have wallet return true,false
+    if minimumAmountForMainGroup == '0' and 'assets' not in res['Item']:
+        return True, False
+
     #if eth
     if address == 'n/a':
         address = 'eth'
-
-    #get users amount of asset
-    res = dynamodb.get_item(TableName=table_name, Key={'username':{'S':username}})
-    #TODO change this to num type
-    # amountOwned = res['Item'][f'balance_{assetSymbol}']['S']
 
     assets = res['Item']['assets']
 
@@ -51,17 +54,16 @@ def checkMinAssetRequirement(username,klubname):
         amountOwned = 0
 
 
-    print(f'assets {assets}')
-    print(f'amountOwned {amountOwned}')
-    print(float(minimumAmountForMainGroup))
-
     #compare amountOwned to min requirement
     if amountOwned >= float(minimumAmountForMainGroup):
-        print('owns enough')
-        return True
+        print('owns enough for main')
+        if amountOwned >= float(minimumAmountForWhaleGroup):
+            return True, True
+        return True, False
+
     else:
         print('doesnt own enough')
-        return False
+        return False, False
 
 def lambda_handler(event, context):
     print(f'event {event}')
@@ -70,7 +72,7 @@ def lambda_handler(event, context):
     username = event['arguments']['username']
     klubname = event['arguments']['klubname']
 
-    meetsRequirement = checkMinAssetRequirement(username,klubname)
+    meetsRequirement,meetsWhaleRequirement = checkMinAssetRequirement(username,klubname)
 
     if meetsRequirement:
         #TODO create user klub bridge
@@ -79,8 +81,14 @@ def lambda_handler(event, context):
         response = ssm_client.get_parameter(Name=f'userklubbridge-table-name-{Stage}')
         table_name=response['Parameter']['Value']
 
+        #dynamically add field if the meet whale requirement
+        if meetsWhaleRequirement:
+            putItem = {'username':{'S':username},'klubname':{'S':klubname},'whale':{'BOOL':True}}
+        else:
+            putItem = {'username':{'S':username},'klubname':{'S':klubname},'whale':{'BOOL':False}}
+
         #add row to userKlubBridge Table to join
-        result = dynamodb.put_item(TableName=table_name, Item={'username':{'S':username},'klubname':{'S':klubname}})
+        result = dynamodb.put_item(TableName=table_name, Item=putItem)
         print(f'result {result}')
 
         return json.dumps({

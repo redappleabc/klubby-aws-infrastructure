@@ -1,0 +1,57 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "klubname" : { "S" : "${context.arguments.klubname}" }
+    },
+    "condition" : {
+        "expression" : "#owner = :owner",
+        "expressionNames" : {
+            "#owner" : "owner"
+        },
+        "expressionValues" : {
+            ":owner" : {"S": "${context.identity.username}"}
+        }
+    },
+    "update" : {
+        "expression" : "SET #assetSymbol = :assetSymbol, #avatar_url = :avatar_url, #description = :description, #contractAddress = :contractAddress, #blockchainExplorer = :blockchainExplorer, #tokenType = :tokenType, #minimumAmountForMainGroup = :minimumAmountForMainGroup, #minimumAmountForWhaleGroup = :minimumAmountForWhaleGroup,  #website = :website, #coinmarketcap = :coinmarketcap, #coingecho = :coingecho, #dextools = :dextools, #telegram = :telegram, #discord = :discord, #twitter = :twitter, #reddit = :reddit, #instagram = :instagram",
+        "expressionNames": {
+            "#assetSymbol": "assetSymbol",
+            "#avatar_url": "avatar_url",
+            "#description": "description",
+            "#contractAddress": "contractAddress",
+            "#blockchainExplorer": "blockchainExplorer",
+            "#tokenType": "tokenType",
+            "#minimumAmountForMainGroup":"minimumAmountForMainGroup"  ,
+            "#minimumAmountForWhaleGroup": "minimumAmountForWhaleGroup",
+            "#website": "website",
+            "#coinmarketcap": "coinmarketcap",
+            "#coingecho": "coingecho",
+            "#dextools": "dextools",
+            "#telegram": "telegram",
+            "#discord": "discord",
+            "#twitter": "twitter",
+            "#reddit": "reddit",
+            "#instagram": "instagram" 
+        },
+        "expressionValues": {
+            ":assetSymbol" : {  "S": "${context.arguments.assetSymbol}" },
+            ":avatar_url" : {  "S": "${context.arguments.avatar_url}" },
+            ":description": {  "S": "${context.arguments.description}" },
+            ":contractAddress": {  "S": "${context.arguments.contractAddress}" },
+            ":blockchainExplorer": {  "S": "${context.arguments.blockchainExplorer}" },
+            ":tokenType": {  "S": "${context.arguments.tokenType}" },
+            ":minimumAmountForMainGroup":  #if(${context.arguments.minimumAmountForMainGroup}) {  "N": "${context.arguments.minimumAmountForMainGroup}" } #else {"N":"0"} #end,
+            ":minimumAmountForWhaleGroup": #if(${context.arguments.minimumAmountForWhaleGroup}) {  "N": "${context.arguments.minimumAmountForWhaleGroup}" } #else {"N":"0"} #end,
+            ":website": #if(${context.arguments.website}) {  "S": "${context.arguments.website}" } #else {"S":""} #end,
+            ":coinmarketcap": #if(${context.arguments.coinmarketcap}) {  "S": "${context.arguments.coinmarketcap}" } #else {"S":""} #end,
+            ":coingecho": #if(${context.arguments.coingecho}) {  "S": "${context.arguments.coingecho}" } #else {"S":""} #end,
+            ":dextools": #if(${context.arguments.dextools}) {  "S": "${context.arguments.dextools}" } #else {"S":""} #end,
+            ":telegram": #if(${context.arguments.telegram}) {  "S": "${context.arguments.telegram}" } #else {"S":""} #end,
+            ":discord": #if(${context.arguments.discord}) {  "S": "${context.arguments.discord}" } #else {"S":""} #end,
+            ":twitter": #if(${context.arguments.twitter}) {  "S": "${context.arguments.twitter}" } #else {"S":""} #end,
+            ":reddit": #if(${context.arguments.reddit}) {  "S": "${context.arguments.reddit}" } #else {"S":""} #end,
+            ":instagram": #if(${context.arguments.instagram}) {  "S": "${context.arguments.instagram}" } #else {"S":""} #end
+        }
+    }
+}

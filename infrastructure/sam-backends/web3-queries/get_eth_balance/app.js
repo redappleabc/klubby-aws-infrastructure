@@ -141,8 +141,10 @@ exports.lambdaHandler = async (event, context) => {
                 // let updateExpression  = 'set balance_eth = :eth'
                 // let expressionValueObj = {":eth": {'N':ethBalance}}
                 let assetObj = {}
+                let assetList = []
                 if(ethBalance > 0){
                     assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
+                    assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
                     // assetObj['eth'] = {'balance': ethBalance,'symbol': 'ETH','name': 'ethereum'}
                 }
 
@@ -154,13 +156,15 @@ exports.lambdaHandler = async (event, context) => {
                     if(balance > 0){
                         assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
                         // assetObj[asset_address] = {'balance':balance,'symbol': asset.symbol.S,'name': asset.name.S}
-
+                        assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
                     }
                     // updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
 
                 }
-                expressionValueObj = {':asset_obj': {'M': assetObj}}
-                updateExpression = 'set assets = :asset_obj'
+                // expressionValueObj = {':asset_obj': {'M': assetObj}}
+                expressionValueObj = {':asset_list': {'L': assetList}}
+                // updateExpression = 'set assets = :asset_obj'
+                updateExpression = 'set assets = :asset_list'
                 console.log(updateExpression)
                 console.log(expressionValueObj)
 

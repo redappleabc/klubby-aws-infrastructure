@@ -137,6 +137,24 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 3
 
+  AnnouncementTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      # TableName: !Sub 'user-table-${Stage}'
+      AttributeDefinitions:
+      - AttributeName: klubname
+        AttributeType: S
+      - AttributeName: id
+        AttributeType: S
+      KeySchema:
+      - AttributeName: klubname
+        KeyType: HASH
+      - AttributeName: id
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+
 
 ### for landing page ###
 
@@ -225,5 +243,15 @@ Resources:
       Type: String
       Value: !Ref ContractTable
       Description: SSM Parameter for contract table name
+      Tags:
+        Environment: !Ref Stage
+
+  AnnouncementTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'announcement-table-name-${Stage}'
+      Type: String
+      Value: !Ref AnnouncementTable
+      Description: SSM Parameter for announcement table name
       Tags:
         Environment: !Ref Stage

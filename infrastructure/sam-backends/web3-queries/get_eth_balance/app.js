@@ -57,7 +57,7 @@ async function get_ssm_param(ssm_param_name){
 async function getEthBalance(web3,walletAddress){
     const balance = await web3.eth.getBalance(walletAddress);
 
-    return balance
+    return Web3.utils.fromWei(balance, 'ether')
 }
 
 //funuction to get kishu inu balance
@@ -143,8 +143,8 @@ exports.lambdaHandler = async (event, context) => {
                 let assetObj = {}
                 let assetList = []
                 if(ethBalance > 0){
-                    assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
-                    assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
+                    // assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
+                    assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
                     // assetObj['eth'] = {'balance': ethBalance,'symbol': 'ETH','name': 'ethereum'}
                 }
 
@@ -154,7 +154,7 @@ exports.lambdaHandler = async (event, context) => {
                     let asset_address = asset.address.S.toLowerCase()
                     //TODO will break with colliding symbols
                     if(balance > 0){
-                        assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
+                        // assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
                         // assetObj[asset_address] = {'balance':balance,'symbol': asset.symbol.S,'name': asset.name.S}
                         assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
                     }

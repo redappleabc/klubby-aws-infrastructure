@@ -6,6 +6,7 @@
     },
     "attributeValues" : {
         "conversationId": {  "S": "${context.arguments.conversationId}" },
+        "title": {  "S": "${context.arguments.title}" },
         "content": {  "S": "${context.arguments.content}" },
         "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
         "sender": {  "S": "${context.identity.username}" },

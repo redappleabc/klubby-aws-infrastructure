@@ -128,6 +128,9 @@ type Message {
     #  The id of the Conversation this message belongs to. This is the table primary key.
     conversationId: ID!
 
+    # title for announcement
+    title: String
+
     #  The message content.
     content: String!
 
@@ -285,7 +288,7 @@ type Mutation {
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
     #Create a message in a Conversation.
-    createMessage(content: String!, conversationId: ID!): Message
+    createMessage(content: String!, conversationId: ID!, title: String): Message
 
     #creates a presigned url that can be used to upload avatar image
     createKlubAvatarPresignedUrl(klubname: String!): String

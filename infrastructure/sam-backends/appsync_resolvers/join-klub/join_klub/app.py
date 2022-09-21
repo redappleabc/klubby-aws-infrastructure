@@ -28,6 +28,22 @@ def query_klub_table(klubname):
 
     return (assetSymbol,address,minimumAmountForMainGroup,minimumAmountForWhaleGroup)
 
+def create_asset_object(assetList):
+    assetObj = {}
+
+    for asset in assetList:
+        # print(asset)
+
+        key = asset['M']['address']['S']
+        if key == 'n/a':
+            key = 'eth'
+
+        value = float(asset['M']['balance']['N'])
+
+        assetObj[key] = value
+
+    return assetObj
+
 def checkMinAssetRequirement(username,klubname):
     assetSymbol,address,minimumAmountForMainGroup,minimumAmountForWhaleGroup = query_klub_table(klubname)
 
@@ -46,19 +62,26 @@ def checkMinAssetRequirement(username,klubname):
     if address == 'n/a':
         address = 'eth'
 
-    assets = res['Item']['assets']
+    assets = res['Item']['assets']['L']
+
+    assetObj = create_asset_object(assets)
+    print(f'assetObj {assetObj}')
 
     try:
-        amountOwned = float(assets['M'][address]['M']['balance']['N'])
+        # amountOwned = float(assets['M'][address]['M']['balance']['N'])
+        amountOwned = assetObj[address]
     except Exception as e:
         amountOwned = 0
 
+    print(f'amountOwned {amountOwned}')
 
     #compare amountOwned to min requirement
     if amountOwned >= float(minimumAmountForMainGroup):
         print('owns enough for main')
         if amountOwned >= float(minimumAmountForWhaleGroup):
+            print('owns enough for whale')
             return True, True
+        print('doesnt own enough for whale')
         return True, False
 
     else:

@@ -79,7 +79,9 @@ def checkMinAssetRequirement(username,klubname):
     if amountOwned >= float(minimumAmountForMainGroup):
         print('owns enough for main')
         if amountOwned >= float(minimumAmountForWhaleGroup):
+            print('owns enough for whale')
             return True, True
+        print('doesnt own enough for whale')
         return True, False
 
     else:

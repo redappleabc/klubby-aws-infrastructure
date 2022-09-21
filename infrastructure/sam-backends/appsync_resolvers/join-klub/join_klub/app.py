@@ -53,6 +53,7 @@ def checkMinAssetRequirement(username,klubname):
     except Exception as e:
         amountOwned = 0
 
+    print(f'amountOwned {amountOwned}')
 
     #compare amountOwned to min requirement
     if amountOwned >= float(minimumAmountForMainGroup):

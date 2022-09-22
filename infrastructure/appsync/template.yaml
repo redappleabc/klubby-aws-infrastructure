@@ -708,6 +708,18 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+  RemoveMessageMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "removeMessage"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/removeMessage.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
   EditMessageMutationResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
@@ -1079,7 +1091,20 @@ Resources:
         }
 
 
-
+  AnnouncementsKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Klub"
+      FieldName: "announcements"
+      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/announcementsKlub.request.vtl
+      ResponseMappingTemplate: |
+        {
+          "announcements": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
 
 
   # -- UserKlubBridge Type Resolvers ---- #

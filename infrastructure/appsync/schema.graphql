@@ -107,7 +107,7 @@ type Klub {
     # This is pointer to Conversation for above announcementConversationId
     # announcementConversatioin: Conversation
 
-    announcements: [AnnouncementConnection]
+    announcements: AnnouncementConnection
 
     mainGroupConversationId: ID!
 

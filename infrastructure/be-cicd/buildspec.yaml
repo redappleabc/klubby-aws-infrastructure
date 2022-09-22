@@ -37,6 +37,7 @@ phases:
           CreateKlubAvatarPresignedUrlFunctionArn=create-klub-avatar-presigned-url-function-arn-$STAGE
           JoinKlubFunctionArn=join-klub-function-arn-$STAGE
           ValidateAddressFunctionArn=validate-address-function-arn-$STAGE
+          AnnouncementTableName=announcement-table-name-$STAGE
       #--- Deploy EC2 Infrastructure ---#
       - cd ../ec2
       - aws cloudformation deploy --stack-name klubby-ec2-$STAGE --template template.yaml --region us-east-1 --capabilities CAPABILITY_IAM --no-execute-changeset --parameter-override Stage=$STAGE

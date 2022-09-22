@@ -379,7 +379,7 @@ type Subscription  {
 
 
     #Subscribes to all new announcements in a given Klub.
-    subscribeToNewMessage(klubname: ID!): Announcement
+    subscribeToNewAnnouncement(klubname: ID!): Announcement
     @aws_subscribe(mutations:["createAnnouncement","editAnnouncement"])
 
 

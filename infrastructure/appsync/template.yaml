@@ -1079,7 +1079,7 @@ Resources:
         }
 
 
-  announcementsKlubResolver:
+  AnnouncementsKlubResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:

@@ -34,6 +34,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: message-table-name-dev
     Description: message table name
+  AnnouncementTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: announcement-table-name-dev
+    Description: announcement table name
   KlubTableName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: klub-table-name-dev
@@ -137,6 +141,18 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
+
+  AnnouncementTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub AnnouncementDynamoDBTable_${Stage}
+      Description: Announcement DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref AnnouncementTableName
 
   KlubTableDataSource:
     Type: "AWS::AppSync::DataSource"
@@ -654,6 +670,20 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
+
+  CreateAnnouncementMutationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Mutation"
+      FieldName: "createAnnouncement"
+      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/createAnnouncement.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
   ReplyMessageMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -666,15 +696,15 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  RemoveMessageMutationResolver:
+  RemoveAnnouncementMutationResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
-      FieldName: "removeMessage"
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/removeMessage.request.vtl
+      FieldName: "removeAnnouncement"
+      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/removeAnnouncement.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
@@ -687,6 +717,19 @@ Resources:
       FieldName: editMessage
       DataSourceName: !GetAtt MessageTableDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/editMessage.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+  EditAnnouncementMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: editAnnouncement
+      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/editAnnouncement.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
@@ -799,20 +842,37 @@ Resources:
   #     ResponseMappingTemplate: |
   #       $utils.toJson($context.result.items)
 
-  ListMessageConnectionsResolver:
+  ListMessagesByConversationIdResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
-      FieldName: listMessageConnections
+      FieldName: listMessagesByConversationId
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/listMessageConnections.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/listMessagesByConversationId.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
+
+
+  ListAnnouncementsByKlubnameResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: listAnnouncementsByKlubname
+      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/listAnnouncementsByKlubname.request.vtl
+      ResponseMappingTemplate: |
+        {
+          "messages": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
+
 
   SearchKlubsResolver:
     Type: AWS::AppSync::Resolver
@@ -938,17 +998,17 @@ Resources:
 
   # -- Klub Type Resolvers ---- #
 
-  announcementConversatioinKlubResolver:
-    Type: "AWS::AppSync::Resolver"
-    DependsOn: Schema
-    Properties:
-      ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: Klub
-      FieldName: "announcementConversatioin"
-      DataSourceName: !GetAtt ConversationTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/klub/announcementConversationKlub.request.vtl
-      ResponseMappingTemplate: |
-        $utils.toJson($context.result)
+  # announcementConversatioinKlubResolver:
+  #   Type: "AWS::AppSync::Resolver"
+  #   DependsOn: Schema
+  #   Properties:
+  #     ApiId: !GetAtt GraphQLApi.ApiId
+  #     TypeName: Klub
+  #     FieldName: "announcementConversatioin"
+  #     DataSourceName: !GetAtt ConversationTableDataSource.Name
+  #     RequestMappingTemplateS3Location: resolver-mappings/klub/announcementConversationKlub.request.vtl
+  #     ResponseMappingTemplate: |
+  #       $utils.toJson($context.result)
 
   KlubNumberMembersResolver:
     Type: "AWS::AppSync::Resolver"
@@ -1017,6 +1077,23 @@ Resources:
           "messages": $utils.toJson($context.result.items),
           "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
         }
+
+
+  announcementsKlubResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Klub"
+      FieldName: "announcements"
+      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/announcementsKlub.request.vtl
+      ResponseMappingTemplate: |
+        {
+          "announcements": $utils.toJson($context.result.items),
+          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+        }
+
 
   # -- UserKlubBridge Type Resolvers ---- #
 

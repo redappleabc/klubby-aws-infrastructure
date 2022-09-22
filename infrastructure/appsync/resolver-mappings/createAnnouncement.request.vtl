@@ -2,13 +2,14 @@
     "version" : "2017-02-28",
     "operation" : "PutItem",
     "key" : {
-        "conversationId" : { "S" : "${context.arguments.conversationId}" }
+        "klubname" : { "S" : "${context.arguments.klubname}" }
     },
     "attributeValues" : {
-        "conversationId": {  "S": "${context.arguments.conversationId}" },
+        "klubname": {  "S": "${context.arguments.klubname}" },
+        "title": {  "S": "${context.arguments.title}" },
         "content": {  "S": "${context.arguments.content}" },
         "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
-        "sender": {  "S": "${context.identity.username}" },
+        "publisher": {  "S": "${context.identity.username}" },
         "isSent": {  "BOOL": true },
         "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" }
     }

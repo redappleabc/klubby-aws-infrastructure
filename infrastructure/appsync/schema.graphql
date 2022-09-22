@@ -103,10 +103,11 @@ type Klub {
 
     members: String
 
-    announcementConversationId: ID!
-
+    # announcementConversationId: ID!
     # This is pointer to Conversation for above announcementConversationId
-    announcementConversatioin: Conversation
+    # announcementConversatioin: Conversation
+
+    announcements: [AnnouncementConnection]
 
     mainGroupConversationId: ID!
 
@@ -128,9 +129,6 @@ type Message {
     #  The id of the Conversation this message belongs to. This is the table primary key.
     conversationId: ID!
 
-    # title for announcement
-    title: String
-
     #  The message content.
     content: String!
 
@@ -151,8 +149,37 @@ type Message {
     sender: String
 }
 
+type Announcement {
+
+    #  Generated id for a message -- read-only
+    id: ID!
+
+    # The klubname this announcement belongs to.
+    klubname: ID!
+
+    title: String!
+
+    content: String!
+
+    #  The message timestamp.
+    createdAt: String
+
+    updatedAt: String
+    
+    #  Flag denoting if this announcement has been accepted by the server or not.
+    isSent: Boolean
+
+    publisher: String
+    
+}
+
 type MessageConnection {
     messages: [Message]
+    nextToken: String
+}
+
+type AnnouncementConnection {
+    announcements: [Announcement]
     nextToken: String
 }
 
@@ -244,7 +271,8 @@ type Query {
     searchKlubs(klubname: String!): [Klub]
 
     #Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
-    listMessageConnections(after: String, conversationId: ID!, first: Int): MessageConnection
+    listMessagesByConversationId(after: String, conversationId: ID!, first: Int): MessageConnection
+    listAnnouncementsByKlubname(after: String, klubname: ID!, first: Int): AnnouncementConnection
 
     #get all the klubs the user belongs to
     listMyKlubs: [UserKlubBridge]
@@ -287,8 +315,11 @@ type Mutation {
     website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
+
     #Create a message in a Conversation.
-    createMessage(content: String!, conversationId: ID!, title: String): Message
+    createMessage(content: String!, conversationId: ID!): Message
+
+    createAnnouncement(content: String!, klubname: ID!, title: String): Announcement
 
     #creates a presigned url that can be used to upload avatar image
     createKlubAvatarPresignedUrl(klubname: String!): String
@@ -302,6 +333,9 @@ type Mutation {
 
     disconnected(username: ID!): Presence
 
+    #edit announcement in Announcement table
+    editAnnouncement(klubname: ID!, id: String!, title: String!,  content: String!): Announcement
+
     #edit message in Messages table
     editMessage(conversationId: ID!, id: String!, content: String!): Message
 
@@ -314,6 +348,10 @@ type Mutation {
 
     #Delete the Conversation
     removeConversation(conversationId: ID!): Conversation
+
+
+    #remove message in Announcement table
+    removeAnnouncement(klubname: ID!, id: String!): Announcement
 
     #remove message in Messages table
     removeMessage(conversationId: ID!, id: String!): Message
@@ -339,6 +377,12 @@ type Subscription  {
     onStatus(id: ID!): Presence
     @aws_subscribe(mutations: ["connect","disconnect","disconnected"])
 
+
+    #Subscribes to all new announcements in a given Klub.
+    subscribeToNewMessage(klubname: ID!): Announcement
+    @aws_subscribe(mutations:["createAnnouncement","editAnnouncement"])
+
+
     #Subscribes to all new messages in a given Conversation.
     subscribeToNewMessage(conversationId: ID!): Message
     @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
@@ -352,6 +396,10 @@ type Subscription  {
     #Subscribes to all removed messages in a given Conversation
     subscribeToRemovedMessage(conversationId: ID!): Message
     @aws_subscribe(mutations: ["removeMessage"]) 
+
+    #Subscribes to all removed messages in a given Klub
+    subscribeToRemovedAnnouncement(klubname: ID!): Announcement
+    @aws_subscribe(mutations: ["removeAnnouncement"]) 
     
     #Subscribes to read message
     subscribeToReadMessage(conversationId: ID!): UserConversationBridge

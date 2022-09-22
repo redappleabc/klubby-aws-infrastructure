@@ -1,0 +1,17 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "DeleteItem",
+    "key" : {
+        "id" : { "S" : "${context.arguments.id}" },
+        "klubname": {"S" : "${context.arguments.klubname}"}
+    },
+    "condition" : {
+        "expression" : "#publisher = :publisher",
+        "expressionNames" : {
+            "#publisher" : "publisher"
+        },
+        "expressionValues" : {
+            ":publisher" : {"S": "${context.identity.username}"}
+        }
+    }
+}

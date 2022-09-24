@@ -714,9 +714,9 @@ Resources:
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Mutation"
-      FieldName: "removeAnnouncement"
-      DataSourceName: !GetAtt AnnouncementTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/removeAnnouncement.request.vtl
+      FieldName: "removeMessage"
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/removeMessage.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

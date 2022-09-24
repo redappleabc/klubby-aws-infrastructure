@@ -60,9 +60,9 @@ Resources:
       OauthToken: !Ref OauthToken
       AccessToken: !Ref OauthToken
       CustomRules:
-          - Source: /*
+          - Source: /dashboard
             Status: 200
-            Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]
+            Target: !If [IsProd, https://app.klubby.io, https://dev.klubby.me]
         # - Source: /dashboard
         #   Status: 200
         #   Target: !If [IsProd, https://klubby.me, https://dev.klubby.me]

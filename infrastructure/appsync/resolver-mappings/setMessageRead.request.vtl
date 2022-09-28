@@ -1,0 +1,13 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "PutItem",
+    "key": {
+        "username": { "S" : "${context.identity.username}"},
+        "conversationId": { "S" : "${context.arguments.conversationId}"}
+    },
+    "attributeValues" : {
+        "username": {  "S": "${context.identity.username}" },
+        "conversationId": {  "S": "${context.arguments.conversationId}" },
+        "messageId": {  "S": "${context.arguments.messageId}" },
+    }
+}

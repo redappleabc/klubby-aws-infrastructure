@@ -1027,7 +1027,7 @@ Resources:
       RequestMappingTemplateS3Location: resolver-mappings/readUserConversationBridge.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
-        $util.toJson($ctx.result)     
+        $util.toJson($ctx.result.messageId)     
 
 
 

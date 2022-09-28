@@ -149,6 +149,12 @@ type Message {
     sender: String
 }
 
+type MessageRead {
+    username: ID!
+    conversationId: ID!
+    messageId: String
+}
+
 type Announcement {
 
     #  Generated id for a message -- read-only
@@ -365,6 +371,8 @@ type Mutation {
     #set message id which user read
     setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
 
+    setMessageRead(conversationId: ID!, messageId: ID!): MessageRead
+
     updateUser(username: String!,wallets: String!): User
 
     validateAddress(address: String!,contractType: String!): String
@@ -404,6 +412,11 @@ type Subscription  {
     #Subscribes to read message
     subscribeToReadMessage(conversationId: ID!): UserConversationBridge
     @aws_subscribe(mutations: ["setRead"])
+
+
+    #Subscribes to read message
+    subscribeToMessageRead(conversationId: ID!): MessageRead
+    @aws_subscribe(mutations: ["setMessageRead"])
 
     #Subscribes to accept conversation
     subscribeToAcceptConversation(conversationId: ID!): UserConversationBridge

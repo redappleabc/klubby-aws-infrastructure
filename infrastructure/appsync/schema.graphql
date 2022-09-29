@@ -270,7 +270,7 @@ type Query {
 
     getConversationById(conversationId: ID!): Conversation
 
-    getKlubByKlubname(klubname: ID!): Klub
+    getKlubByKlubname(klubname: ID!): UserKlubBridge
 
     heartbeat(username: ID!): Presence
 

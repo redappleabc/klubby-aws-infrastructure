@@ -970,7 +970,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getKlubByKlubname
-      DataSourceName: !GetAtt KlubTableDataSource.Name
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/getKlubByKlubname.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)

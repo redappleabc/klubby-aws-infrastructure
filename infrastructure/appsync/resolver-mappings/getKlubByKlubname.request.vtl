@@ -2,6 +2,7 @@
     "version" : "2017-02-28",
     "operation" : "GetItem",
     "key" : {
-        "klubname" : { "S" : "${context.arguments.klubname}" }
+        "klubname" : { "S" : "${context.arguments.klubname}" },
+        "username" : { "S" : "${context.identity.username}" }
     }
 }

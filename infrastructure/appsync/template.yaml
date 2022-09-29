@@ -1030,6 +1030,34 @@ Resources:
         $util.toJson($ctx.result.messageId)     
 
 
+  ReadMainGroup:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: readMainGroup
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/readMainGroup.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result.messageId)
+
+
+  ReadWhaleGroup:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: readWhaleGroup
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/readWhaleGroup.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result.messageId) 
+
+
 
 
   # -- User Type Resolvers ---- #

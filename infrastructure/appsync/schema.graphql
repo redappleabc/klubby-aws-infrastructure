@@ -118,8 +118,15 @@ type Klub {
 
     # This is pointer to Conversation for above whaleGroupConversationId
     whaleGroupConversation: Conversation
-    
-    
+
+
+    # latest message id for main group which I has read
+    readMainGroup: String
+
+    # latest message id for whale group which I has read
+    readWhaleGroup: String
+
+
 }
 
 type Message {
@@ -237,12 +244,6 @@ type UserKlubBridge {
     whale: Boolean
 
     klub: Klub
-
-    # latest message id for main group which I has read
-    readMainGroup: String
-
-    # latest message id for whale group which I has read
-    readWhaleGroup: String
 
     # latest message id for announcement which I has read
     readAnnouncement: String

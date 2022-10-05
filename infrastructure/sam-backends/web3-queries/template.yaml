@@ -44,6 +44,9 @@ Resources:
             Action:
             - ssm:*
             Resource: '*'
+      VpcConfig:
+        SubnetIds:
+          - subnet-0fd7af308d3fd80e3
       Environment:
         Variables:
           STAGE: !Ref Stage

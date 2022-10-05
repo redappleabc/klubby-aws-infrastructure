@@ -45,6 +45,8 @@ Resources:
             - ssm:*
             Resource: '*'
       VpcConfig:
+        SecurityGroupIds:
+          - sg-09df9a7147a5abd03
         SubnetIds:
           - subnet-0fd7af308d3fd80e3
       Environment:

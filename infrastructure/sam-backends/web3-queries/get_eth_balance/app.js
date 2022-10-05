@@ -6,11 +6,7 @@ const Web3 = require('web3')
 const USER_TABLE_SSM_NAME = `user-table-name-${process.env.STAGE}`
 const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
 
-const RPC_URL="http://18.206.231.219:8545"
-
-// KINSHU_ADDRESS = "0xA2b4C0Af19cC16a6CfAcCe81F192B024d625817D"
-// SANSHU_ADDRESS = "0xc73c167e7a4ba109e4052f70d5466d0c312a344d"
-// RAKU_ADDRESS = "0x714599f7604144a3fE1737c440a70fc0fD6503ea"
+const RPC_URL="http://35.171.16.213:8545"
 
 //conect to GETH node
 const web3 = new Web3(RPC_URL)
@@ -21,24 +17,24 @@ var erc20ABI = JSON.parse(fs.readFileSync('abi/erc20Abi.json', 'utf8'));
 var erc721ABI = JSON.parse(fs.readFileSync('abi/erc721Abi.json', 'utf8'));
 
 // The minimum ABI to get ERC20 Token balance
-const minABI = [
-    // balanceOf
-    {
-      "constant":true,
-      "inputs":[{"name":"_owner","type":"address"}],
-      "name":"balanceOf",
-      "outputs":[{"name":"balance","type":"uint256"}],
-      "type":"function"
-    },
-    // decimals
-    {
-      "constant":true,
-      "inputs":[],
-      "name":"decimals",
-      "outputs":[{"name":"","type":"uint8"}],
-      "type":"function"
-    }
-  ];
+// const minABI = [
+//     // balanceOf
+//     {
+//       "constant":true,
+//       "inputs":[{"name":"_owner","type":"address"}],
+//       "name":"balanceOf",
+//       "outputs":[{"name":"balance","type":"uint256"}],
+//       "type":"function"
+//     },
+//     // decimals
+//     {
+//       "constant":true,
+//       "inputs":[],
+//       "name":"decimals",
+//       "outputs":[{"name":"","type":"uint8"}],
+//       "type":"function"
+//     }
+//   ];
   
 
 async function get_ssm_param(ssm_param_name){
@@ -60,33 +56,6 @@ async function getEthBalance(web3,walletAddress){
     return Web3.utils.fromWei(balance, 'ether')
 }
 
-//funuction to get kishu inu balance
-async function getKishuBalance(web3,walletAddress){
-    const contract = new web3.eth.Contract(minABI,KINSHU_ADDRESS);
-
-    const balance = await contract.methods.balanceOf(walletAddress).call();
-
-    return balance
-}
-
-//funuction to get sanshu inu balance
-async function getSanshuBalance(web3,walletAddress){
-    const contract = new web3.eth.Contract(minABI,SANSHU_ADDRESS);
-
-    const balance = await contract.methods.balanceOf(walletAddress).call();
-
-    return balance
-}
-
-//funuction to get raku coin balance
-async function getRakuBalance(web3,walletAddress){
-    const contract = new web3.eth.Contract(minABI,RAKU_ADDRESS);
-
-    const balance = await contract.methods.balanceOf(walletAddress).call();
-
-    return balance
-}
-
 async function getAssetBalance(asset,walletAddress){
     let asset_type = asset.contractType.S
 
@@ -98,11 +67,41 @@ async function getAssetBalance(asset,walletAddress){
     else if(asset_type==='erc721'){
         const contract = new web3.eth.Contract(erc721ABI,asset.address.S);
         balance = await contract.methods.balanceOf(walletAddress).call();
+
+        if(balance > 0){
+            console.log('balance',balance,asset.address.S)
+
+            for(let i in balance){
+                try {
+                    let tokenId = await contract.methods.tokenOfOwnerByIndex(walletAddress,i).call();
+                    console.log('tokenId',tokenId)
+    
+                    let tokenUri = await contract.methods.tokenURI(6332).call();
+                    // baseURI = await contract.methods.baseURI().call();
+                    console.log('tokenUri',tokenUri)
+                    console.log('tokenUri',tokenUri.length)
+
+
+
+
+                }
+
+                catch(e){
+                    console.error("error",e)
+                    console.log("error",e.message)
+                    console.log("error",e.data)
+                    console.log("error",Object.keys(e))
+                    console.log("error",e)
+                }
+
+            }
+        }
+
     }
 
 
-    console.log(asset)
-    console.log('balance',balance)
+    // console.log(asset)
+    // console.log('balance',balance)
     return balance
 }
 
@@ -165,13 +164,9 @@ exports.lambdaHandler = async (event, context) => {
                 expressionValueObj = {':asset_list': {'L': assetList}}
                 // updateExpression = 'set assets = :asset_obj'
                 updateExpression = 'set assets = :asset_list'
-                console.log(updateExpression)
-                console.log(expressionValueObj)
 
- 
-                // const kishuBalance = await getKishuBalance(web3,walletAddress)
-                // const sanshuBalance = await getSanshuBalance(web3,walletAddress)
-                // const rakuBalance = await getRakuBalance(web3,walletAddress)
+                // console.log('assetList',assetList)
+                console.log('name',element.username)
 
 
                 const params = {
@@ -184,22 +179,6 @@ exports.lambdaHandler = async (event, context) => {
                 }
 
                 let res = await dynamodb.updateItem(params).promise() 
-
-                // const params = {
-                //     TableName: user_table_name,
-                //     Key: {
-                //         "username": element.username
-                //     },
-                //     UpdateExpression: "set balance_eth = :x, balance_kishu = :kishu, balance_sanshu = :sanshu, balance_raku = :raku",
-                //     ExpressionAttributeValues: {
-                //         ":x": {'S':ethBalance},
-                //         ":kishu": {'S':kishuBalance},
-                //         ":sanshu": {'S':sanshuBalance},
-                //         ":raku": {'S':rakuBalance}
-                //     }
-                // }
-
-                // let res = await dynamodb.updateItem(params).promise()
             }
         }
 

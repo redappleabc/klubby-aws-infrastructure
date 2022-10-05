@@ -107,9 +107,14 @@ async function getAssetBalance(asset,walletAddress){
 
 exports.lambdaHandler = async (event, context) => {
     try {
+        console.log('starting')
         //get user table names from ssm
         const user_table_name = await get_ssm_param(USER_TABLE_SSM_NAME)
         const contract_table_name = await get_ssm_param(CONTRACT_TABLE_SSM_NAME)
+
+        console.log('user_table_name',user_table_name)
+        console.log('contract_table_name',contract_table_name)
+
 
         //get users from dynamo
         var dynamodb = new AWS.DynamoDB()

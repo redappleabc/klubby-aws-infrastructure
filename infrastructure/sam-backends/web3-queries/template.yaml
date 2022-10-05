@@ -48,7 +48,7 @@ Resources:
         SecurityGroupIds:
           - sg-025760b87a39dff6a
         SubnetIds:
-          - subnet-04093d570991abd90
+          - subnet-0a69c7378151a35b0
       Environment:
         Variables:
           STAGE: !Ref Stage

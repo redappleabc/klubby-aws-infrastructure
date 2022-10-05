@@ -46,9 +46,9 @@ Resources:
             Resource: '*'
       VpcConfig:
         SecurityGroupIds:
-          - sg-09df9a7147a5abd03
+          - sg-025760b87a39dff6a
         SubnetIds:
-          - subnet-0fd7af308d3fd80e3
+          - subnet-04093d570991abd90
       Environment:
         Variables:
           STAGE: !Ref Stage

@@ -123,6 +123,8 @@ exports.lambdaHandler = async (event, context) => {
         for(const element of result.Items){
         // result.Items.forEach(async function (element, index, array) {
 
+            console.log(element)
+
             //if user has a wallet
             if(element.wallets && element.wallets.S != ""){
                 const walletAddress = element.wallets.S

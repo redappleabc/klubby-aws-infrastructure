@@ -13,7 +13,7 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 30
+    Timeout: 120
 
 Resources:
   GetEthBalance:
@@ -44,6 +44,11 @@ Resources:
             Action:
             - ssm:*
             Resource: '*'
+      VpcConfig:
+        SecurityGroupIds:
+          - sg-0388afc577d007c0b
+        SubnetIds:
+          - subnet-0a69c7378151a35b0
       Environment:
         Variables:
           STAGE: !Ref Stage

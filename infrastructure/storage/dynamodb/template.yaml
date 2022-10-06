@@ -96,6 +96,24 @@ Resources:
         ReadCapacityUnits: 5
         WriteCapacityUnits: 3
 
+
+  MessageReadTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      AttributeDefinitions:
+      - AttributeName: username
+        AttributeType: S
+      - AttributeName: conversationId
+        AttributeType: S
+      KeySchema:
+      - AttributeName: username
+        KeyType: HASH
+      - AttributeName: conversationId
+        KeyType: RANGE
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 3
+
   UserConversationBridgeTable:
     Type: "AWS::DynamoDB::Table"
     Properties:
@@ -202,6 +220,17 @@ Resources:
       Description: SSM Parameter for message table name
       Tags:
         Environment: !Ref Stage
+
+  MessageReadTableNameParam:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub 'message-read-table-name-${Stage}'
+      Type: String
+      Value: !Ref MessageReadTable
+      Description: SSM Parameter for message read table name
+      Tags:
+        Environment: !Ref Stage
+
 
   UserConversationBridgeTableNameParam:
     Type: AWS::SSM::Parameter

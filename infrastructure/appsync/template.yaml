@@ -34,6 +34,12 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: message-table-name-dev
     Description: message table name
+
+  MessageReadTableName:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: message-read-table-name-dev
+    Description: message read table name
+
   AnnouncementTableName:
     Type: AWS::SSM::Parameter::Value<String>
     Default: announcement-table-name-dev
@@ -141,6 +147,19 @@ Resources:
       DynamoDBConfig:
         AwsRegion: "us-east-1"
         TableName: !Ref MessageTableName
+
+
+  MessageReadTableDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub MessageReadDynamoDBTable_${Stage}
+      Description: MessageRead DynamoDB table
+      Type: AMAZON_DYNAMODB
+      ServiceRoleArn: !GetAtt AppSyncDynamoDBRole.Arn
+      DynamoDBConfig:
+        AwsRegion: "us-east-1"
+        TableName: !Ref MessageReadTableName
 
   AnnouncementTableDataSource:
     Type: "AWS::AppSync::DataSource"
@@ -951,7 +970,7 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Query
       FieldName: getKlubByKlubname
-      DataSourceName: !GetAtt KlubTableDataSource.Name
+      DataSourceName: !GetAtt UserKlubBridgeTableDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/getKlubByKlubname.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
@@ -981,6 +1000,65 @@ Resources:
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
+
+
+
+  SetMessageReadResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: setMessageRead
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/setMessageRead.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
+  ReadUserConversationBridge:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: UserConversationBridge
+      FieldName: read
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/readUserConversationBridge.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result.messageId)     
+
+
+  ReadMainGroup:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: readMainGroup
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/readMainGroup.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result.messageId)
+
+
+  ReadWhaleGroup:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Klub
+      FieldName: readWhaleGroup
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/klub/readWhaleGroup.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result.messageId) 
+
+
+
 
   # -- User Type Resolvers ---- #
 

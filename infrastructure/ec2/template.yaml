@@ -68,13 +68,23 @@ Resources:
       SubnetId: !Ref PublicSubnet
 
   #TODO lock down to ssh and ports used by GETH
-  OpenSecurityGroup:
+  GethSecurityGroup:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupDescription: Allows instances complete openness
       VpcId: !Ref VPC
       SecurityGroupIngress:
         - IpProtocol: -1
+          CidrIp: 65.25.51.190/32
+        - IpProtocol: -1
+          CidrIp: 162.155.28.76/32
+        - IpProtocol: -1
+          CidrIp: 172.31.0.0/20
+        - IpProtocol: udp
+          ToPort: 30303
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          ToPort: 30303
           CidrIp: 0.0.0.0/0
       SecurityGroupEgress:
         - IpProtocol: -1
@@ -90,7 +100,7 @@ Resources:
       KeyName: brenden-klubby
       PrivateIpAddress: 10.0.0.4
       SecurityGroupIds:
-        - !Ref OpenSecurityGroup
+        - !Ref GethSecurityGroup
       Tags:
         - Key: Name
           Value: !Sub geth-intance-${Stage}
@@ -115,6 +125,15 @@ Resources:
 
 
 ### SSM PARAMS ###
+  GethNodePublicIp:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub geth-node-public-ip-${Stage}
+      Type: String
+      Value: ''
+      Description: SSM Parameter for geth node public ip
+      Tags:
+        Environment: !Ref Stage
   # NodeId:
   #   Type: AWS::SSM::Parameter
   #   Properties:

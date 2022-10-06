@@ -118,8 +118,15 @@ type Klub {
 
     # This is pointer to Conversation for above whaleGroupConversationId
     whaleGroupConversation: Conversation
-    
-    
+
+
+    # latest message id for main group which I has read
+    readMainGroup: String
+
+    # latest message id for whale group which I has read
+    readWhaleGroup: String
+
+
 }
 
 type Message {
@@ -147,6 +154,12 @@ type Message {
     isSent: Boolean
 
     sender: String
+}
+
+type MessageRead {
+    username: ID!
+    conversationId: ID!
+    messageId: String
 }
 
 type Announcement {
@@ -232,12 +245,6 @@ type UserKlubBridge {
 
     klub: Klub
 
-    # latest message id for main group which I has read
-    readMainGroup: String
-
-    # latest message id for whale group which I has read
-    readWhaleGroup: String
-
     # latest message id for announcement which I has read
     readAnnouncement: String
 
@@ -263,7 +270,7 @@ type Query {
 
     getConversationById(conversationId: ID!): Conversation
 
-    getKlubByKlubname(klubname: ID!): Klub
+    getKlubByKlubname(klubname: ID!): UserKlubBridge
 
     heartbeat(username: ID!): Presence
 
@@ -367,6 +374,8 @@ type Mutation {
     #set message id which user read
     setRead(conversationId: ID!, username: ID!, messageId: ID!): UserConversationBridge
 
+    setMessageRead(conversationId: ID!, messageId: ID!): MessageRead
+
     updateUser(username: String!,wallets: String!): User
 
     validateAddress(address: String!,contractType: String!): String
@@ -406,6 +415,11 @@ type Subscription  {
     #Subscribes to read message
     subscribeToReadMessage(conversationId: ID!): UserConversationBridge
     @aws_subscribe(mutations: ["setRead"])
+
+
+    #Subscribes to read message
+    subscribeToMessageRead(conversationId: ID!): MessageRead
+    @aws_subscribe(mutations: ["setMessageRead"])
 
     #Subscribes to accept conversation
     subscribeToAcceptConversation(conversationId: ID!): UserConversationBridge

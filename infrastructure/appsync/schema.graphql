@@ -277,6 +277,8 @@ type Query {
     #get all the klubs the user belongs to
     listMyKlubs: [UserKlubBridge]
 
+    listKlubMembers(klubname: ID!): [User]
+
     #get all users
     listUsers: [User]
 

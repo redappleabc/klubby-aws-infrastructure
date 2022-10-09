@@ -3,7 +3,7 @@ let response;
 const AWS = require('aws-sdk');
 const Web3 = require('web3')
 
-const RPC_URL="http://18.206.231.219:8545"
+const RPC_URL="http://35.171.16.213:8545"
 
 const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
 

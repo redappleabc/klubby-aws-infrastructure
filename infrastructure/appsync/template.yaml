@@ -1124,6 +1124,18 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result.items)
 
+  ListConversationMembersResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName: listConversationMembers
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/conversation/listConversationMembers.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items)
+
   mainGroupConversationKlubResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema

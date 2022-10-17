@@ -881,7 +881,7 @@ Resources:
       TypeName: Query
       FieldName: listMessagesByConversationId
       DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/listMessagesByConversationId.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/message/listMessagesByConversationId.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),
@@ -897,7 +897,7 @@ Resources:
       TypeName: Query
       FieldName: listAnnouncementsByKlubname
       DataSourceName: !GetAtt AnnouncementTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/listAnnouncementsByKlubname.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/klub/listAnnouncementsByKlubname.request.vtl
       ResponseMappingTemplate: |
         {
           "messages": $utils.toJson($context.result.items),

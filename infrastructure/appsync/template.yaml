@@ -1201,7 +1201,7 @@ Resources:
       TypeName: "Klub"
       FieldName: "announcements"
       DataSourceName: !GetAtt AnnouncementTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/announcementsKlub.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/klub/announcementsKlub.request.vtl
       ResponseMappingTemplate: |
         {
           "announcements": $utils.toJson($context.result.items),

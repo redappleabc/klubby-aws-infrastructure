@@ -10,6 +10,6 @@
         }
     },
     "scanIndexForward": false,
-    "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
+    "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 3 #end,
     "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
 }

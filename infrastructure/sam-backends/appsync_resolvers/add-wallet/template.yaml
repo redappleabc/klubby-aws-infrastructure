@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  add-wallet
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  AddWalletFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: add_wallet/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+
+# Outputs:
+#   HelloWorldApi:
+#     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
+#     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
+#   HelloWorldFunction:
+#     Description: "Hello World Lambda Function ARN"
+#     Value: !GetAtt HelloWorldFunction.Arn
+#   HelloWorldFunctionIamRole:
+#     Description: "Implicit IAM Role created for Hello World function"
+#     Value: !GetAtt HelloWorldFunctionRole.Arn

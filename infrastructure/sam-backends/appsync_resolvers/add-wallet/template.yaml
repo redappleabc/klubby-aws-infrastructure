@@ -27,13 +27,13 @@ Resources:
           STAGE: !Ref Stage
 
 
-# Outputs:
-#   HelloWorldApi:
-#     Description: "API Gateway endpoint URL for Prod stage for Hello World function"
-#     Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/hello/"
-#   HelloWorldFunction:
-#     Description: "Hello World Lambda Function ARN"
-#     Value: !GetAtt HelloWorldFunction.Arn
-#   HelloWorldFunctionIamRole:
-#     Description: "Implicit IAM Role created for Hello World function"
-#     Value: !GetAtt HelloWorldFunctionRole.Arn
+### SSM PARAMS ###
+  AddWalletFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub add-wallet-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt AddWalletFunction.Arn
+      Description: SSM Parameter for user ARN of add wallet function
+      Tags:
+        Environment: !Ref Stage

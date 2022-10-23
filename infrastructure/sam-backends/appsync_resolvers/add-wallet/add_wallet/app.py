@@ -6,8 +6,8 @@ from web3 import Web3
 # import requests
 
 #get stage from env var
-# Stage = os.getenv('STAGE')
-Stage = 'dev'
+Stage = os.getenv('STAGE')
+# Stage = 'dev'
 
 ssm_client = boto3.client('ssm')
 dynamodb = boto3.client('dynamodb')

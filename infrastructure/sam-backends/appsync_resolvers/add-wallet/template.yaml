@@ -3,10 +3,11 @@ Transform: AWS::Serverless-2016-10-31
 Description: >
   add-wallet
 
-Stage:
-  Type: String
-  Default: dev
-  Description: Stage of build
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
 
 Globals:
   Function:

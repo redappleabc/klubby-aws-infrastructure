@@ -4,6 +4,7 @@ const AWS = require('aws-sdk');
 const Web3 = require('web3')
 
 const RPC_URL="http://35.171.16.213:8545"
+const INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 
 const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
 
@@ -27,7 +28,8 @@ async function get_ssm_param(ssm_param_name){
 exports.lambdaHandler = async (event, context) => {
     try {
         //conect to GETH node
-        const web3 = new Web3(RPC_URL)
+        // const web3 = new Web3(RPC_URL)
+        const web3 = new Web3(INFURA_URL)
 
         let address = event.arguments.address
         let contractType = event.arguments.contractType

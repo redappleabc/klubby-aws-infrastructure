@@ -7,9 +7,11 @@ const USER_TABLE_SSM_NAME = `user-table-name-${process.env.STAGE}`
 const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
 
 const RPC_URL="http://35.171.16.213:8545"
+const INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 
 //conect to GETH node
-const web3 = new Web3(RPC_URL)
+// const web3 = new Web3(RPC_URL)
+const web3 = new Web3(INFURA_URL)
 
 //load ABIs
 var fs = require('fs');
@@ -185,7 +187,7 @@ exports.lambdaHandler = async (event, context) => {
                     ExpressionAttributeValues: expressionValueObj
                 }
 
-                let res = await dynamodb.updateItem(params).promise() 
+                let res = await dynamodb.updateItem(params).promise()
             }
         }
 

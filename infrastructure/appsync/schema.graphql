@@ -309,6 +309,8 @@ type Mutation {
 
     # addUser(username: String!): User
 
+    addWallet(wallet_address: String): User
+
     connect(username: ID!): Presence
 
     #Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.

@@ -48,6 +48,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: klub-table-name-dev
     Description: klub table name
+  AddWalletFunctionArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: add-wallet-function-arn-dev
+    Description: add wallet function arn
   CreateKlubAvatarPresignedUrlFunctionArn:
     Type: AWS::SSM::Parameter::Value<String>
     Default: create-klub-avatar-presigned-url-function-arn-dev
@@ -185,6 +189,17 @@ Resources:
         AwsRegion: "us-east-1"
         TableName: !Ref KlubTableName
 
+  AddWalletFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub AddWalletFunction_${Stage}
+      Description: The lambda function to add wallet and load assets
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref AddWalletFunctionArn
+
   CreateKlubAvatarPresignedUrlFunctionDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
@@ -290,7 +305,20 @@ Resources:
 
   
 
-  ### Lambda Resolvers ###
+  ###-------Lambda Resolver--------###
+
+  AddWalletResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: addWallet
+      DataSourceName: !GetAtt AddWalletFunctionDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/addWallet.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
   CreateKlubAvatarPresignedUrlResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema
@@ -338,6 +366,9 @@ Resources:
       RequestMappingTemplateS3Location: resolver-mappings/validateAddress.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
+
+  ###------------------------------###
+
 
   # HeartbeatResolver:
   #   Type: "AWS::AppSync::Resolver"

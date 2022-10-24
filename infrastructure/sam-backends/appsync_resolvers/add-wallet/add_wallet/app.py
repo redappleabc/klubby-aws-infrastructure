@@ -58,7 +58,7 @@ def get_eth_balance(wallet_address):
 def lambda_handler(event, context):
     # print(event)
 
-    wallet_address = event['arguments']['address']
+    wallet_address = event['arguments']['wallet_address']
     username = event['arguments']['username']
     
     #get user table name from ssm

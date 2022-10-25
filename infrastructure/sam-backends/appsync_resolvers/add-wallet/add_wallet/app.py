@@ -110,6 +110,8 @@ def lambda_handler(event, context):
     #update dynamo record
     result = dynamodb.put_item(TableName=user_table_name, Item=user_item)
 
+    print(user_item)
+
     return user_item
     # return json.dumps({
     #     "statusCode": 200,

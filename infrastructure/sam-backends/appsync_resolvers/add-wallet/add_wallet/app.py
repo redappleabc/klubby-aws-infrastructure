@@ -112,6 +112,10 @@ def lambda_handler(event, context):
 
     print(user_item)
 
+    #need to change to plain list to work with appsync query in console
+    user_item['assets'] = asset_list
+
+
     return user_item
     # return json.dumps({
     #     "statusCode": 200,

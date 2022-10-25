@@ -110,9 +110,10 @@ def lambda_handler(event, context):
     #update dynamo record
     result = dynamodb.put_item(TableName=user_table_name, Item=user_item)
 
-    return {
-        "statusCode": 200,
-        "body": json.dumps({
-            user_item
-        }),
-    }
+    return user_item
+    # return json.dumps({
+    #     "statusCode": 200,
+    #     "data": {
+    #         user_item
+    #     },
+    # })

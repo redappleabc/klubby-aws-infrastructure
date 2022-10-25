@@ -25,6 +25,20 @@ Resources:
       Environment:
         Variables:
           STAGE: !Ref Stage
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: DynamoDBAccess
+            Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
 
 
 ### SSM PARAMS ###

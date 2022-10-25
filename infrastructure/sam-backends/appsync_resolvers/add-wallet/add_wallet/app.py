@@ -14,8 +14,12 @@ dynamodb = boto3.client('dynamodb')
 deserializer = TypeDeserializer()
 
 
+
 RPC_URL="http://35.171.16.213:8545"
-w3 = Web3(Web3.HTTPProvider(RPC_URL))
+INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
+
+# w3 = Web3(Web3.HTTPProvider(RPC_URL))
+w3 = Web3(Web3.HTTPProvider(INFURA_URL))
 
 #load abi files
   

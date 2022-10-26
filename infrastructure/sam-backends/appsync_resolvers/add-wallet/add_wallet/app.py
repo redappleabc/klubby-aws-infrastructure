@@ -100,10 +100,10 @@ def lambda_handler(event, context):
 
         balance = get_asset_balance(clean_data,wallet_address)
 
-        asset_address = w3.toChecksumAddress(asset['address'])
+        # asset_address = w3.toChecksumAddress(asset['address']['S'])
 
         if balance > 0:
-            asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': {'S':asset_address}}})
+            asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}})
     
     #update assets field
     user_item['assets'] = {'L': asset_list}

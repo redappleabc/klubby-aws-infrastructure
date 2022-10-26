@@ -82,7 +82,7 @@ def lambda_handler(event, context):
     #TODO rn just overwitting address, make it a list and append
 
     #add wallet to user item
-    user_item['wallets'] = {'S' : wallet_address}
+    user_item['wallets'] = {'L' : [{'S': wallet_address}]}
 
     #get user assets
     asset_list = []

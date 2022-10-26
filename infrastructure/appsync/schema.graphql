@@ -309,7 +309,7 @@ type Mutation {
 
     # addUser(username: String!): User
 
-    addWallet(username: String!,wallet_address: String!): User
+    addWallet(username: String!,wallets: String!): User
 
     connect(username: ID!): Presence
 

@@ -123,8 +123,8 @@ exports.lambdaHandler = async (event, context) => {
                 }
                 let result = await dynamodb.scan(query_params).promise()
 
-                // let assetObj = {}
-                let assetList = []
+                let assetObj = {}
+                // let assetList = []
 
                 //for each wallet
                 for(wallet_obj of walletList){
@@ -137,9 +137,18 @@ exports.lambdaHandler = async (event, context) => {
                     const ethBalance = await getEthBalance(web3,walletAddress)
 
                     if(ethBalance > 0){
-                        // assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
-                        assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
-                        // assetObj['eth'] = {'balance': ethBalance,'symbol': 'ETH','name': 'ethereum'}
+                        if(!('ETH' in assetObj)){
+                            // assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
+                            assetObj['ETH'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}}
+                            console.log("SETTT",assetObj)
+
+                        }
+                        else{
+                            console.log("FOUNDDDD",assetObj)
+                            let new_balance = parseFloat(ethBalance) + parseFloat(assetObj['ETH']['M']['balance']['N'])
+                            assetObj['ETH'] = {'M': {'balance':{'N':new_balance.toString()},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}}
+
+                        }
                     }
 
                     //get balance for each asset
@@ -151,9 +160,14 @@ exports.lambdaHandler = async (event, context) => {
                             let asset_address = asset.address.S.toLowerCase()
                             //TODO will break with colliding symbols
                             if(balance > 0){
-                                // assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
-                                // assetObj[asset_address] = {'balance':balance,'symbol': asset.symbol.S,'name': asset.name.S}
-                                assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
+                                if(!(asset_address in assetObj)){
+                                    // assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
+                                    assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}}
+                                }
+                                else{
+                                    let new_balance = parseFloat(ethBalance) + parseFloat(assetObj[asset_address]['M']['balance']['N'])
+                                    assetObj[asset_address] = {'M': {'balance':{'N':new_balance.toString()},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}}
+                                }
                             }
                             // updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
                         }
@@ -163,11 +177,29 @@ exports.lambdaHandler = async (event, context) => {
 
 
                             if(balance > 0){
-                                assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':tokens}}})
+                                if(!(asset_address in assetObj)){
+                                    // assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':tokens}}})
+                                    assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':tokens}}}
+                                }
+                                else{
+                                    let new_balance = parseFloat(ethBalance) + parseFloat(assetObj[asset_address]['M']['balance']['N'])
+                                    let new_tokens = tokens + assetObj[asset_address]['M']['tokens']['L']
+
+                                    assetObj[asset_address] = {'M': {'balance':{'N':new_balance.toString()},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':new_tokens}}}
+
+                                }
                             }
                         }
                     }
                 }
+
+                //create assetList
+                let assetList = []
+                for(asset in assetObj){
+                    assetList.push(assetObj[asset])
+                }
+
+
                 // expressionValueObj = {':asset_obj': {'M': assetObj}}
                 expressionValueObj = {':asset_list': {'L': assetList}}
                 // updateExpression = 'set assets = :asset_obj'

@@ -2,6 +2,7 @@ import json
 import os
 import boto3
 from boto3.dynamodb.types import TypeDeserializer
+from boto3.dynamodb.types import TypeSerializer
 from web3 import Web3
 # import requests
 
@@ -12,6 +13,7 @@ Stage = os.getenv('STAGE')
 ssm_client = boto3.client('ssm')
 dynamodb = boto3.client('dynamodb')
 deserializer = TypeDeserializer()
+serializer = TypeSerializer()
 
 
 
@@ -62,7 +64,7 @@ def get_eth_balance(wallet_address):
 def lambda_handler(event, context):
     # print(event)
 
-    wallet_address = event['arguments']['wallet_address']
+    wallet_list = event['arguments']['wallets']
     username = event['arguments']['username']
     
     #get user table name from ssm
@@ -80,33 +82,61 @@ def lambda_handler(event, context):
     user_item = results['Item']
 
     #TODO rn just overwitting address, make it a list and append
-
-    #add wallet to user item
-    user_item['wallets'] = {'L' : [{'S': wallet_address}]}
-
-    #get user assets
-    asset_list = []
-
-    eth_balance = get_eth_balance(wallet_address)
-
-    if(eth_balance > 0):
-        asset_list.append({'M': {'balance':{'N':str(eth_balance)},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
+    #serialize wallet list for dynamo
+    serialized_wallet_list = serializer.serialize(wallet_list)
 
     #get list of possible assets from contract table
     contact_results = dynamodb.scan(TableName=contract_table_name)
 
-    for asset in contact_results['Items']:
-        clean_data = {k: deserializer.deserialize(v) for k,v in asset.items()}
+    #get user assets
+    # asset_list = []
+    asset_obj = {}
 
-        balance = get_asset_balance(clean_data,wallet_address)
+    for wallet_address in wallet_list:
+        eth_balance = get_eth_balance(wallet_address)
 
-        # asset_address = w3.toChecksumAddress(asset['address']['S'])
+        if(eth_balance > 0):
+            if 'ETH' not in asset_obj:
+                # asset_list.append({'M': {'balance':{'N':str(eth_balance)},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
+                asset_obj['ETH'] = {'M': {'balance':{'N':str(eth_balance)},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}}
+            else:
+                new_balance = float(eth_balance) + float(asset_obj['ETH']['M']['balance']['N'])
+                # asset_list.append({'M': {'balance':{'N':str(eth_balance)},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
+                asset_obj['ETH'] = {'M': {'balance':{'N':str(new_balance)},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}}
 
-        if balance > 0:
-            asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}})
-    
+
+        for asset in contact_results['Items']:
+            clean_data = {k: deserializer.deserialize(v) for k,v in asset.items()}
+
+            balance = get_asset_balance(clean_data,wallet_address)
+
+            # asset_address = w3.toChecksumAddress(asset['address']['S'])
+
+            asset_address = asset['address']['S']
+
+            if balance > 0:
+                if asset_address not in asset_obj:
+                    # asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}})
+                    asset_obj[asset_address] = {'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
+
+                else:
+                    new_balance = float(balance) + float(asset_obj[asset_address]['M']['balance']['N'])
+
+                    asset_obj[asset_address] = {'M': {'balance':{'N':str(new_balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
+
+
+
+    # print("asset_obj",asset_obj)
+    # print("list",asset_obj.values())
+
+    asset_list = list(asset_obj.values())
+
+
     #update assets field
     user_item['assets'] = {'L': asset_list}
+
+    #add wallet to user item
+    user_item['wallets'] = serialized_wallet_list
 
 
     #update dynamo record
@@ -117,14 +147,7 @@ def lambda_handler(event, context):
     #need to change to plain list to work with appsync query in console
     # user_item['assets'] = asset_list
 
+    #deserialize the data
     user_clean_data = {k: deserializer.deserialize(v) for k,v in user_item.items()}
 
-
-
     return user_clean_data
-    # return json.dumps({
-    #     "statusCode": 200,
-    #     "data": {
-    #         user_item
-    #     },
-    # })

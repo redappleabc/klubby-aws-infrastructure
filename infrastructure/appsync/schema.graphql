@@ -200,7 +200,7 @@ type User {
     # This is partition key
     username: String!
     assets: [ownedAsset]
-    wallets: String
+    wallets: [String]
     #  A user's enrolled Conversations. This is an interesting case. This is an interesting pagination case.
     conversations: [UserConversationBridge]
     klubs: [UserKlubBridge]

@@ -17,26 +17,6 @@ const web3 = new Web3(INFURA_URL)
 var fs = require('fs');
 var erc20ABI = JSON.parse(fs.readFileSync('abi/erc20Abi.json', 'utf8'));
 var erc721ABI = JSON.parse(fs.readFileSync('abi/erc721Abi.json', 'utf8'));
-
-// The minimum ABI to get ERC20 Token balance
-// const minABI = [
-//     // balanceOf
-//     {
-//       "constant":true,
-//       "inputs":[{"name":"_owner","type":"address"}],
-//       "name":"balanceOf",
-//       "outputs":[{"name":"balance","type":"uint256"}],
-//       "type":"function"
-//     },
-//     // decimals
-//     {
-//       "constant":true,
-//       "inputs":[],
-//       "name":"decimals",
-//       "outputs":[{"name":"","type":"uint8"}],
-//       "type":"function"
-//     }
-//   ];
   
 
 async function get_ssm_param(ssm_param_name){
@@ -65,9 +45,13 @@ async function getAssetBalance(asset,walletAddress){
     if(asset_type==='erc20'){
         const contract = new web3.eth.Contract(erc20ABI,asset.address.S);
         balance = await contract.methods.balanceOf(walletAddress).call();
+
+        return ('erc20',balance)
     }
+
     else if(asset_type==='erc721'){
         const contract = new web3.eth.Contract(erc721ABI,asset.address.S);
+        let tokens = []
         balance = await contract.methods.balanceOf(walletAddress).call();
 
         if(balance > 0){
@@ -76,14 +60,12 @@ async function getAssetBalance(asset,walletAddress){
             for(let i in balance){
                 try {
                     let tokenId = await contract.methods.tokenOfOwnerByIndex(walletAddress,i).call();
-                    console.log('tokenId',tokenId)
+                    // console.log('tokenId',tokenId)
     
-                    let tokenUri = await contract.methods.tokenURI(6332).call();
+                    let tokenUri = await contract.methods.tokenURI(tokenId).call();
                     // baseURI = await contract.methods.baseURI().call();
-                    console.log('tokenUri',tokenUri)
-                    console.log('tokenUri',tokenUri.length)
-
-
+                    // console.log('tokenUri',tokenUri)
+                    tokens.push({tokenId,tokenUri})
 
 
                 }
@@ -91,20 +73,16 @@ async function getAssetBalance(asset,walletAddress){
                 catch(e){
                     console.error("error",e)
                     console.log("error",e.message)
-                    console.log("error",e.data)
-                    console.log("error",Object.keys(e))
-                    console.log("error",e)
+                    // console.log("error",e.data)
+                    // console.log("error",Object.keys(e))
+                    // console.log("error",e)
                 }
 
             }
         }
 
+        return ('erc721',balance,tokens)
     }
-
-
-    // console.log(asset)
-    // console.log('balance',balance)
-    return balance
 }
 
 exports.lambdaHandler = async (event, context) => {
@@ -130,11 +108,14 @@ exports.lambdaHandler = async (event, context) => {
         for(const element of result.Items){
         // result.Items.forEach(async function (element, index, array) {
 
-            console.log(element)
+            console.log('element',element)
 
             //if user has a wallet
-            if(element.wallets && element.wallets.S != ""){
-                const walletAddress = element.wallets.S
+            if(element.wallets && element.wallets.length != 0){
+                const walletList = element.wallets.L
+
+                console.log('walletList',walletList)
+
 
                 //get assets from contract table
                 let query_params = {
@@ -142,39 +123,57 @@ exports.lambdaHandler = async (event, context) => {
                 }
                 let result = await dynamodb.scan(query_params).promise()
 
-
-                //get eth balance
-                const ethBalance = await getEthBalance(web3,walletAddress)
-
-                // let updateExpression  = 'set balance_eth = :eth'
-                // let expressionValueObj = {":eth": {'N':ethBalance}}
-                let assetObj = {}
+                // let assetObj = {}
                 let assetList = []
-                if(ethBalance > 0){
-                    // assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
-                    assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
-                    // assetObj['eth'] = {'balance': ethBalance,'symbol': 'ETH','name': 'ethereum'}
-                }
 
-                //get balance for each asset
-                for(asset of result.Items){
-                    let balance = await getAssetBalance(asset,walletAddress)
-                    let asset_address = asset.address.S.toLowerCase()
-                    //TODO will break with colliding symbols
-                    if(balance > 0){
-                        // assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
-                        // assetObj[asset_address] = {'balance':balance,'symbol': asset.symbol.S,'name': asset.name.S}
-                        assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
+                //for each wallet
+                for(wallet_obj of walletList){
+
+                    let walletAddress = wallet_obj.S
+
+                    console.log('walletAddress',walletAddress)
+
+                    //get eth balance
+                    const ethBalance = await getEthBalance(web3,walletAddress)
+
+                    if(ethBalance > 0){
+                        // assetObj['eth'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'ethereum'}, 'contractType': {'S':'eth'}}}
+                        assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
+                        // assetObj['eth'] = {'balance': ethBalance,'symbol': 'ETH','name': 'ethereum'}
                     }
-                    // updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
 
+                    //get balance for each asset
+                    for(asset of result.Items){
+                        let balance_result = await getAssetBalance(asset,walletAddress)
+                        if(balance_result[0] === 'erc20'){
+                            let balance = balance_result[1]
+
+                            let asset_address = asset.address.S.toLowerCase()
+                            //TODO will break with colliding symbols
+                            if(balance > 0){
+                                // assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S}}}
+                                // assetObj[asset_address] = {'balance':balance,'symbol': asset.symbol.S,'name': asset.name.S}
+                                assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
+                            }
+                            // updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
+                        }
+                        else if(balance_result[0] === 'erc721'){
+                            let balance = balance_result[1]
+                            let tokens = balance_result[2]
+
+
+                            if(balance > 0){
+                                assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':tokens}}})
+                            }
+                        }
+                    }
                 }
                 // expressionValueObj = {':asset_obj': {'M': assetObj}}
                 expressionValueObj = {':asset_list': {'L': assetList}}
                 // updateExpression = 'set assets = :asset_obj'
                 updateExpression = 'set assets = :asset_list'
 
-                // console.log('assetList',assetList)
+                console.log('assetList',assetList)
                 console.log('name',element.username)
 
 

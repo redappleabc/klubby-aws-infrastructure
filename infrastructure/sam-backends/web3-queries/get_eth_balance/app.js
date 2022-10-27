@@ -46,7 +46,7 @@ async function getAssetBalance(asset,walletAddress){
         const contract = new web3.eth.Contract(erc20ABI,asset.address.S);
         balance = await contract.methods.balanceOf(walletAddress).call();
 
-        return ('erc20',balance)
+        return ['erc20',balance]
     }
 
     else if(asset_type==='erc721'){
@@ -79,7 +79,7 @@ async function getAssetBalance(asset,walletAddress){
             }
         }
 
-        return ('erc721',balance,tokens)
+        return ['erc721',balance,tokens]
     }
 }
 
@@ -138,6 +138,7 @@ exports.lambdaHandler = async (event, context) => {
                     //get balance for each asset
                     for(asset of result.Items){
                         let balance_result = await getAssetBalance(asset,walletAddress)
+
                         if(balance_result[0] === 'erc20'){
                             let balance = balance_result[1]
 

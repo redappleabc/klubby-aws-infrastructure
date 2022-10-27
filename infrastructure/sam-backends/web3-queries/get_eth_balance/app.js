@@ -55,8 +55,6 @@ async function getAssetBalance(asset,walletAddress){
         balance = await contract.methods.balanceOf(walletAddress).call();
 
         if(balance > 0){
-            console.log('balance',balance,asset.address.S)
-
             for(let i in balance){
                 try {
                     let tokenId = await contract.methods.tokenOfOwnerByIndex(walletAddress,i).call();
@@ -92,10 +90,6 @@ exports.lambdaHandler = async (event, context) => {
         const user_table_name = await get_ssm_param(USER_TABLE_SSM_NAME)
         const contract_table_name = await get_ssm_param(CONTRACT_TABLE_SSM_NAME)
 
-        console.log('user_table_name',user_table_name)
-        console.log('contract_table_name',contract_table_name)
-
-
         //get users from dynamo
         var dynamodb = new AWS.DynamoDB()
 
@@ -106,16 +100,10 @@ exports.lambdaHandler = async (event, context) => {
 
         //for each user
         for(const element of result.Items){
-        // result.Items.forEach(async function (element, index, array) {
-
-            console.log('element',element)
 
             //if user has a wallet
             if(element.wallets && element.wallets.length != 0){
                 const walletList = element.wallets.L
-
-                console.log('walletList',walletList)
-
 
                 //get assets from contract table
                 let query_params = {
@@ -131,8 +119,6 @@ exports.lambdaHandler = async (event, context) => {
 
                     let walletAddress = wallet_obj.S
 
-                    console.log('walletAddress',walletAddress)
-
                     //get eth balance
                     const ethBalance = await getEthBalance(web3,walletAddress)
 
@@ -140,11 +126,9 @@ exports.lambdaHandler = async (event, context) => {
                         if(!('ETH' in assetObj)){
                             // assetList.push({'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}})
                             assetObj['ETH'] = {'M': {'balance':{'N':ethBalance},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}}
-                            console.log("SETTT",assetObj)
 
                         }
                         else{
-                            console.log("FOUNDDDD",assetObj)
                             let new_balance = parseFloat(ethBalance) + parseFloat(assetObj['ETH']['M']['balance']['N'])
                             assetObj['ETH'] = {'M': {'balance':{'N':new_balance.toString()},'symbol': {'S': 'ETH'},'name': {'S':'Ethereum'}, 'contractType': {'S':'eth'},'address': {'S':'n/a'}}}
 

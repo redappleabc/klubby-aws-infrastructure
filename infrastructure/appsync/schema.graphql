@@ -256,6 +256,7 @@ type ownedAsset{
     balance: String!
     contractType: String!
     name: String!
+    tokens: [String]
 }
 
 

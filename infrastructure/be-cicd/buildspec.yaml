@@ -39,7 +39,7 @@ phases:
           ValidateAddressFunctionArn=validate-address-function-arn-$STAGE
           AnnouncementTableName=announcement-table-name-$STAGE
           MessageReadTableName=message-read-table-name-$STAGE
-          AddWalletFunctionArn=add-wallet-function-arn-$STAGE
+          UpdateWalletsFunctionArn=update-wallets-function-arn-$STAGE
 
       #--- Deploy EC2 Infrastructure ---#
       - cd ../ec2

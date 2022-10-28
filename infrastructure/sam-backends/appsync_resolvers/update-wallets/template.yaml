@@ -1,7 +1,7 @@
 AWSTemplateFormatVersion: '2010-09-09'
 Transform: AWS::Serverless-2016-10-31
 Description: >
-  add-wallet
+ update wallets function
 
 Parameters:
   Stage:
@@ -14,10 +14,10 @@ Globals:
     Timeout: 60
 
 Resources:
-  AddWalletFunction:
+  UpdateWalletsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: add_wallet/
+      CodeUri: update_wallets/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:
@@ -42,12 +42,12 @@ Resources:
 
 
 ### SSM PARAMS ###
-  AddWalletFunctionArn:
+  UpdateWalletsFunctionArn:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub add-wallet-function-arn-${Stage}
+      Name: !Sub update-wallets-function-arn-${Stage}
       Type: String
-      Value: !GetAtt AddWalletFunction.Arn
-      Description: SSM Parameter for user ARN of add wallet function
+      Value: !GetAtt UpdateWalletsFunction.Arn
+      Description: SSM Parameter for user ARN of update wallets function
       Tags:
         Environment: !Ref Stage

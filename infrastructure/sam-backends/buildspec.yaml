@@ -81,11 +81,11 @@ phases:
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
 
-  #----Deploy add-wallet Function-------#
-      - cd ../add-wallet
+  #----Deploy update-wallets Function-------#
+      - cd ../update-wallets
       - sam build
       - sam deploy
-        --stack-name klubby-$STAGE-add-wallet
+        --stack-name klubby-$STAGE-update-wallets
         --s3-bucket $ARTIFACTS_BUCKET
         --capabilities CAPABILITY_IAM
         --region us-east-1

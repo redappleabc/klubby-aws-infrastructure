@@ -250,13 +250,18 @@ type UserKlubBridge {
 
 }
 
+type erc721Token {
+    tokenId: String!
+    tokenUri: String!
+}
+
 type ownedAsset{
     address: String!
     symbol: String!
     balance: String!
     contractType: String!
     name: String!
-    tokens: [String]
+    tokens: [erc721Token]
 }
 
 

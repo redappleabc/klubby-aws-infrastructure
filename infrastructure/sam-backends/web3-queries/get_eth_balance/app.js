@@ -63,7 +63,7 @@ async function getAssetBalance(asset,walletAddress){
                     let tokenUri = await contract.methods.tokenURI(tokenId).call();
                     // baseURI = await contract.methods.baseURI().call();
                     // console.log('tokenUri',tokenUri)
-                    tokens.push({tokenId,tokenUri})
+                    tokens.push({'L': [{'N': tokenId},{'S': tokenUri}] })
 
 
                 }
@@ -138,15 +138,15 @@ exports.lambdaHandler = async (event, context) => {
                     //get balance for each asset
                     for(asset of result.Items){
                         let balance_result = await getAssetBalance(asset,walletAddress)
+                        let asset_address = asset.address.S.toLowerCase()
+
 
                         if(balance_result[0] === 'erc20'){
                             let balance = balance_result[1]
 
-                            let asset_address = asset.address.S.toLowerCase()
                             //TODO will break with colliding symbols
                             if(balance > 0){
                                 if(!(asset_address in assetObj)){
-                                    // assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}})
                                     assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}}
                                 }
                                 else{
@@ -154,7 +154,6 @@ exports.lambdaHandler = async (event, context) => {
                                     assetObj[asset_address] = {'M': {'balance':{'N':new_balance.toString()},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address}}}
                                 }
                             }
-                            // updateExpression = updateExpression + `, balance_${asset_address} = :${asset_address}`
                         }
                         else if(balance_result[0] === 'erc721'){
                             let balance = balance_result[1]
@@ -163,7 +162,6 @@ exports.lambdaHandler = async (event, context) => {
 
                             if(balance > 0){
                                 if(!(asset_address in assetObj)){
-                                    // assetList.push({'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':tokens}}})
                                     assetObj[asset_address] = {'M': {'balance':{'N':balance},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':tokens}}}
                                 }
                                 else{
@@ -171,7 +169,6 @@ exports.lambdaHandler = async (event, context) => {
                                     let new_tokens = tokens + assetObj[asset_address]['M']['tokens']['L']
 
                                     assetObj[asset_address] = {'M': {'balance':{'N':new_balance.toString()},'symbol': {'S':asset.symbol.S},'name': {'S':asset.name.S}, 'contractType': {'S': asset.contractType.S},'address': {'S':asset_address},'tokens': {'L':new_tokens}}}
-
                                 }
                             }
                         }

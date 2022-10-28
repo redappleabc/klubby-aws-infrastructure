@@ -251,8 +251,8 @@ type UserKlubBridge {
 }
 
 type erc721Token {
-    tokenId: String!
-    tokenUri: String!
+    tokenId: String
+    tokenUri: String
 }
 
 type ownedAsset{

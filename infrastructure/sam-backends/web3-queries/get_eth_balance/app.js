@@ -63,7 +63,7 @@ async function getAssetBalance(asset,walletAddress){
                     let tokenUri = await contract.methods.tokenURI(tokenId).call();
                     // baseURI = await contract.methods.baseURI().call();
                     // console.log('tokenUri',tokenUri)
-                    tokens.push({'L': [{'N': tokenId},{'S': tokenUri}] })
+                    tokens.push({'M': {'tokenId': {'N': tokenId}, 'tokenUri': {'S': tokenUri}} })
 
 
                 }

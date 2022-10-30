@@ -4,7 +4,7 @@ import boto3
 from boto3.dynamodb.types import TypeDeserializer
 from boto3.dynamodb.types import TypeSerializer
 from web3 import Web3
-# import requests
+import requests
 
 #get stage from env var
 Stage = os.getenv('STAGE')
@@ -35,6 +35,11 @@ erc721ABI = {}
 with open('./abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
   
+def decodeIpfsUrl(ipfs_url):
+    prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    hash = ipfs_url.replace('ipfs://', '')
+
+    return prefix + hash
 
 def get_asset_balance(asset,wallet_address):
     # print(asset)
@@ -45,15 +50,31 @@ def get_asset_balance(asset,wallet_address):
         contract = w3.eth.contract(abi=erc20ABI,address=asset_address)
         balance = contract.functions.balanceOf(wallet_address).call()
 
+        return balance
 
     elif asset['contractType'] == 'erc721':
         asset_address = w3.toChecksumAddress(asset['address']) 
         contract = w3.eth.contract(abi=erc721ABI,address=asset_address)
         balance = contract.functions.balanceOf(wallet_address).call()
 
-    print(asset['name'],balance)
+        tokens = []
+        for i in range(0,balance):
+            tokenId = contract.functions.tokenOfOwnerByIndex(wallet_address,i).call()
 
-    return balance  
+            tokenUri = contract.functions.tokenURI(tokenId).call()
+
+            #decode ipfs uri
+            decoddedUrl = decodeIpfsUrl(tokenUri)
+
+            r = requests.get(decoddedUrl).json()
+
+            #pull ipfs image url and decode
+            imageUrl = decodeIpfsUrl(r['image'])
+
+            tokens.append({'M': {'tokenId': {'N': tokenId}, 'tokenUri': {'S': tokenUri},'imageUrl': {'S': imageUrl}} })
+
+
+        return (balance,tokens)
 
 def get_eth_balance(wallet_address):
     wei_eth_balance = w3.eth.get_balance(wallet_address)
@@ -107,22 +128,35 @@ def lambda_handler(event, context):
 
         for asset in contact_results['Items']:
             clean_data = {k: deserializer.deserialize(v) for k,v in asset.items()}
-
-            balance = get_asset_balance(clean_data,wallet_address)
-
-            # asset_address = w3.toChecksumAddress(asset['address']['S'])
-
             asset_address = asset['address']['S']
 
-            if balance > 0:
-                if asset_address not in asset_obj:
-                    # asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}})
-                    asset_obj[asset_address] = {'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
+            if clean_data['contractType'] == 'erc20':
+                balance = get_asset_balance(clean_data,wallet_address)
 
-                else:
-                    new_balance = float(balance) + float(asset_obj[asset_address]['M']['balance']['N'])
+                if balance > 0:
+                    if asset_address not in asset_obj:
+                        # asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}})
+                        asset_obj[asset_address] = {'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
 
-                    asset_obj[asset_address] = {'M': {'balance':{'N':str(new_balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
+                    else:
+                        new_balance = float(balance) + float(asset_obj[asset_address]['M']['balance']['N'])
+
+                        asset_obj[asset_address] = {'M': {'balance':{'N':str(new_balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
+
+            elif clean_data['contractType'] == 'erc721':
+                balance,tokens = get_asset_balance(clean_data,wallet_address)
+
+
+                if balance > 0:
+                    if asset_address not in asset_obj:
+                        # asset_list.append({'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}})
+                        asset_obj[asset_address] = {'M': {'balance':{'N':str(balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address'],'tokens': {'L': tokens}}}
+
+                    else:
+                        new_balance = float(balance) + float(asset_obj[asset_address]['M']['balance']['N'])
+                        new_tokens = tokens + asset_obj[asset_address]['M']['tokens']['L']
+
+                        asset_obj[asset_address] = {'M': {'balance':{'N':str(new_balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address'],'tokens': {'L': new_tokens}}}
 
 
 

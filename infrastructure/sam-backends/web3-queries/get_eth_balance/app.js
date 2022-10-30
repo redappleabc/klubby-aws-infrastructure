@@ -2,6 +2,7 @@ let response;
 
 const AWS = require('aws-sdk');
 const Web3 = require('web3')
+const axios = require('axios')
 
 const USER_TABLE_SSM_NAME = `user-table-name-${process.env.STAGE}`
 const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
@@ -38,6 +39,14 @@ async function getEthBalance(web3,walletAddress){
     return Web3.utils.fromWei(balance, 'ether')
 }
 
+function decodeIpfsUrl(ipfs_url) {
+    const prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    const hash = ipfs_url.replace(/^ipfs?:\/\//, '')
+    const final_url = prefix + hash
+
+    return final_url
+}
+
 async function getAssetBalance(asset,walletAddress){
     let asset_type = asset.contractType.S
 
@@ -58,14 +67,21 @@ async function getAssetBalance(asset,walletAddress){
             for(let i in balance){
                 try {
                     let tokenId = await contract.methods.tokenOfOwnerByIndex(walletAddress,i).call();
-                    // console.log('tokenId',tokenId)
     
+                    //get token uri from contract
                     let tokenUri = await contract.methods.tokenURI(tokenId).call();
-                    // baseURI = await contract.methods.baseURI().call();
-                    // console.log('tokenUri',tokenUri)
-                    tokens.push({'M': {'tokenId': {'N': tokenId}, 'tokenUri': {'S': tokenUri}} })
+
+                    //decode ipfs uri
+                    let decoddedUrl = decodeIpfsUrl(tokenUri)
+
+                    //get tokem data from uri
+                    let res = await axios.get(decoddedUrl)
+
+                    //decode clean image url from result
+                    let cleanImageUrl = decodeIpfsUrl(res.data.image)
 
 
+                    tokens.push({'M': {'tokenId': {'N': tokenId}, 'tokenUri': {'S': tokenUri},'imageUrl': {'S': cleanImageUrl}} })
                 }
 
                 catch(e){

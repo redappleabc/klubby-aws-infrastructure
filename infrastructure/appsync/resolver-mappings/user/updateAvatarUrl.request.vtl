@@ -2,15 +2,15 @@
     "version" : "2017-02-28",
     "operation" : "UpdateItem",
     "key" : {
-        "username" : $util.dynamodb.toDynamoDBJson($context.arguments.username)
+        "username" : $util.dynamodb.toDynamoDBJson($context.identity.username)
     },
     "update" : {
-        "expression" : "SET wallets = :wallets",
+        "expression" : "SET avatarUrl = :avatarUrl",
         ## "expressionNames": {
         ##     "#url" : "url"
         ## },
         "expressionValues": {
-            ":wallets" : $util.dynamodb.toDynamoDBJson($context.arguments.wallets)
+            ":avatarUrl" : $util.dynamodb.toDynamoDBJson($context.arguments.avatarUrl)
         }
     }
 }

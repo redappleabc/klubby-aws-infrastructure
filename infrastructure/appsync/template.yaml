@@ -1006,15 +1006,15 @@ Resources:
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 
-  UpdateUserResolver:
+  UpdateAvatarUrlResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: Mutation
-      FieldName: updateUser
+      FieldName: updateAvatarUrl
       DataSourceName: !GetAtt UserTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/updateUser.request.vtl
+      RequestMappingTemplateS3Location: resolver-mappings/user/updateAvatarUrl.request.vtl
       ResponseMappingTemplate: |
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)

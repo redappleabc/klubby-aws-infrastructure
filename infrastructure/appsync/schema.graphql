@@ -387,7 +387,7 @@ type Mutation {
 
     setMessageRead(conversationId: ID!, messageId: ID!): MessageRead
 
-    updateUser(username: String!,wallets: String!): User
+    updateAvatarUrl(avatarUrl: String!): User
 
     validateAddress(address: String!,contractType: String!): String
 }

@@ -862,6 +862,20 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
+  GetProfileAvatarByUsernameResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Query
+      FieldName:  getProfileAvatarByUsername
+      DataSourceName: !GetAtt UserTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/getProfileAvatarByUsername.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result.avatarUrl)
+
+
   GetMeResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema

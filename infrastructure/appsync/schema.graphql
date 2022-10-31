@@ -280,6 +280,8 @@ type Query {
 
     getKlubByKlubname(klubname: ID!): UserKlubBridge
 
+    getProfileAvatarByUsername(username: ID!): String
+
     heartbeat(username: ID!): Presence
 
     #get all klubs

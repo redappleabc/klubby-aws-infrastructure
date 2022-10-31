@@ -71,7 +71,7 @@ def get_asset_balance(asset,wallet_address):
             #pull ipfs image url and decode
             imageUrl = decodeIpfsUrl(r['image'])
 
-            tokens.append({'M': {'tokenId': {'N': tokenId}, 'tokenUri': {'S': tokenUri},'imageUrl': {'S': imageUrl}} })
+            tokens.append({'M': {'tokenId': {'N': str(tokenId)}, 'tokenUri': {'S': tokenUri},'imageUrl': {'S': imageUrl}} })
 
 
         return (balance,tokens)

@@ -270,38 +270,39 @@ type ownedAsset{
 
 type Query {
 
-    # get Me
-    getMe: User
-
-    #get user wallets
-    getUserWallets(username: String!): User
-
     getConversationById(conversationId: ID!): Conversation
 
     getKlubByKlubname(klubname: ID!): UserKlubBridge
 
+    # get Me
+    getMe: User
+
     getProfileAvatarByUsername(username: ID!): String
 
-    heartbeat(username: ID!): Presence
+    #get user wallets
+    getUserWallets(username: String!): User
 
-    #get all klubs
-    searchKlubs(klubname: String!): [Klub]
+    heartbeat(username: ID!): Presence
 
     #Scan through all values of type 'MessageConnection'. Use the 'after' and 'before' arguments with the 'nextToken' returned by the 'MessageConnectionConnection' result to fetch pages.
     listMessagesByConversationId(after: String, conversationId: ID!, first: Int): MessageConnection
     listAnnouncementsByKlubname(after: String, klubname: ID!, first: Int): AnnouncementConnection
 
-    #get all the klubs the user belongs to
-    listMyKlubs: [UserKlubBridge]
+    listConversationMembers(conversationId: ID!): [User]
 
     listKlubMembers(klubname: ID!): [User]
-    listConversationMembers(conversationId: ID!): [User]
+
+    #get all the klubs the user belongs to
+    listMyKlubs: [UserKlubBridge]
 
     #get all users
     listUsers: [User]
 
     # get users whose username starts with _username
     searchUsers(username: String!): [User]
+
+    #get all klubs
+    searchKlubs(klubname: String!): [Klub]
 
     status(username: ID!): Presence
 
@@ -319,9 +320,11 @@ type Mutation {
 
     # addUser(username: String!): User
 
-    updateWallets(username: String!,wallets: [String]!): User
+    acceptConversation(conversationId: ID!, username: ID!, acceptTime: String ): UserConversationBridge
 
     connect(username: ID!): Presence
+
+    createAnnouncement(content: String!, klubname: ID!, title: String): Announcement
 
     #Create a Conversation. Use some of the cooked in template functions for UUID and DateTime.
     createConversation: Conversation
@@ -331,17 +334,8 @@ type Mutation {
     website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
-
-    #Edit a klub
-    '''editKlub(klubname: ID!, assetName: String, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
-    website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
-    coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
-
-
     #Create a message in a Conversation.
     createMessage(content: String!, conversationId: ID!): Message
-
-    createAnnouncement(content: String!, klubname: ID!, title: String): Announcement
 
     #creates a presigned url that can be used to upload avatar image
     createKlubAvatarPresignedUrl(klubname: String!): String
@@ -349,14 +343,17 @@ type Mutation {
     #Create a user conversation.
     createUserConversationBridge(conversationId: ID!, username: ID!, name: String, accepted: Boolean): UserConversationBridge
 
-    acceptConversation(conversationId: ID!, username: ID!, acceptTime: String ): UserConversationBridge
-
     disconnect(username: ID!): Presence
 
     disconnected(username: ID!): Presence
 
     #edit announcement in Announcement table
     editAnnouncement(klubname: ID!, id: String!, title: String!,  content: String!): Announcement
+
+    #Edit a klub
+    '''editKlub(klubname: ID!, assetName: String, assetSymbol: String, avatar_url: String!,  description: String!, contractAddress: String!, tokenType: String!,
+    website: String, minimumAmountForMainGroup: String, minimumAmountForWhaleGroup: String, coinmarketcap: String,
+    coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
     #edit message in Messages table
     editMessage(conversationId: ID!, id: String!, content: String!): Message
@@ -367,10 +364,8 @@ type Mutation {
     # Leave given klub for given user
     leaveKlub(klubname: ID!): UserKlubBridge
 
-
     #Delete the Conversation
     removeConversation(conversationId: ID!): Conversation
-
 
     #remove message in Announcement table
     removeAnnouncement(klubname: ID!, id: String!): Announcement
@@ -390,6 +385,8 @@ type Mutation {
     setMessageRead(conversationId: ID!, messageId: ID!): MessageRead
 
     updateAvatarUrl(avatarUrl: String!): User
+
+    updateWallets(username: String!,wallets: [String]!): User
 
     validateAddress(address: String!,contractType: String!): String
 }

@@ -7,7 +7,7 @@
     "attributeValues" : {
         "conversationId": {  "S": "${context.arguments.conversationId}" },
         "content": {  "S": "${context.arguments.content}" },
-        "createdAt": {  "S": "$util.time.nowEpochMilliSeconds()" },
+        "createdAt": {  "N": "$util.time.nowEpochMilliSeconds()" },
         "sender": {  "S": "${context.identity.username}" },
         "isSent": {  "BOOL": true },
         "id": { "S": "$util.time.nowEpochMilliSeconds()-$util.autoId()" },

@@ -2,14 +2,17 @@
     "version" : "2017-02-28",
     "operation" : "Query",
     "query" : {
-        "expression": "conversationId = :id",
+        "expression": "conversationId = :id and id > :read ",
         "expressionValues" : {
             ":id" : {
                 "S" : "${context.source.id}"
+            },
+             ":read" : {
+                "S" : "${context.source.read}"
             }
         }
     },
     "scanIndexForward": false,
-    "limit": #if(${context.arguments.first}) ${context.arguments.first} #else 20 #end,
-    "nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
+    "limit": 30,
+    ##"nextToken": #if(${context.arguments.after}) "${context.arguments.after}" #else null #end
 }

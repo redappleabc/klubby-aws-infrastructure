@@ -1238,6 +1238,22 @@ Resources:
         }
 
 
+
+  ReadConversationResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: "Conversation"
+      FieldName: "read"
+      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/conversation/readConversation.request.vtl
+      ResponseMappingTemplate: |
+        {
+          #if(${context.result.read}) "${context.result.read}" #else "0" #end
+        }
+
+
   AnnouncementsKlubResolver:
     Type: "AWS::AppSync::Resolver"
     DependsOn: Schema

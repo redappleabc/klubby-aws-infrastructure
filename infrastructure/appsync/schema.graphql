@@ -26,8 +26,6 @@ type Conversation {
     createdAt: String
 
     # the lastest read message id
-
-    read: String
     
     #  The Conversation's messages.
     messages(after: String, first: Int): MessageConnection

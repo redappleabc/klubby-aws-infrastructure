@@ -1,17 +1,16 @@
-#set($readCnt = 25)
-#set($unReadCnt = $ctx.prev.result)
-#set($totalCount = $readCnt + $unReadCnt)
 {
     "version" : "2017-02-28",
     "operation" : "Query",
     "query" : {
-        "expression": "conversationId = :id",
+        "expression": "conversationId = :id and id > :read ",
         "expressionValues" : {
             ":id" : {
                 "S" : "${context.source.id}"
+            },
+             ":read" : {
+                "S" : "${ctx.prev.result}"
             }
         }
     },
-    "scanIndexForward": false,
-    "limit": $totalCount
+    "scanIndexForward": false
 }

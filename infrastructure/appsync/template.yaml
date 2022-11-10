@@ -1229,29 +1229,62 @@ Resources:
       ApiId: !GetAtt GraphQLApi.ApiId
       TypeName: "Conversation"
       FieldName: "messages"
-      DataSourceName: !GetAtt MessageTableDataSource.Name
-      RequestMappingTemplateS3Location: resolver-mappings/conversation/messagesConversation.request.vtl
+      Kind: PIPELINE
+      PipelineConfig:
+        Functions:
+          - !GetAtt MessagesGetLastReadMessageIdFunction.FunctionId
+          - !GetAtt MessagesUnReadCountConversationFunction.FunctionId
+          - !GetAtt MessagesConversationFunction.FunctionId
+      RequestMappingTemplate: |
+        {}
       ResponseMappingTemplate: |
         {
-          "messages": $utils.toJson($context.result.items),
-          "nextToken": #if(${context.result.nextToken}) "${context.result.nextToken}" #else null #end
+          "messages": $utils.toJson($ctx.prev.result.items),
+          "nextToken": #if(${ctx.prev.result.nextToken}) "${ctx.prev.result.nextToken}" #else null #end
         }
-
-
-
-  ReadConversationResolver:
-    Type: "AWS::AppSync::Resolver"
+  
+  
+  MessagesConversationFunction:
+    Type: "AWS::AppSync::FunctionConfiguration"
     DependsOn: Schema
     Properties:
       ApiId: !GetAtt GraphQLApi.ApiId
-      TypeName: "Conversation"
-      FieldName: "read"
-      DataSourceName: !GetAtt UserConversationBridgeTableDataSource.Name
+      FunctionVersion: "2018-05-29"
+      Name: getNecessaryMessages
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/conversation/messagesConversation.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+
+  MessagesUnReadCountConversationFunction:
+    Type: AWS::AppSync::FunctionConfiguration
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      FunctionVersion: "2018-05-29"
+      Name: getUnReadMessagesCount
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/conversation/messagesUnReadCountConversation.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result.items.size())
+
+
+  MessagesGetLastReadMessageIdFunction:
+    Type: AWS::AppSync::FunctionConfiguration
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      FunctionVersion: "2018-05-29"
+      Name: getLastReadMessageId
+      DataSourceName: !GetAtt MessageReadTableDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/conversation/readConversation.request.vtl
       ResponseMappingTemplate: |
-        {
-          #if(${context.result.read}) "${context.result.read}" #else "0" #end
-        }
+          #if(!$util.isNullOrEmpty($ctx.result))
+            $util.toJson($ctx.result.messageId)
+          #else 
+            $util.toJson("9")
+          #end
 
 
   AnnouncementsKlubResolver:

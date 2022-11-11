@@ -103,6 +103,15 @@ Resources:
       Description: SSM Parameter for artifacts bucket name
       Tags:
         Environment: !Ref Stage
+  AttachedFilesBucketName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub attaached-files-bucket-name-${Stage}
+      Type: String
+      Value: !Ref AttachedFilesBucket
+      Description: SSM Parameter for attached files bucket name
+      Tags:
+        Environment: !Ref Stage
   KlubAvatarBuckettName:
     Type: AWS::SSM::Parameter
     Properties:

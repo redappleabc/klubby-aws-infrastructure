@@ -106,7 +106,7 @@ Resources:
   AttachedFilesBucketName:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub attaached-files-bucket-name-${Stage}
+      Name: !Sub attached-files-bucket-name-${Stage}
       Type: String
       Value: !Ref AttachedFilesBucket
       Description: SSM Parameter for attached files bucket name

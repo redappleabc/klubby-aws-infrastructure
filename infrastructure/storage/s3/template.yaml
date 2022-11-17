@@ -74,6 +74,18 @@ Resources:
         ServerSideEncryptionConfiguration:
           - ServerSideEncryptionByDefault:
               SSEAlgorithm: AES256
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              # - POST
+              - PUT
+              # - DELETE
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3600
     
   # KlubAvatarBucketPolicy:
   #   Type: AWS::S3::BucketPolicy

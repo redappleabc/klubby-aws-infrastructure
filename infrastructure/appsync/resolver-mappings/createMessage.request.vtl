@@ -7,6 +7,7 @@
     "attributeValues" : {
         "conversationId": {  "S": "${context.arguments.conversationId}" },
         "content": {  "S": "${context.arguments.content}" },
+        "attachedFiles": #if(${context.arguments.attachedFiles}) $util.dynamodb.toListJson(${context.arguments.attachedFiles}) #else { "L": [] } #end,
         "createdAt": {  "N": "$util.time.nowEpochMilliSeconds()" },
         "sender": {  "S": "${context.identity.username}" },
         "isSent": {  "BOOL": true },

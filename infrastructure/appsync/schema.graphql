@@ -141,6 +141,9 @@ type Message {
     #  The message content.
     content: String!
 
+    # The attached files 
+    attachedFiles: [String]
+
     # The original id for a replay messages.
     originalId: ID
 
@@ -337,7 +340,7 @@ type Mutation {
     coingecho: String, dextools: String, telegram: String, discord: String, twitter: String, reddit: String, instagram: String): Klub'''
 
     #Create a message in a Conversation.
-    createMessage(content: String!, conversationId: ID!): Message
+    createMessage(content: String!, conversationId: ID!, attachedFiles: [String]): Message
 
     #creates a presigned url that can be used to upload attached file
     createAttachedFilePresignedUrl(fileName: String!, conversationId: ID!, username: ID!): String

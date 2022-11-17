@@ -1,6 +1,7 @@
 import json
 import boto3
 import os
+import time
 
 s3_client = boto3.client('s3')
 ssm_client = boto3.client('ssm')
@@ -15,10 +16,12 @@ def lambda_handler(event, context):
 
         #Format object_key from event info
         conversationId = event['arguments']['conversationId']
-        messageId = event['arguments']['messageId']
+        username = event['arguments']['username']
         fileName = event['arguments']['fileName']
 
-        object_key=f"attached-files/{conversationId}/{messageId}/{fileName}"
+        createdAt = int(time.time() * 1000)
+
+        object_key=f"attached-files/{conversationId}/{createdAt}/{username}/{fileName}"
 
 
         #get klub table name from ssm

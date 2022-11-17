@@ -15,8 +15,10 @@ def lambda_handler(event, context):
 
         #Format object_key from event info
         conversationId = event['arguments']['conversationId']
+        messageId = event['arguments']['messageId']
+        fileName = event['arguments']['fileName']
 
-        object_key=f"attached-files-avatars/{conversationId}/timestamp"
+        object_key=f"attached-files/{conversationId}/{messageId}/{fileName}"
 
 
         #get klub table name from ssm

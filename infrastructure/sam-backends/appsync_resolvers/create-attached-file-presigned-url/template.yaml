@@ -1,0 +1,53 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  creates s3 presigned url for uploading attached file
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 10
+
+Resources:
+  CreateAttachedFilePresignedUrlFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: create_attached_file_presigned_url/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: S3Access
+            Effect: Allow
+            Action:
+            - s3:*
+            Resource: '*'
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+
+### SSM PARAMS ###
+  CreateKlubAvatarPresignedUrlFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub create-attached-file-presigned-url-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt CreateAttachedFilePresignedUrlFunction.Arn
+      Description: SSM Parameter for user ARN of create attached file presigned url function
+      Tags:
+        Environment: !Ref Stage

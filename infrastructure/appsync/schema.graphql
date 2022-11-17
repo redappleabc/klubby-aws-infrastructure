@@ -339,6 +339,9 @@ type Mutation {
     #Create a message in a Conversation.
     createMessage(content: String!, conversationId: ID!): Message
 
+    #creates a presigned url that can be used to upload attached file
+    createAttachedFilePresignedUrl(conversationId: ID!): String
+
     #creates a presigned url that can be used to upload avatar image
     createKlubAvatarPresignedUrl(klubname: String!): String
 

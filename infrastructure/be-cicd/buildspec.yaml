@@ -34,6 +34,7 @@ phases:
           MessageTableName=message-table-name-$STAGE
           KlubTableName=klub-table-name-$STAGE
           UserPoolId=userpool-id-$STAGE
+          CreateAttachedFilePresignedUrlFunctionArn=create-attached-file-presigned-url-function-arn-$STAGE
           CreateKlubAvatarPresignedUrlFunctionArn=create-klub-avatar-presigned-url-function-arn-$STAGE
           JoinKlubFunctionArn=join-klub-function-arn-$STAGE
           ValidateAddressFunctionArn=validate-address-function-arn-$STAGE

@@ -52,6 +52,10 @@ Parameters:
     Type: AWS::SSM::Parameter::Value<String>
     Default: update-wallets-function-arn-dev
     Description: update wallets function arn
+  CreateAttachedFilePresignedUrlFunctionArn:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: create-attached-file-presigned-url-function-arn-dev
+    Description: create presigned url function arn
   CreateKlubAvatarPresignedUrlFunctionArn:
     Type: AWS::SSM::Parameter::Value<String>
     Default: create-klub-avatar-presigned-url-function-arn-dev
@@ -200,6 +204,17 @@ Resources:
       LambdaConfig:
         LambdaFunctionArn: !Ref UpdateWalletsFunctionArn
 
+  CreateAttachedFilePresignedUrlFunctionDataSource:
+    Type: "AWS::AppSync::DataSource"
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      Name: !Sub CreateAttachedFilePresignedUrl_${Stage}
+      Description: The lambda function to create a presigned url for attached file
+      Type: AWS_LAMBDA
+      ServiceRoleArn: !GetAtt AppSyncLambdaRole.Arn
+      LambdaConfig:
+        LambdaFunctionArn: !Ref CreateAttachedFilePresignedUrlFunctionArn
+
   CreateKlubAvatarPresignedUrlFunctionDataSource:
     Type: "AWS::AppSync::DataSource"
     Properties:
@@ -316,6 +331,18 @@ Resources:
       FieldName: updateWallets
       DataSourceName: !GetAtt UpdateWalletsFunctionDataSource.Name
       RequestMappingTemplateS3Location: resolver-mappings/updateWallets.request.vtl
+      ResponseMappingTemplate: |
+        $utils.toJson($context.result)
+
+  CreateAttachedFilePresignedUrlResolver:
+    Type: "AWS::AppSync::Resolver"
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: createAttachedFilePresignedUrl
+      DataSourceName: !GetAtt CreateAttachedFilePresignedUrlFunctionDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/createAttachedFilePresignedUrl.request.vtl
       ResponseMappingTemplate: |
         $utils.toJson($context.result)
 

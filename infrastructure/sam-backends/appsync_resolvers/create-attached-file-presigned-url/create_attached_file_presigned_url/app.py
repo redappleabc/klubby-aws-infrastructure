@@ -7,8 +7,7 @@ s3_client = boto3.client('s3')
 ssm_client = boto3.client('ssm')
 
 #get stage from env var
-# Stage = os.getenv('STAGE')
-Stage = 'dev'
+Stage = os.getenv('STAGE')
 
 def lambda_handler(event, context):
     try:

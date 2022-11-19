@@ -131,6 +131,16 @@ type Klub {
 
 }
 
+type EmojiReaction {
+    username: String!
+    emojiId: String!
+}
+
+input EmojiReactionInput {
+    username: String!
+    emojiId: String!
+}
+
 type Message {
     #  Generated id for a message -- read-only
     id: ID!
@@ -140,6 +150,9 @@ type Message {
 
     #  The message content.
     content: String!
+
+    #  emoji reactions.
+    reactions: [EmojiReaction]
 
     # The attached files 
     attachedFiles: [String]
@@ -372,6 +385,9 @@ type Mutation {
     # Leave given klub for given user
     leaveKlub(klubname: ID!): UserKlubBridge
 
+    # React to message
+    reactMessage(conversationId: ID!, id: String!, reactions: [EmojiReactionInput]!): Message
+
     #Delete the Conversation
     removeConversation(conversationId: ID!): Conversation
 
@@ -414,7 +430,7 @@ type Subscription  {
 
     #Subscribes to all new messages in a given Conversation.
     subscribeToNewMessage(conversationId: ID!): Message
-    @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage"])
+    @aws_subscribe(mutations:["createMessage","editMessage", "replyMessage", "reactMessage"])
 
     subscribeToNewUserConversationBridge(username:ID!): UserConversationBridge
     @aws_subscribe(mutations: ["createUserConversationBridge"])

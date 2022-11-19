@@ -810,6 +810,20 @@ Resources:
         ## Pass back the result from DynamoDB. **
         $util.toJson($ctx.result)
 
+
+  ReactMessageMutationResolver:
+    Type: AWS::AppSync::Resolver
+    DependsOn: Schema
+    Properties:
+      ApiId: !GetAtt GraphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: reactMessage
+      DataSourceName: !GetAtt MessageTableDataSource.Name
+      RequestMappingTemplateS3Location: resolver-mappings/reactMessage.request.vtl
+      ResponseMappingTemplate: |
+        ## Pass back the result from DynamoDB. **
+        $util.toJson($ctx.result)
+
   EditAnnouncementMutationResolver:
     Type: AWS::AppSync::Resolver
     DependsOn: Schema

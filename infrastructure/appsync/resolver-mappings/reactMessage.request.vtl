@@ -1,0 +1,17 @@
+{
+    "version" : "2017-02-28",
+    "operation" : "UpdateItem",
+    "key" : {
+        "id" : { "S" : "${context.arguments.id}" },
+        "conversationId": {"S" : "${context.arguments.conversationId}"}
+    },
+    "update" : {
+        "expression" : "SET #reactions = :reactions",
+        "expressionNames": {
+            "#reactions" : "reactions"
+        },
+        "expressionValues": {
+            ":reactions" : $util.dynamodb.toDynamoDBJson($context.arguments.reactions)
+        }
+    }
+}

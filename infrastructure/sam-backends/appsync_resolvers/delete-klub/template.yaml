@@ -13,7 +13,7 @@ Parameters:
 
 Globals:
   Function:
-    Timeout: 10
+    Timeout: 30
 
 Resources:
   DeleteKlubFunction:
@@ -37,6 +37,12 @@ Resources:
             Effect: Allow
             Action:
             - ssm:*
+            Resource: '*'
+        - Statement:
+          - Sid: S3Access
+            Effect: Allow
+            Action:
+            - s3:*
             Resource: '*'
       Environment:
         Variables:

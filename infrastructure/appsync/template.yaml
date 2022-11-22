@@ -595,15 +595,15 @@ Resources:
       DataSourceName: !GetAtt KlubTableDataSource.Name
       RequestMappingTemplate: !Sub 
         - |
-          #set($announcementConversationId = $util.autoId())
+          ##set($announcementConversationId = $util.autoId())
           #set($mainConversationId = $util.autoId())
           #set($whaleConversationId = $util.autoId())
           #set($createdAt = "$util.time.nowEpochMilliSeconds()")
           #set($conversations = [])
           #set($announcementConversation = {})
-          $util.qr($announcementConversation.put("id", $announcementConversationId))
-          $util.qr($announcementConversation.put("creator", $context.identity.username))
-          $util.qr($announcementConversation.put("createdAt", $createdAt))
+          ##$util.qr($announcementConversation.put("id", $announcementConversationId))
+          ##$util.qr($announcementConversation.put("creator", $context.identity.username))
+          ##$util.qr($announcementConversation.put("createdAt", $createdAt))
 
           #set($mainConversation = {})
           $util.qr($mainConversation.put("id", $mainConversationId))
@@ -615,7 +615,7 @@ Resources:
           $util.qr($whaleConversation.put("creator", $context.identity.username))
           $util.qr($whaleConversation.put("createdAt", $createdAt))
 
-          $util.qr($conversations.add($util.dynamodb.toMapValues($announcementConversation)))
+          ##$util.qr($conversations.add($util.dynamodb.toMapValues($announcementConversation)))
           $util.qr($conversations.add($util.dynamodb.toMapValues($mainConversation)))
           $util.qr($conversations.add($util.dynamodb.toMapValues($whaleConversation)))
 
@@ -632,7 +632,7 @@ Resources:
           $util.qr($klub.put("avatar_url", {  "S": "$ctx.args.avatar_url" }))
           $util.qr($klub.put("contractAddress", {  "S": "$context.arguments.contractAddress" }))
           $util.qr($klub.put("tokenType", {  "S": "$context.arguments.tokenType" }))
-          $util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
+          ##$util.qr($klub.put("announcementConversationId", {  "S": "$announcementConversationId" }))
           $util.qr($klub.put("mainGroupConversationId", {  "S": "$mainConversationId" }))
           $util.qr($klub.put("whaleGroupConversationId", {  "S": "$whaleConversationId" }))
           

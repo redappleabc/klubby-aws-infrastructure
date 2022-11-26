@@ -40,7 +40,8 @@ async function getEthBalance(web3,walletAddress){
 }
 
 function decodeIpfsUrl(ipfs_url) {
-    const prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    // const prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    const prefix = "https://cloudflare-ipfs.com/ipfs/"
     const hash = ipfs_url.replace(/^ipfs?:\/\//, '')
     const final_url = prefix + hash
 

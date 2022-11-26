@@ -16,7 +16,7 @@ RUN apt-get install -qqy --no-install-recommends \
       curl \
       git-core \
       html2text \
-      openjdk-8-jdk \
+      openjdk-11-jdk \
       libc6-i386 \
       lib32stdc++6 \
       lib32gcc1 \

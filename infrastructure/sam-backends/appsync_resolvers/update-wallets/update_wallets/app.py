@@ -36,7 +36,9 @@ with open('./abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
   
 def decodeIpfsUrl(ipfs_url):
-    prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    # prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    prefix = "https://cloudflare-ipfs.com/ipfs/"
+
     hash = ipfs_url.replace('ipfs://', '')
 
     return prefix + hash

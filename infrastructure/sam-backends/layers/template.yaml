@@ -37,7 +37,7 @@ Resources:
     Properties:
       Name: !Sub lib-layer-arn-${Stage}
       Type: String
-      Value: !GetAtt LibLayer.Arn
+      Value: !Ref LibLayer
       Description: SSM Parameter for lib layer arn
       Tags:
         Environment: !Ref Stage

@@ -19,7 +19,7 @@ Resources:
   CreateKlubAvatarPresignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: create_presigned_url/
+      CodeUri: ../../../../src/functions/create_presigned_url/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:

@@ -19,7 +19,7 @@ Resources:
   DeleteKlubFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: delete_klub/
+      CodeUri: ../../../../src/functions/delete_klub/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:

@@ -17,7 +17,7 @@ Resources:
   CreateAttachedFilePresignedUrlFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../../../src/functions/appsync_resolvers/create_attached_file_presigned_url/
+      CodeUri: ../../../../src/functions/appsync_resolvers/create_presigned_url_attached_file/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:

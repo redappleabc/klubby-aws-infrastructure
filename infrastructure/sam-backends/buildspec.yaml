@@ -8,7 +8,7 @@ phases:
 
     #----Zip and Upload Lib Src-------#
       - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/layers
-      - zip -r lib.zip $CODEBUILD_SRC_DIR
+      - zip -r lib.zip $CODEBUILD_SRC_DIR/src/lib
       - aws s3 cp lib.zip s3://$LAYERS_SRC_BUCKET/lib.zip
 
     # Deploy Layer Stack

@@ -10,7 +10,7 @@ Parameters:
     Description: The deployment stage for this stack. Used to name a variety of different resources.
     Type: String
   SrcBucket:
-    Default: ''
+    # Default: ''
     Description: Bucket with the src code for lib
     Type: String
   # SrcBucket:

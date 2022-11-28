@@ -19,7 +19,9 @@ phases:
         --capabilities CAPABILITY_IAM
         --region us-east-1
         --parameter-overrides
-          Stage=$STAGE,ProjectName=$PROJECT_NAME,SrcBucket=$LAYER_SRC_BUCKET
+          Stage=$STAGE
+          ProjectName=$PROJECT_NAME
+          SrcBucket=$LAYER_SRC_BUCKET
 
     #----Deploy add-new-user Function-------#
       - cd infrastructure/sam-backends/add-new-user

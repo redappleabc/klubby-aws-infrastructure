@@ -18,6 +18,7 @@ phases:
         --stack-name sam-backends-layers-$STAGE
         --capabilities CAPABILITY_IAM
         --region us-east-1
+        --no-fail-on-empty-changeset
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
           ParameterKey=ProjectName,ParameterValue=$PROJECT_NAME

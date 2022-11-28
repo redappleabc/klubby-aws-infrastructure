@@ -59,7 +59,7 @@ def get_asset_balance(asset,wallet_address):
         contract = w3.eth.contract(abi=erc721ABI,address=asset_address)
         balance = contract.functions.balanceOf(wallet_address).call()
 
-        console.log('erc721',asset)
+        print(f'erc721 {asset}')
 
 
         tokens = []
@@ -71,7 +71,7 @@ def get_asset_balance(asset,wallet_address):
             #decode ipfs uri
             decodedUrl = decodeIpfsUrl(tokenUri)
 
-            console.log('decodedUrl',decodedUrl)
+            print(f'decodedUrl {decodedUrl}')
 
             r = requests.get(decodedUrl).json()
 

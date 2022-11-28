@@ -17,7 +17,7 @@ Resources:
   UpdateWalletsFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../../../src/functions/update_wallets/
+      CodeUri: ../../../../src/functions/appsync_resolvers/update_wallets/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:

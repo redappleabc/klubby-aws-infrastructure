@@ -19,7 +19,7 @@ Resources:
   JoinKlubFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: ../../../../src/functions/join_klub/
+      CodeUri: ../../../../src/functions/appsync_resolvers/join_klub/
       Handler: app.lambda_handler
       Runtime: python3.9
       Architectures:

@@ -144,7 +144,7 @@ Resources:
   LayerSrcBucketName:
     Type: AWS::SSM::Parameter
     Properties:
-      Name: !Sub klub-avatar-bucket-name-${Stage}
+      Name: !Sub layer-src-bucket-name-${Stage}
       Type: String
       Value: !Ref LayerSrcBucket
       Description: SSM Parameter for lib src bucket name

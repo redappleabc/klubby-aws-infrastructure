@@ -13,8 +13,8 @@ phases:
 
     # Deploy Layer Stack
       - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/layers
-      - cloudformation deploy
-        --template template.yaml
+      - sam deploy
+        --template-file template.yaml
         --stack-name sam-backends-layers-$STAGE
         --capabilities CAPABILITY_IAM
         --region us-east-1

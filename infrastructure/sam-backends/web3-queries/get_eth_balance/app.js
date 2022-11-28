@@ -40,6 +40,12 @@ async function getEthBalance(web3,walletAddress){
 }
 
 function decodeIpfsUrl(ipfs_url) {
+    // check if ipfs_url starts with "https://"
+    if (ipfs_url.startsWith("https://")) {
+        return ipfs_url
+    }
+
+
     // const prefix = "https://mainnet.infura-ipfs.io/ipfs/"
     const prefix = "https://cloudflare-ipfs.com/ipfs/"
     const hash = ipfs_url.replace(/^ipfs?:\/\//, '')

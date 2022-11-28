@@ -67,6 +67,14 @@ Resources:
       #         - x-amz-id-2
       #         - ETag
 
+  LayerSrcBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+
   AttachedFilesBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -131,5 +139,14 @@ Resources:
       Type: String
       Value: !Ref KlubAvatarBucket
       Description: SSM Parameter for klub avatar bucket name
+      Tags:
+        Environment: !Ref Stage
+  LayerSrcBucketName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub klub-avatar-bucket-name-${Stage}
+      Type: String
+      Value: !Ref LayerSrcBucket
+      Description: SSM Parameter for lib src bucket name
       Tags:
         Environment: !Ref Stage

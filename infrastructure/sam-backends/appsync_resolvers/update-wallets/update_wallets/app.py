@@ -68,6 +68,9 @@ def get_asset_balance(asset,wallet_address):
 
             tokenUri = contract.functions.tokenURI(tokenId).call()
 
+            print(f'tokenUri {tokenUri}')
+
+
             #decode ipfs uri
             decodedUrl = decodeIpfsUrl(tokenUri)
 

@@ -30,3 +30,14 @@ Resources:
       Description: lib layer
       LayerName: lib-layer
       LicenseInfo: MIT
+
+  ### SSM PARAMS ###
+  LibLayerArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub lib-layer-arn-${Stage}
+      Type: String
+      Value: !GetAtt LibLayer.Arn
+      Description: SSM Parameter for lib layer arn
+      Tags:
+        Environment: !Ref Stage

@@ -4,6 +4,23 @@ phases:
   build:
     commands:
       - ARTIFACTS_BUCKET=$(aws ssm get-parameter --name artifacts-bucket-name-$STAGE --region us-east-1 --query Parameter.Value --output text)
+      - LAYERS_SRC_BUCKET=$(aws ssm get-parameter --name layers-src-bucket-name-$STAGE --region us-east-1 --query Parameter.Value --output text)
+
+    #----Zip and Upload Lib Src-------#
+      - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/layers
+      - zip -r lib.zip $CODEBUILD_SRC_DIR
+      - aws s3 cp lib.zip s3://$LAYERS_SRC_BUCKET/lib.zip
+
+    # Deploy Layer Stack
+      - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/layers
+      - cloudformation deploy
+        --template template.yaml
+        --stack-name sam-backends-layers-$STAGE
+        --capabilities CAPABILITY_IAM
+        --region us-east-1
+        --parameter-overrides
+          Stage=$STAGE,ProjectName=$PROJECT_NAME,SrcBucket=$LAYERS_SRC_BUCKET
+
     #----Deploy add-new-user Function-------#
       - cd infrastructure/sam-backends/add-new-user
       - sam build

@@ -8,6 +8,10 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage of build
+  LibLayerArn:
+    Type: String
+    Default: ''
+    Description: Arn of lib layer
 
 Globals:
   Function:
@@ -22,6 +26,8 @@ Resources:
       Runtime: python3.9
       Architectures:
         - x86_64
+      Layers:
+        - !Ref LibLayerArn
       Environment:
         Variables:
           STAGE: !Ref Stage

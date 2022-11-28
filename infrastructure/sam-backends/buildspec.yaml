@@ -23,6 +23,9 @@ phases:
           ParameterKey=ProjectName,ParameterValue=$PROJECT_NAME
           ParameterKey=SrcBucket,ParameterValue=$LAYER_SRC_BUCKET
 
+    #get lib layer arn from ssm
+      - LIB_LAYER_ARN=$(aws ssm get-parameter --name lib-layer-arn-$STAGE --region us-east-1 --query Parameter.Value --output text)
+
     #----Deploy add-new-user Function-------#
       - cd infrastructure/sam-backends/add-new-user
       - sam build
@@ -123,3 +126,4 @@ phases:
         --no-fail-on-empty-changeset
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
+          ParameterKey=LibLayerArn,ParameterValue=$LIB_LAYER_ARN

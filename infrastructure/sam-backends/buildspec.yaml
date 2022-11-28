@@ -27,7 +27,7 @@ phases:
       - LIB_LAYER_ARN=$(aws ssm get-parameter --name lib-layer-arn-$STAGE --region us-east-1 --query Parameter.Value --output text)
 
     #----Deploy add-new-user Function-------#
-      - cd infrastructure/sam-backends/add-new-user
+      - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/add-new-user
       - sam build
       - sam deploy
         --stack-name add-new-user-function-$STAGE

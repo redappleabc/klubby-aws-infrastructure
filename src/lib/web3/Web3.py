@@ -11,11 +11,11 @@ INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 # returns JSON object as
 # a dictionary
 erc20ABI = {}
-with open('abi/erc20Abi.json') as f:
+with open('lib/web3/abi/erc20Abi.json') as f:
     erc20ABI = json.load(f)
 
 erc721ABI = {}
-with open('abi/erc721Abi.json') as f:
+with open('lib/web3/abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
     print('YOYOYOYO')
     print(erc721ABI)

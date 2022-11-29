@@ -19,11 +19,11 @@ print('WEWEWEWE')
 # returns JSON object as
 # a dictionary
 erc20ABI = {}
-with open('lib/web3/abi/erc20Abi.json') as f:
+with open('web3/abi/erc20Abi.json') as f:
     erc20ABI = json.load(f)
 
 erc721ABI = {}
-with open('lib/web3/abi/erc721Abi.json') as f:
+with open('web3/abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
     print('YOYOYOYO')
     print(erc721ABI)

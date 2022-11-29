@@ -6,6 +6,7 @@ phases:
       - ARTIFACTS_BUCKET=$(aws ssm get-parameter --name artifacts-bucket-name-$STAGE --region us-east-1 --query Parameter.Value --output text)
       - LAYER_SRC_BUCKET=$(aws ssm get-parameter --name layer-src-bucket-name-$STAGE --region us-east-1 --query Parameter.Value --output text)
 
+    #TODO move the layer stuff to own step only tiggered on src/lib/
     #----Zip and Upload Lib Src-------#
       - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/layers
       - mkdir python && cp -r $CODEBUILD_SRC_DIR/src/lib python/lib
@@ -26,7 +27,7 @@ phases:
           ParameterKey=SrcBucket,ParameterValue=$LAYER_SRC_BUCKET
 
     # Publish Layer Version and Update SSM Param
-      - LIB_LAYER_ARN=$(aws lambda publish-layer-version --layer-name lib-layer --region us-east-1 --query LayerVersionArn --output text)
+      - LIB_LAYER_ARN=$(aws lambda publish-layer-version --layer-name lib-layer --content S3Bucket=$LAYER_SRC_BUCKET,S3Key=lib.zip --region us-east-1 --query LayerVersionArn --output text)
       - aws ssm put-parameter --name lib-layer-arn-$STAGE --type String --value $LIB_LAYER_ARN --region us-east-1
 
     #get lib layer arn from ssm

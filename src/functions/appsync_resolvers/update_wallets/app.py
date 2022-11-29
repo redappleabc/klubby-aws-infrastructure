@@ -55,8 +55,8 @@ def get_asset_balance(asset,wallet_address):
         asset_address = w3.toChecksumAddress(asset['address']) 
         contract = w3.eth.contract(abi=erc20ABI,address=asset_address)
         balance = contract.functions.balanceOf(wallet_address).call()
-
-        return balance
+        decimal = contract.functions.decimals().call()
+        return balance / 10**decimal 
 
     elif asset['contractType'] == 'erc721':
         asset_address = w3.toChecksumAddress(asset['address']) 

@@ -8,6 +8,14 @@ INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 
 #load abi files
 
+
+#list files in current directory
+import os
+print(os.listdir())
+print('WEWEWEWE')
+
+
+
 # returns JSON object as
 # a dictionary
 erc20ABI = {}

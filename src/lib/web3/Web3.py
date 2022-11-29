@@ -20,6 +20,19 @@ with open('./abi/erc721Abi.json') as f:
     print('YOYOYOYO')
     print(erc721ABI)
 
+
+def decodeIpfsUrl(ipfs_url):
+    #check if string starts with 'https://'
+    if ipfs_url.startswith('https://'):
+        return ipfs_url
+
+    # prefix = "https://mainnet.infura-ipfs.io/ipfs/"
+    prefix = "https://cloudflare-ipfs.com/ipfs/"
+
+    hash = ipfs_url.replace('ipfs://', '')
+
+    return prefix + hash
+
 class Web3Client():
     def __init__(self):
         # self.client = Web3(Web3.HTTPProvider(RPC_URL))
@@ -65,15 +78,3 @@ class Web3Client():
                 tokens.append({'M': {'tokenId': {'N': str(tokenId)}, 'tokenUri': {'S': tokenUri},'imageUrl': {'S': imageUrl}} })
 
             return (balance,tokens)
-
-def decodeIpfsUrl(ipfs_url):
-    #check if string starts with 'https://'
-    if ipfs_url.startswith('https://'):
-        return ipfs_url
-
-    # prefix = "https://mainnet.infura-ipfs.io/ipfs/"
-    prefix = "https://cloudflare-ipfs.com/ipfs/"
-
-    hash = ipfs_url.replace('ipfs://', '')
-
-    return prefix + hash

@@ -1,94 +1,23 @@
-import json
 import os
 import boto3
 from boto3.dynamodb.types import TypeDeserializer
 from boto3.dynamodb.types import TypeSerializer
-from web3 import Web3
-import requests
 
 #get stage from env var
 Stage = os.getenv('STAGE')
 # Stage = 'dev'
 
-ssm_client = boto3.client('ssm')
 dynamodb = boto3.client('dynamodb')
 deserializer = TypeDeserializer()
 serializer = TypeSerializer()
 
+from lib.aws.SSM import SSM
+from lib.Web3 import Web3Client
+from lib.Web3 import decodeIpfsUrl
 
+ssm = SSM()
+web3 = Web3Client()
 
-RPC_URL="http://35.171.16.213:8545"
-INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
-
-# w3 = Web3(Web3.HTTPProvider(RPC_URL))
-w3 = Web3(Web3.HTTPProvider(INFURA_URL))
-
-#load abi files
-  
-# returns JSON object as 
-# a dictionary
-erc20ABI = {}
-with open('./abi/erc20Abi.json') as f:
-    erc20ABI = json.load(f)
-
-erc721ABI = {}
-with open('./abi/erc721Abi.json') as f:
-    erc721ABI = json.load(f)
-  
-def decodeIpfsUrl(ipfs_url):
-    #check if string starts with 'https://'
-    if ipfs_url.startswith('https://'):
-        return ipfs_url
-
-    # prefix = "https://mainnet.infura-ipfs.io/ipfs/"
-    prefix = "https://cloudflare-ipfs.com/ipfs/"
-
-    hash = ipfs_url.replace('ipfs://', '')
-
-    return prefix + hash
-
-def get_asset_balance(asset,wallet_address):
-    # print(asset)
-
-    if asset['contractType'] == 'erc20':
-
-        asset_address = w3.toChecksumAddress(asset['address']) 
-        contract = w3.eth.contract(abi=erc20ABI,address=asset_address)
-        balance = contract.functions.balanceOf(wallet_address).call()
-        decimal = contract.functions.decimals().call()
-        return balance / 10**decimal 
-
-    elif asset['contractType'] == 'erc721':
-        asset_address = w3.toChecksumAddress(asset['address']) 
-        contract = w3.eth.contract(abi=erc721ABI,address=asset_address)
-        balance = contract.functions.balanceOf(wallet_address).call()
-
-        tokens = []
-        for i in range(0,balance):
-            tokenId = contract.functions.tokenOfOwnerByIndex(wallet_address,i).call()
-
-            tokenUri = contract.functions.tokenURI(tokenId).call()
-
-            #decode ipfs uri
-            decodedUrl = decodeIpfsUrl(tokenUri)
-
-            print(f'decodedUrl {decodedUrl}')
-
-            r = requests.get(decodedUrl).json()
-
-            #pull ipfs image url and decode
-            imageUrl = decodeIpfsUrl(r['image'])
-
-            tokens.append({'M': {'tokenId': {'N': str(tokenId)}, 'tokenUri': {'S': tokenUri},'imageUrl': {'S': imageUrl}} })
-
-
-        return (balance,tokens)
-
-def get_eth_balance(wallet_address):
-    wei_eth_balance = w3.eth.get_balance(wallet_address)
-    eth_balance = w3.fromWei(wei_eth_balance, 'ether')
-
-    return eth_balance
 
 def lambda_handler(event, context):
     # print(event)
@@ -96,13 +25,9 @@ def lambda_handler(event, context):
     wallet_list = event['arguments']['wallets']
     username = event['arguments']['username']
     
-    #get user table name from ssm
-    response = ssm_client.get_parameter(Name=f'user-table-name-{Stage}')
-    user_table_name=response['Parameter']['Value']
-
-    #get contract table name from ssm
-    response = ssm_client.get_parameter(Name=f'contract-table-name-{Stage}')
-    contract_table_name=response['Parameter']['Value']
+    #get params from ssm
+    user_table_name = ssm.getParameterValue(f'user-table-name-{Stage}')
+    contract_table_name = ssm.getParameterValue(f'contract-table-name-{Stage}')
 
     #query the table
     results = dynamodb.get_item(TableName=user_table_name, Key={'username':{'S':username}})
@@ -122,7 +47,7 @@ def lambda_handler(event, context):
     asset_obj = {}
 
     for wallet_address in wallet_list:
-        eth_balance = get_eth_balance(wallet_address)
+        eth_balance = web3.get_eth_balance(wallet_address)
 
         if(eth_balance > 0):
             if 'ETH' not in asset_obj:
@@ -139,7 +64,7 @@ def lambda_handler(event, context):
             asset_address = asset['address']['S']
 
             if clean_data['contractType'] == 'erc20':
-                balance = get_asset_balance(clean_data,wallet_address)
+                balance = web3.getAssetBalance(asset=clean_data,wallet_address=wallet_address)
 
                 if balance > 0:
                     if asset_address not in asset_obj:
@@ -152,7 +77,7 @@ def lambda_handler(event, context):
                         asset_obj[asset_address] = {'M': {'balance':{'N':str(new_balance)},'symbol': {'S':asset['symbol']['S']},'name': {'S':asset['name']['S']}, 'contractType': {'S': asset['contractType']['S']}, 'address': asset['address']}}
 
             elif clean_data['contractType'] == 'erc721':
-                balance,tokens = get_asset_balance(clean_data,wallet_address)
+                balance,tokens = web3.getAssetBalance(asset=clean_data,wallet_address=wallet_address)
 
 
                 if balance > 0:

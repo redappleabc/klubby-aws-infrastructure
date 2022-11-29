@@ -28,7 +28,8 @@ phases:
 
     # Publish Layer Version and Update SSM Param
       - LIB_LAYER_ARN=$(aws lambda publish-layer-version --layer-name lib-layer --content S3Bucket=$LAYER_SRC_BUCKET,S3Key=lib.zip --region us-east-1 --query LayerVersionArn --output text)
-      - aws ssm put-parameter --name lib-layer-arn-$STAGE --type String --value $LIB_LAYER_ARN --region us-east-1
+      - aws ssm put-parameter --name lib-layer-arn-$STAGE --type String --value $LIB_LAYER_ARN --region us-east-1 --overwrite
+      #TODO this ssm param is not used anymore, figured good to keep for now
 
     #get lib layer arn from ssm
       # - LIB_LAYER_ARN=$(aws ssm get-parameter --name lib-layer-arn-$STAGE --region us-east-1 --query Parameter.Value --output text)

@@ -12,8 +12,8 @@ deserializer = TypeDeserializer()
 serializer = TypeSerializer()
 
 from lib.aws.SSM import SSM
-from lib.Web3 import Web3Client
-from lib.Web3 import decodeIpfsUrl
+from lib.web3.Web3 import Web3Client
+from lib.web3.Web3 import decodeIpfsUrl
 
 ssm = SSM()
 web3 = Web3Client()

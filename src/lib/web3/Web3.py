@@ -17,6 +17,8 @@ with open('./abi/erc20Abi.json') as f:
 erc721ABI = {}
 with open('./abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
+    print('YOYOYOYO')
+    print(erc721ABI)
 
 class Web3Client():
     def __init__(self):

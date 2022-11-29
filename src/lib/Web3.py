@@ -1,6 +1,6 @@
 from web3 import Web3
 
-class Web3():
+class Web3Client():
     def __init__(self):
         # self.client = Web3(Web3.HTTPProvider(RPC_URL))
         self.client = Web3(Web3.HTTPProvider(INFURA_URL))

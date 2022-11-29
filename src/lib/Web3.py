@@ -23,6 +23,12 @@ class Web3Client():
         # self.client = Web3(Web3.HTTPProvider(RPC_URL))
         self.client = Web3(Web3.HTTPProvider(INFURA_URL))
 
+    def get_eth_balance(wallet_address):
+        wei_eth_balance = self.client.eth.get_balance(wallet_address)
+        eth_balance = self.client.fromWei(wei_eth_balance, 'ether')
+
+        return eth_balance
+
     def getAssetBalance(self,asset,wallet_address):
         # print(asset)
 

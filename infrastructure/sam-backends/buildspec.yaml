@@ -8,7 +8,7 @@ phases:
 
     #----Zip and Upload Lib Src-------#
       - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/layers
-      - mkdir asset-output && cp -r $CODEBUILD_SRC_DIR/src/lib python
+      - mkdir python && cp -r $CODEBUILD_SRC_DIR/src/lib python/lib
       - zip -r lib.zip python
       - aws s3 cp lib.zip s3://$LAYER_SRC_BUCKET/lib.zip
 

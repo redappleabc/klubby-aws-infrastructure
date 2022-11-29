@@ -25,8 +25,12 @@ phases:
           ParameterKey=ProjectName,ParameterValue=$PROJECT_NAME
           ParameterKey=SrcBucket,ParameterValue=$LAYER_SRC_BUCKET
 
+    # Publish Layer Version and Update SSM Param
+      - LIB_LAYER_ARN=$(aws lambda publish-layer-version --layer-name lib-layer --region us-east-1 --query LayerVersionArn --output text)
+      - aws ssm put-parameter --name lib-layer-arn-$STAGE --type String --value $LIB_LAYER_ARN --region us-east-1
+
     #get lib layer arn from ssm
-      - LIB_LAYER_ARN=$(aws ssm get-parameter --name lib-layer-arn-$STAGE --region us-east-1 --query Parameter.Value --output text)
+      # - LIB_LAYER_ARN=$(aws ssm get-parameter --name lib-layer-arn-$STAGE --region us-east-1 --query Parameter.Value --output text)
 
     #----Deploy add-new-user Function-------#
       - cd $CODEBUILD_SRC_DIR/infrastructure/sam-backends/add-new-user

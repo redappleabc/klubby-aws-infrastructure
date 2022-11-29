@@ -11,7 +11,9 @@ INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 
 #list files in current directory
 import os
-print(os.listdir())
+print(os.listdir('/opt'))
+print(os.listdir('/opt/pyhthon'))
+print(os.listdir('/opt/lib'))
 print('WEWEWEWE')
 
 
@@ -19,11 +21,11 @@ print('WEWEWEWE')
 # returns JSON object as
 # a dictionary
 erc20ABI = {}
-with open('web3/abi/erc20Abi.json') as f:
+with open('opt/python/lib/web3/abi/erc20Abi.json') as f:
     erc20ABI = json.load(f)
 
 erc721ABI = {}
-with open('web3/abi/erc721Abi.json') as f:
+with open('opt/python/lib/web3/abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
     print('YOYOYOYO')
     print(erc721ABI)

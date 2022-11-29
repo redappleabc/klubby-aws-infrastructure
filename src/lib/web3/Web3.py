@@ -13,6 +13,9 @@ INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 import os
 print(os.listdir('/opt'))
 print(os.listdir('/opt/python'))
+print(os.listdir('/opt/python/lib'))
+print(os.listdir('/opt/python/lib/web3'))
+print(os.listdir('/opt/python/lib/web3/abi'))
 print('WEWEWEWE')
 
 

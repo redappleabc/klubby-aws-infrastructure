@@ -7,20 +7,7 @@ RPC_URL="http://35.171.16.213:8545"
 INFURA_URL="https://mainnet.infura.io/v3/2b81405266ea4180b99daeff72498e0c"
 
 #load abi files
-
-
-#list files in current directory
-import os
-print(os.listdir('/opt'))
-print(os.listdir('/opt/python'))
-print(os.listdir('/opt/python/lib'))
-print(os.listdir('/opt/python/lib/web3'))
-print(os.listdir('/opt/python/lib/web3/abi'))
-print('WEWEWEWE')
-
-
-
-# returns JSON object as a dictionary
+#TODO can probably just use import
 erc20ABI = {}
 with open('/opt/python/lib/web3/abi/erc20Abi.json') as f:
     erc20ABI = json.load(f)
@@ -28,7 +15,6 @@ with open('/opt/python/lib/web3/abi/erc20Abi.json') as f:
 erc721ABI = {}
 with open('/opt/python/lib/web3/abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
-
 
 def decodeIpfsUrl(ipfs_url):
     #check if string starts with 'https://'

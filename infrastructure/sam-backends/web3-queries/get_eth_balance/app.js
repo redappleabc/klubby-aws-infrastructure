@@ -3,6 +3,7 @@ let response;
 const AWS = require('aws-sdk');
 const Web3 = require('web3')
 const axios = require('axios')
+const BigNumber = require('bignumber.js');
 
 const USER_TABLE_SSM_NAME = `user-table-name-${process.env.STAGE}`
 const CONTRACT_TABLE_SSM_NAME = `contract-table-name-${process.env.STAGE}`
@@ -60,9 +61,11 @@ async function getAssetBalance(asset,walletAddress){
     let balance = -1
     if(asset_type==='erc20'){
         const contract = new web3.eth.Contract(erc20ABI,asset.address.S);
-        balance = await contract.methods.balanceOf(walletAddress).call();
+        const wei_balance = await contract.methods.balanceOf(walletAddress).call();
+        const decimals = await contract.methods.decimals().call()
+        balance = new BigNumber(wei_balance).div(10 ** decimals);
 
-        return ['erc20',balance]
+        return ['erc20',balance.toString()]
     }
 
     else if(asset_type==='erc721'){

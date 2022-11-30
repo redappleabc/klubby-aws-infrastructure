@@ -11,7 +11,8 @@
     "aws-sdk": "^2.1116.0",
     "axios": "^1.1.3",
     "web3": "^1.7.3",
-    "ws": "^8.5.0"
+    "ws": "^8.5.0",
+    "bignumber.js":"9.1.0"
   },
   "scripts": {
     "test": "mocha tests/unit/"

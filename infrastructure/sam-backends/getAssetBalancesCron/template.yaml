@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  get asset balances cron
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+  LibLayerArn:
+    Type: String
+    Default: ''
+    Description: Arn of lib layer
+
+Globals:
+  Function:
+    Timeout: 120
+
+Resources:
+  GetAssetBalancesFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../../src/functions/get_asset_balances_cron/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Layers:
+        - !Ref LibLayerArn
+      Events:
+        CloudWatchEvent:
+          Type: Schedule
+          Properties:
+            Schedule: rate(15 minutes)
+            # Schedule: cron(0 * * * ? *)
+      Policies:
+      #TODO reduce perms
+        - Statement:
+          - Sid: DynamoDBAccess
+            Effect: Allow
+            Action:
+            - dynamodb:*
+            Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+        - Statement:
+          - Sid: SSMAccess
+            Effect: Allow
+            Action:
+            - ssm:*
+            Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+### SSM PARAMS ###
+  GetAssetBalancesFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub get-asset-balances-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt GetAssetBalancesFunction.Arn
+      Description: SSM Parameter for user ARN of get asset balances cron function
+      Tags:
+        Environment: !Ref Stage

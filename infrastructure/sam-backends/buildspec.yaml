@@ -49,18 +49,30 @@ phases:
     #----Deploy landing-page Function-------#
       #not actually deploying this for now
 
-
     #----Deploy web3-queries Function-------#
-      - cd ../web3-queries
+      - cd ../getAssetBalancesCron
       - sam build
       - sam deploy
-        --stack-name klubby-$STAGE-web3-queries
+        --stack-name klubby-$STAGE-get-assets-balances-cron
         --s3-bucket $ARTIFACTS_BUCKET
         --capabilities CAPABILITY_IAM
         --region us-east-1
         --no-fail-on-empty-changeset
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
+          ParameterKey=LibLayerArn,ParameterValue=$LIB_LAYER_ARN
+
+    #----Deploy web3-queries Function-------#
+      # - cd ../web3-queries
+      # - sam build
+      # - sam deploy
+      #   --stack-name klubby-$STAGE-web3-queries
+      #   --s3-bucket $ARTIFACTS_BUCKET
+      #   --capabilities CAPABILITY_IAM
+      #   --region us-east-1
+      #   --no-fail-on-empty-changeset
+      #   --parameter-overrides
+      #     ParameterKey=Stage,ParameterValue=$STAGE
 
   #----Deploy attached-file-presigned-url Function-------#
       - cd ../appsync_resolvers/create-attached-file-presigned-url

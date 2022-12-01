@@ -78,7 +78,7 @@ class Web3Client():
         try:
             print('yoyoyoyoyoshmo')
             #get contract
-            contract = self.client.get_contract(address, erc20ABI)
+            contract = self.client.eth.contract(address=address, abi=erc20ABI)
 
             #get name
             name = contract.functions.name().call()

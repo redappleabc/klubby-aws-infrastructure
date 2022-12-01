@@ -76,7 +76,6 @@ class Web3Client():
 
     def isERC20Contract(self,address):
         try:
-            print('yoyoyoyoyoshmo')
             #get contract
             contract = self.client.eth.contract(address=address, abi=erc20ABI)
 
@@ -97,63 +96,6 @@ class Web3Client():
 
             #get allowance
             allowance = contract.functions.allowance(address, address).call()
-
-            #get owner
-            # owner = contract.functions.owner().call()
-
-            #get paused
-            paused = contract.functions.paused().call()
-
-            #get cap
-            cap = contract.functions.cap().call()
-
-            #get mintingFinished
-            mintingFinished = contract.functions.mintingFinished().call()
-
-            #get minter
-            minter = contract.functions.minter().call()
-
-            #get pauser
-            pauser = contract.functions.pauser().call()
-
-            #get transferOwnership
-            transferOwnership = contract.functions.transferOwnership(address).call()
-
-            #get renounceOwnership
-            renounceOwnership = contract.functions.renounceOwnership().call()
-
-            #get addMinter
-            addMinter = contract.functions.addMinter(address).call()
-
-            #get renounceMinter
-            renounceMinter = contract.functions.renounceMinter().call()
-
-            #get addPauser
-            addPauser = contract.functions.addPauser(address).call()
-
-            #get renouncePauser
-            renouncePauser = contract.functions.renouncePauser().call()
-
-            #get pause
-            pause = contract.functions.pause().call()
-
-            #get unpause
-            unpause = contract.functions.unpause().call()
-
-            #get mint
-            mint = contract.functions.mint(address, 1).call()
-
-            #get finishMinting
-            finishMinting = contract.functions.finishMinting().call()
-
-            #get burn
-            burn = contract.functions.burn(1).call()
-
-            #get burnFrom
-            burnFrom = contract.functions.burnFrom(address, 1).call()
-
-            #get increaseAllowance
-            increaseAllowance = contract.functions.increaseAllow
 
         except Exception as e:
             print(e)

@@ -99,7 +99,7 @@ class Web3Client():
             allowance = contract.functions.allowance(address, address).call()
 
             #get owner
-            owner = contract.functions.owner().call()
+            # owner = contract.functions.owner().call()
 
             #get paused
             paused = contract.functions.paused().call()

@@ -41,7 +41,6 @@ def lambda_handler(event, context):
 
             for wallet in user_item['wallets']['L']:
                 wallet_address = wallet['S']
-                print(f'add {wallet_address}')
 
                 eth_balance = web3.get_eth_balance(wallet_address)
 
@@ -56,7 +55,7 @@ def lambda_handler(event, context):
 
                 for asset in contracts:
                     clean_data = {k: deserializer.deserialize(v) for k,v in asset.items()}
-                    asset_address = asset['address']['S']
+                    asset_address = asset['address']['S'].lower()
 
                     if clean_data['contractType'] == 'erc20':
                         balance = web3.getAssetBalance(asset=clean_data,wallet_address=wallet_address)
@@ -94,8 +93,6 @@ def lambda_handler(event, context):
 
         #update dynamo record
         result = dynamodb.put_item(TableName=user_table_name, Item=user_item)
-
-        print(user_item)
 
 
     return json.dumps({

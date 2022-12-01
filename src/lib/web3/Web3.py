@@ -76,6 +76,7 @@ class Web3Client():
 
     def isERC20Contract(self,address):
         try:
+            print('yoyoyoyoyoshmo')
             #get contract
             contract = self.client.get_contract(address, erc20ABI)
 

@@ -14,14 +14,14 @@ Stage = os.getenv('STAGE')
 
 def lambda_handler(event, context):
     #parse address from event
-    # address = event['arguments']['address']
-    # contractType = event['arguments']['contractType']
+    address = event['arguments']['address']
+    contractType = event['arguments']['contractType']
 
-    address = '0x714599f7604144a3fE1737c440a70fc0fD6503ea' #20
+    # address = '0x714599f7604144a3fE1737c440a70fc0fD6503ea' #20
     # address = '0x95ad61b0a150d79219dcf64e1e6cc01f0b64c4ce' #20
     # address = '0x06012c8cf97BEaD5deAe237070F9587f8E7A266d' #721
     # address = '0x495f947276749Ce646f68AC8c248420045cb7b5e' #1155
-    contractType = 'erc20'
+    # contractType = 'erc20'
 
 
     #check that checksum is valid address

@@ -1,4 +1,5 @@
 from web3 import Web3
+from web3 import utils
 import requests
 import json
 
@@ -33,7 +34,7 @@ class Web3Client():
         self.client = Web3(Web3.HTTPProvider(INFURA_URL))
 
     def isValid(self,address):
-        return self.client.utils.isAddress(address)
+        return utils.isAddress(address)
 
     def get_eth_balance(self,wallet_address):
         wei_eth_balance = self.client.eth.get_balance(wallet_address)

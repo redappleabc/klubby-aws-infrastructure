@@ -95,7 +95,31 @@ class Web3Client():
             balanceOf = contract.functions.balanceOf(address).call()
 
             #get allowance
+            #TODO is this really an erc20 function?
             allowance = contract.functions.allowance(address, address).call()
+
+        except Exception as e:
+            print(e)
+            return False
+
+        return True
+
+    def isERC721Contract(self,address):
+        try:
+            #get contract
+            contract = self.client.eth.contract(address=address, abi=erc721ABI)
+
+            #get name
+            name = contract.functions.name().call()
+
+            #get symbol
+            symbol = contract.functions.symbol().call()
+
+            #get balanceOf
+            balanceOf = contract.functions.balanceOf(address).call()
+
+            #get supportsInterface
+            supportsInterface = contract.functions.supportsInterface('0x80ac58cd').call()
 
         except Exception as e:
             print(e)

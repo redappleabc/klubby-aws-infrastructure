@@ -101,11 +101,10 @@ class Web3Client():
             totalSupply = contract.functions.totalSupply().call()
 
             #get balanceOf
-            balanceOf = contract.functions.balanceOf(address).call()
+            balanceOf = contract.functions.balanceOf("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B").call()
 
             #get allowance
-            #TODO is this really an erc20 function?
-            allowance = contract.functions.allowance(address, address).call()
+            allowance = contract.functions.allowance("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B", "0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B").call()
 
         except Exception as e:
             print(e)
@@ -130,7 +129,7 @@ class Web3Client():
             totalSupply = contract.functions.totalSupply().call()
 
             #get balanceOf
-            balanceOf = contract.functions.balanceOf(address).call()
+            balanceOf = contract.functions.balanceOf("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B").call()
 
             #get supportsInterface
             supportsInterface = contract.functions.supportsInterface('0x80ac58cd').call()

@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  join-klub
+
+  Join a given klub for a given user
+
+Parameters:
+  Stage:
+    Type: String
+    Default: dev
+    Description: Stage of build
+
+Globals:
+  Function:
+    Timeout: 30
+
+Resources:
+  ValidateContractFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: ../../../../src/functions/appsync_resolvers/validate_contract/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Layers:
+        - !Ref LibLayerArn
+      # Policies:
+      # #TODO reduce perms
+      #   - Statement:
+      #     - Sid: DynamoDBAccess
+      #       Effect: Allow
+      #       Action:
+      #       - dynamodb:*
+      #       Resource: !Sub arn:aws:dynamodb:us-east-1:${AWS::AccountId}:table/*
+      #   - Statement:
+      #     - Sid: SSMAccess
+      #       Effect: Allow
+      #       Action:
+      #       - ssm:*
+      #       Resource: '*'
+      Environment:
+        Variables:
+          STAGE: !Ref Stage
+
+### SSM PARAMS ###
+  ValidateContractFunctionArn:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: !Sub validate-contract-function-arn-${Stage}
+      Type: String
+      Value: !GetAtt ValidateContractFunction.Arn
+      Description: SSM Parameter for ARN of validate contract function
+      Tags:
+        Environment: !Ref Stage

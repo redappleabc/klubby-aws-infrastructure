@@ -123,8 +123,8 @@ phases:
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
 
-  #----Deploy validate-address Function-------#
-      - cd ../validate-address
+  #----Deploy validate-contract Function-------#
+      - cd ../validate-contract
       - sam build
       - sam deploy
         --stack-name klubby-$STAGE-validate-address
@@ -134,6 +134,7 @@ phases:
         --no-fail-on-empty-changeset
         --parameter-overrides
           ParameterKey=Stage,ParameterValue=$STAGE
+          ParameterKey=LibLayerArn,ParameterValue=$LIB_LAYER_ARN
 
   #----Deploy update-wallets Function-------#
       - cd ../update-wallets

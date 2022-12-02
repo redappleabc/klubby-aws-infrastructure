@@ -37,7 +37,7 @@ phases:
           CreateAttachedFilePresignedUrlFunctionArn=create-attached-file-presigned-url-function-arn-$STAGE
           CreateKlubAvatarPresignedUrlFunctionArn=create-klub-avatar-presigned-url-function-arn-$STAGE
           JoinKlubFunctionArn=join-klub-function-arn-$STAGE
-          ValidateAddressFunctionArn=validate-address-function-arn-$STAGE
+          ValidateAddressFunctionArn=validate-contract-function-arn-$STAGE
           AnnouncementTableName=announcement-table-name-$STAGE
           MessageReadTableName=message-read-table-name-$STAGE
           UpdateWalletsFunctionArn=update-wallets-function-arn-$STAGE

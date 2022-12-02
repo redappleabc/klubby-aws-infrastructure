@@ -107,9 +107,9 @@ class Web3Client():
 
         except Exception as e:
             print(e)
-            return False, '', ''
+            return False, '', '', 0
 
-        return True, name, symbol
+        return True, name, symbol, totalSupply
 
     def isERC721Contract(self,address):
         try:
@@ -122,6 +122,9 @@ class Web3Client():
             #get symbol
             symbol = contract.functions.symbol().call()
 
+            #get totalSupply
+            totalSupply = contract.functions.totalSupply().call()
+
             #get balanceOf
             balanceOf = contract.functions.balanceOf(address).call()
 
@@ -130,6 +133,6 @@ class Web3Client():
 
         except Exception as e:
             print(e)
-            return False, '', ''
+            return False, '', '', 0
 
-        return True, name, symbol
+        return True, name, symbol, totalSupply

@@ -41,7 +41,7 @@ def lambda_handler(event, context):
     # print(f'isERC721Contract {isERC721Contract}')
     
     if contractType == 'erc20':
-        isERC20Contract, asset_name, symbol = web3.isERC20Contract(address)
+        isERC20Contract, asset_name, symbol, totalSupply = web3.isERC20Contract(address)
 
         if not isERC20Contract:
             return json.dumps({
@@ -52,7 +52,7 @@ def lambda_handler(event, context):
             })
 
     elif contractType == 'erc721':
-        isERC721Contract, asset_name, symbol = web3.isERC721Contract(address)
+        isERC721Contract, asset_name, symbol, totalSupply = web3.isERC721Contract(address)
 
         if not isERC721Contract:
             return json.dumps({
@@ -92,5 +92,10 @@ def lambda_handler(event, context):
         "statusCode": 200,
         "body": {
             "validAddress": True,
+                "contractInfo": {
+                    asset_name,
+                    symbol,
+                    totalSupply
+                }
         },
     })

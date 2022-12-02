@@ -83,8 +83,10 @@ class Web3Client():
 
     def isERC20Contract(self,address):
         try:
+            checksum = self.client.toChecksumAddress(address)
+
             #get contract
-            contract = self.client.eth.contract(address=address, abi=erc20ABI)
+            contract = self.client.eth.contract(address=checksum, abi=erc20ABI)
 
             #get name
             name = contract.functions.name().call()
@@ -113,8 +115,10 @@ class Web3Client():
 
     def isERC721Contract(self,address):
         try:
+            checksum = self.client.toChecksumAddress(address)
+
             #get contract
-            contract = self.client.eth.contract(address=address, abi=erc721ABI)
+            contract = self.client.eth.contract(address=checksum, abi=erc721ABI)
 
             #get name
             name = contract.functions.name().call()

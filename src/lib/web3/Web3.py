@@ -33,7 +33,7 @@ class Web3Client():
         self.client = Web3(Web3.HTTPProvider(INFURA_URL))
 
     def isValid(self,address):
-        checksum = w3.toChecksumAddress(address)
+        checksum = self.client.toChecksumAddress(address)
         return self.client.isAddress(checksum)
 
     def toChecksumAddress(self,address):

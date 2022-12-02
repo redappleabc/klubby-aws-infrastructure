@@ -139,3 +139,28 @@ class Web3Client():
             return False, '', '', 0
 
         return True, name, symbol, totalSupply
+
+    def isERC1155Contract(self,address):
+        try:
+            checksum = self.client.toChecksumAddress(address)
+
+            #get contract
+            contract = self.client.eth.contract(address=checksum, abi=erc1155ABI)
+
+            #get ApprovalForAll
+            ApprovalForAll = contract.functions.ApprovalForAll("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B","0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B",False).call()
+
+            #get balanceOf
+            balanceOf = contract.functions.balanceOf("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B",0).call()
+
+            #get uri
+            uri = contract.functions.uri(0).call()
+
+            #get supportsInterface
+            supportsInterface = contract.functions.supportsInterface('0x80ac58cd').call()
+
+        except Exception as e:
+            print(e)
+            return False
+
+        return True

@@ -100,9 +100,9 @@ class Web3Client():
 
         except Exception as e:
             print(e)
-            return False
+            return False, ''
 
-        return True
+        return True, name
 
     def isERC721Contract(self,address):
         try:
@@ -123,6 +123,6 @@ class Web3Client():
 
         except Exception as e:
             print(e)
-            return False
+            return False, ''
 
-        return True
+        return True, name

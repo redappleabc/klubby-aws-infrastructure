@@ -93,7 +93,7 @@ def lambda_handler(event, context):
         "body": {
             "validAddress": True,
                 "contractInfo": {
-                    "asset_name": asset_name,
+                    "name": asset_name,
                     "symbol": symbol,
                     "totalSupply": totalSupply
                 }

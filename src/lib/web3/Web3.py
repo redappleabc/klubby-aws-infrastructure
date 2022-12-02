@@ -152,7 +152,7 @@ class Web3Client():
             contract = self.client.eth.contract(address=checksum, abi=erc1155ABI)
 
             #get ApprovalForAll
-            ApprovalForAll = contract.functions.ApprovalForAll("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B","0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B",False).call()
+            # ApprovalForAll = contract.functions.ApprovalForAll("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B","0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B",False).call()
 
             #get balanceOf
             balanceOf = contract.functions.balanceOf("0x29D7d1dd5B6f9C864d9db560D72a247c178aE86B",0).call()

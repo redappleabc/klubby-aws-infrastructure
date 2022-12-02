@@ -15,6 +15,10 @@ erc721ABI = {}
 with open('/opt/python/lib/web3/abi/erc721Abi.json') as f:
     erc721ABI = json.load(f)
 
+erc1155ABI = {}
+with open('/opt/python/lib/web3/abi/erc1155Abi.json') as f:
+    erc1155ABI = json.load(f)
+
 def decodeIpfsUrl(ipfs_url):
     #check if string starts with 'https://'
     if ipfs_url.startswith('https://'):

@@ -127,7 +127,7 @@ phases:
       - cd ../validate-contract
       - sam build
       - sam deploy
-        --stack-name klubby-$STAGE-validate-address
+        --stack-name klubby-$STAGE-validate-contract
         --s3-bucket $ARTIFACTS_BUCKET
         --capabilities CAPABILITY_IAM
         --region us-east-1

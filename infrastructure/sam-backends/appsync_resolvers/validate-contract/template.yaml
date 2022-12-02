@@ -10,6 +10,10 @@ Parameters:
     Type: String
     Default: dev
     Description: Stage of build
+  LibLayerArn:
+    Type: String
+    Default: ''
+    Description: Arn of lib layer
 
 Globals:
   Function:
